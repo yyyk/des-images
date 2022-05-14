@@ -4,7 +4,7 @@ pragma solidity 0.8.13;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "./DateTime.sol";
 import "./TokenURI.sol";
@@ -14,10 +14,10 @@ error DesImages__FutureDate();
 error DesImages__NotEnouthETHSent();
 error DesImages__TokenNotForSale();
 error DesImages__TokenNotForBurn();
+error DesImages__CreatorTransferFail();
+error DesImages__OwnerTransferFail();
 
-contract DesImages is ERC721, ERC2981, Ownable {
-    using SafeMath for uint256;
-
+contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
     enum Status {
         FOR_SALE,
         MINTED,
@@ -34,12 +34,10 @@ contract DesImages is ERC721, ERC2981, Ownable {
     uint256 private constant LINEAR_COEFFICIENT = 0.001 ether;
     uint256 private constant RESERVE_CUT_OVER_10000 = 9950; // 99.5%
     uint96 private constant ROYALTY_OVER_10000 = 500; // 5%
-    // uint256 private constant MAX_PER_WALLET_BALANCES = 10;
 
     mapping(uint256 => uint256) private _tokenIndex;
     mapping(address => uint256[]) private _userOwnedTokens;
     mapping(uint256 => TokenValue) private _tokenValues;
-    // mapping(address => uint256) private _walletBalances;
 
     uint256 public totalSupply = 0;
     uint256 public totalEverMinted = 0;
@@ -83,16 +81,6 @@ contract DesImages is ERC721, ERC2981, Ownable {
         if (DateTime.timestampFromDate(year, month, day) > block.timestamp) {
             revert DesImages__FutureDate();
         }
-        // require(
-        //     year >= 2020 &&
-        //         year <= 9999 &&
-        //         DateTime.isValidDate(year, month, day),
-        //     "Invalid Date"
-        // );
-        // require(
-        //     DateTime.timestampFromDate(year, month, day) <= block.timestamp,
-        //     "Cannot be future date"
-        // );
         _;
     }
 
@@ -117,14 +105,6 @@ contract DesImages is ERC721, ERC2981, Ownable {
         paused = false;
     }
 
-    function isOwnerOf(uint32 date, uint128 ciphertext)
-        external
-        view
-        returns (bool)
-    {
-        return ownerOf(_getTokenId(date, ciphertext)) == msg.sender;
-    }
-
     function getTokenStatus(uint32 date, uint128 ciphertext)
         external
         view
@@ -136,16 +116,16 @@ contract DesImages is ERC721, ERC2981, Ownable {
 
     function currentMintPrice() public view returns (uint256) {
         uint256 _totalSupply = totalSupply;
-        return INITIAL_PRICE.add(_totalSupply.mul(LINEAR_COEFFICIENT));
+        return INITIAL_PRICE + _totalSupply * LINEAR_COEFFICIENT;
     }
 
     function currentBurnReward() public view returns (uint256) {
         uint256 _currentMintPrice = currentMintPrice();
-        return _getReserveCut(_currentMintPrice.sub(LINEAR_COEFFICIENT));
+        return _getReserveCut(_currentMintPrice - LINEAR_COEFFICIENT);
     }
 
     function _getReserveCut(uint256 mintPrice) private pure returns (uint256) {
-        return mintPrice.mul(RESERVE_CUT_OVER_10000).div(10000); // 0.5%
+        return (mintPrice * RESERVE_CUT_OVER_10000) / 10000; // 0.5%
     }
 
     function _getTokenId(uint32 date, uint128 ciphertext)
@@ -174,13 +154,37 @@ contract DesImages is ERC721, ERC2981, Ownable {
     }
 
     function getTokenIds() external view returns (uint256[] memory) {
-        // uint256 len = balanceOf(_owner);
-        // uint256[] memory _tokensOfOwner = new uint256[](len);
-        // for (uint256 i = 0; i < len; ++i) {
-        //     _tokensOfOwner[i] = tokenOfOwnerByIndex(_owner, i);
-        // }
-        // return _tokensOfOwner;
         return _userOwnedTokens[msg.sender];
+    }
+
+    function addUserOwnedToken(address user, uint256 tokenId) private {
+        uint256[] storage userOwnedTokens = _userOwnedTokens[user];
+        _tokenIndex[tokenId] = userOwnedTokens.length;
+        userOwnedTokens.push(tokenId);
+    }
+
+    function removeUserOwnedToken(
+        address user,
+        uint256 tokenId,
+        bool isBurn
+    ) private {
+        uint256[] storage userOwnedTokens = _userOwnedTokens[user];
+        uint256 lastTokenIndex = userOwnedTokens.length - 1;
+        uint256 tokenIndex = _tokenIndex[tokenId];
+        if (tokenIndex != lastTokenIndex) {
+            for (uint256 i = tokenIndex; i < lastTokenIndex; ++i) {
+                uint256 _tokenId = userOwnedTokens[i + 1];
+                userOwnedTokens[i] = _tokenId;
+                _tokenIndex[_tokenId] = i;
+            }
+            // uint256 lastTokenId = userOwnedTokens[lastTokenIndex];
+            // userOwnedTokens[tokenIndex] = lastTokenId;
+            // _tokenIndex[lastTokenId] = tokenIndex;
+        }
+        userOwnedTokens.pop();
+        if (isBurn) {
+            delete _tokenIndex[tokenId];
+        }
     }
 
     function _beforeTokenTransfer(
@@ -192,41 +196,14 @@ contract DesImages is ERC721, ERC2981, Ownable {
 
         if (from == address(0)) {
             // mint
-            uint256[] storage userOwnedTokens = _userOwnedTokens[to];
-            _tokenIndex[tokenId] = userOwnedTokens.length;
-            userOwnedTokens.push(tokenId);
+            addUserOwnedToken(to, tokenId);
         } else if (to == address(0)) {
             // burn
-            uint256[] storage userOwnedTokens = _userOwnedTokens[from];
-            uint256 lastTokenIndex = userOwnedTokens.length - 1;
-            uint256 tokenIndex = _tokenIndex[tokenId];
-            if (tokenIndex != lastTokenIndex) {
-                for (uint256 i = tokenIndex; i < lastTokenIndex; ++i) {
-                    uint256 _tokenId = userOwnedTokens[i + 1];
-                    userOwnedTokens[i] = _tokenId;
-                    _tokenIndex[_tokenId] = i;
-                }
-                // uint256 lastTokenId = userOwnedTokens[lastTokenIndex];
-                // userOwnedTokens[tokenIndex] = lastTokenId;
-                // _tokenIndex[lastTokenId] = tokenIndex;
-            }
-            userOwnedTokens.pop();
-            delete _tokenIndex[tokenId];
+            removeUserOwnedToken(from, tokenId, true);
         } else if (from != to) {
             // transfer
-            uint256[] storage userOwnedTokensFrom = _userOwnedTokens[from];
-            uint256 lastTokenIndex = userOwnedTokensFrom.length - 1;
-            uint256 tokenIndex = _tokenIndex[tokenId];
-            for (uint256 i = tokenIndex; i < lastTokenIndex; ++i) {
-                uint256 _tokenId = userOwnedTokensFrom[i + 1];
-                userOwnedTokensFrom[i] = _tokenId;
-                _tokenIndex[_tokenId] = i;
-            }
-            userOwnedTokensFrom.pop();
-
-            uint256[] storage userOwnedTokensTo = _userOwnedTokens[to];
-            _tokenIndex[tokenId] = userOwnedTokensTo.length;
-            userOwnedTokensTo.push(tokenId);
+            removeUserOwnedToken(from, tokenId, false);
+            addUserOwnedToken(to, tokenId);
         }
     }
 
@@ -237,41 +214,43 @@ contract DesImages is ERC721, ERC2981, Ownable {
         address recipient,
         uint32 date,
         uint128 ciphertext
-    ) external payable whenNotPaused validDate(date) returns (uint256) {
-        // require(
-        //     _walletBalances[msg.sender] < MAX_PER_WALLET_BALANCES,
-        //     "Max amount exceeded"
-        // );
-        uint256 mintPrice = currentMintPrice(); //_bondingCurve(totalSupply);
-        // require(msg.value >= mintPrice, "Not enough ETH sent");
+    )
+        external
+        payable
+        nonReentrant
+        whenNotPaused
+        validDate(date)
+        returns (uint256)
+    {
+        uint256 mintPrice = currentMintPrice();
         if (msg.value < mintPrice) {
             revert DesImages__NotEnouthETHSent();
         }
-
         uint256 tokenId = _getTokenId(date, ciphertext);
-        // require(_tokenValues[tokenId].status == Status.FOR_SALE);
         if (_tokenValues[tokenId].status != Status.FOR_SALE) {
             revert DesImages__TokenNotForSale();
         }
         _safeMint(recipient, tokenId);
         _tokenValues[tokenId] = TokenValue(Status.MINTED, ciphertext, date);
-        totalEverMinted = totalEverMinted.add(1);
-        totalSupply = totalSupply.add(1);
-        // _walletBalances[msg.sender] += 1;
+        totalEverMinted += 1;
+        totalSupply += 1;
 
-        payable(owner()).transfer(mintPrice.sub(_getReserveCut(mintPrice)));
-        //// nonReentrant needed
-        // (bool success, ) = payable(owner()).call{
-        //     value: mintPrice.sub(_getReserveCut(mintPrice))
-        // }("");
-        // require(success);
+        // payable(owner()).transfer(mintPrice.sub(_getReserveCut(mintPrice)));
+        (bool success, ) = payable(owner()).call{
+            value: mintPrice - _getReserveCut(mintPrice)
+        }("");
+        if (!success) {
+            revert DesImages__CreatorTransferFail();
+        }
 
         if (msg.value > mintPrice) {
-            payable(msg.sender).transfer(msg.value.sub(mintPrice));
-            // (bool _success, ) = payable(msg.sender).call{
-            //     value: msg.value.sub(mintPrice)
-            // }("");
-            // require(_success, "something went wrong");
+            // payable(msg.sender).transfer(msg.value.sub(mintPrice));
+            (bool _success, ) = payable(msg.sender).call{
+                value: msg.value - mintPrice
+            }("");
+            if (!_success) {
+                revert DesImages__OwnerTransferFail();
+            }
         }
 
         emit Minted(
@@ -285,22 +264,21 @@ contract DesImages is ERC721, ERC2981, Ownable {
         return tokenId;
     }
 
-    function burn(uint256 tokenId) external {
+    function burn(uint256 tokenId) external nonReentrant {
         TokenValue storage tokenValue = _tokenValues[tokenId];
-        // require(tokenValue.status == Status.MINTED);
         if (tokenValue.status != Status.MINTED) {
             revert DesImages__TokenNotForBurn();
         }
-        uint256 burnReward = currentBurnReward(); // _getReserveCut(_bondingCurve(totalSupply - 1));
+        uint256 burnReward = currentBurnReward();
         super._burn(tokenId);
         tokenValue.status = Status.BURNED;
-        totalSupply = totalSupply.sub(1);
-        // _walletBalances[msg.sender] -= 1;
-        payable(msg.sender).transfer(burnReward);
-        // (bool success, ) = payable(msg.sender).call{
-        //     value: _getReserveCut(currentMintPrice())
-        // }("");
-        // require(success, "something went wrong");
+        totalSupply -= 1;
+
+        // payable(msg.sender).transfer(burnReward);
+        (bool success, ) = payable(msg.sender).call{value: burnReward}("");
+        if (!success) {
+            revert DesImages__OwnerTransferFail();
+        }
         emit Burned(msg.sender, tokenId, burnReward, totalSupply);
     }
 }

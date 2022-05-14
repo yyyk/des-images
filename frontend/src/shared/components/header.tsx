@@ -4,10 +4,10 @@ import { useWalletContext } from 'src/shared/contexts/wallet';
 import WalletModal from 'src/shared/components/walletModal';
 
 const Header = () => {
-  const [walletModalOpen, setWalletModalOpen] = useState(false);
   const { pathname, state } = useLocation();
   const navigate = useNavigate();
   const { walletAddress } = useWalletContext();
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
 
   return (
     <header

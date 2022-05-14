@@ -4,7 +4,7 @@ import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { useContractContext } from 'src/shared/contexts/contract';
 // import { useWalletContext } from 'src/shared/contexts/wallet';
 import { getTokenData, isSameTokenData } from 'src/shared/utils/tokenDataHelper';
-import { getTokenIds, getTokenStatus, isOwnerOf, tokenURI } from '../services/contract';
+import { getTokenIds, getTokenStatus, isOwnerOf, tokenURI } from 'src/shared/services/contract';
 
 interface ContextState {
   tokenData: TokenData[];

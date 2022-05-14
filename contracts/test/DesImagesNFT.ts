@@ -504,5 +504,4 @@ describe("DesImages", function () {
   // paused
   // unpaused
   // .ownerOf(tokenId)
-  // .isOwnerOf(date, BigNumber.from(value))
 });

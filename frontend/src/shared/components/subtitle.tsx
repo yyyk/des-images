@@ -15,10 +15,10 @@ const Subtitle = () => {
         <>
           <h5 className="mt-0 mb-3">The total supply amount governs the mint price.</h5>
           <ul>
-            <li>The very first token costs 0.01 ETH. Every mint raises the price by 0.001 ETH.</li>
+            <li>The very first token costs 0.01 ETH. Every mint raises the token's price by 0.001 ETH.</li>
             <li>99.5% of the mint price is stored in the contract, while 0.5% goes to the creator.</li>
             <li className="mb-0">
-              The burn rewards the owner of the token the amount equals to 99.5% of last mint price.
+              Burning a token rewards the owner of the token the amount equals to 99.5% of last mint price.
             </li>
           </ul>
         </>
