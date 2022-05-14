@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Modal from './modal';
+import Modal from 'src/shared/components/modal';
 
 const Subtitle = () => {
   const [open, setOpen] = useState(false);

@@ -1,25 +1,27 @@
 import { ethers } from 'ethers';
 import { createContext, ReactNode, useContext } from 'react';
-import { useWallet } from 'src/shared/hooks/useWallet';
+import { useWallet } from 'src/shared/hooks/wallet';
 
 interface ContextState {
   signer: ethers.providers.JsonRpcSigner | null;
   provider: ethers.providers.ExternalProvider | ethers.providers.JsonRpcFetchFunc | null;
+  providers: any[]; // TODO:
   isWalletInstalled: boolean;
   walletAddress: string;
-  connectWallet: () => void;
+  connectWallet: (provider: any) => void;
 }
 
 const WalletContext = createContext({} as ContextState);
 
 const WalletContextProvider = ({ children }: { children: ReactNode }) => {
-  const { provider, signer, isWalletInstalled, walletAddress, connectWallet } = useWallet();
+  const { providers, provider, signer, isWalletInstalled, walletAddress, connectWallet } = useWallet();
 
   return (
     <WalletContext.Provider
       value={{
         signer,
         provider,
+        providers,
         isWalletInstalled,
         walletAddress,
         connectWallet,

@@ -194,15 +194,8 @@ export function isValidPlaintext(plaintext: string): boolean {
   return true;
 }
 
-const hexNums = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-
 export function isValidCiphertext(ciphertext: string): boolean {
-  for (let i = 0; i < ciphertext.length; i++) {
-    if (hexNums.indexOf(ciphertext.charAt(i).toLowerCase()) === -1) {
-      return false;
-    }
-  }
-  return true;
+  return new RegExp(/^0x[0-9a-f]*$/, 'gi').test(ciphertext);
 }
 
 export function generateDateString(year: number, month: number, date: number): string {
@@ -224,14 +217,14 @@ export function decrypt(key: string, ciphertext: string): string {
   if (key.length !== 8) {
     throw new Error('key has to be 8 char long');
   }
+  if (!isValidCiphertext(ciphertext.length === 32 ? `0x${ciphertext}` : ciphertext)) {
+    throw new Error('invalid ciphertext');
+  }
   if (ciphertext.length % 8 === 2 && new RegExp(/^0x/).test(ciphertext)) {
     ciphertext = ciphertext.slice(2);
   }
   if (ciphertext.length !== 32) {
     throw new Error('invalid ciphertext length');
-  }
-  if (!isValidCiphertext(ciphertext)) {
-    throw new Error('invalid ciphertext');
   }
   const decyptionKey = genKey(key).reverse();
   return BinaryArrToString(encode(ciphertext, decyptionKey, false));

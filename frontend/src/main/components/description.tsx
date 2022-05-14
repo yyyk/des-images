@@ -7,7 +7,7 @@ const Description = () => (
       </a>
       's telegram series, the plaintext{' '}
       <b>
-        <i>I am still alive</i>
+        <i>i am still alive</i>
       </b>
       , 16{' '}
       <a className="link" href="https://en.wikipedia.org/wiki/ISO/IEC_8859-1" target="_blank" rel="noreferrer">

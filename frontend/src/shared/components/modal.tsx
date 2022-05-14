@@ -1,6 +1,6 @@
 import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useThemeContext } from '../contexts/theme';
+import { useThemeContext } from 'src/shared/contexts/theme';
 
 const focusableElements =
   'a[href]:not(.disabled), button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled])';
@@ -12,7 +12,7 @@ interface ModalProps {
   onClose: () => void;
 }
 
-const Modal = ({ children, open, disableClose = true, onClose }: ModalProps) => {
+const Modal = ({ children, open, disableClose = false, onClose }: ModalProps) => {
   const { theme } = useThemeContext();
   const [wrapperElement, setWrapperElement] = useState<HTMLElement | null>(null);
   const overlayRef = useRef(null as null | HTMLDivElement);
@@ -23,10 +23,23 @@ const Modal = ({ children, open, disableClose = true, onClose }: ModalProps) => 
     setWrapperElement(element ?? null);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    }
+  }, [open]);
+
   const handleClose = (e: MouseEvent | KeyboardEvent) => {
     e.preventDefault();
     e.stopPropagation();
     (lastActiveElementRef?.current as HTMLElement)?.focus();
+    document.body.style.overflow = '';
     onClose();
   };
 
@@ -71,7 +84,7 @@ const Modal = ({ children, open, disableClose = true, onClose }: ModalProps) => 
 
   const handleOverlayClick = (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
-    if (disableClose && e.target && overlayRef?.current === e.target) {
+    if (!disableClose && e.target && overlayRef?.current === e.target) {
       handleClose(e);
     }
   };
@@ -86,13 +99,13 @@ const Modal = ({ children, open, disableClose = true, onClose }: ModalProps) => 
       <div
         ref={overlayRef}
         data-theme={theme}
-        className={`modal ${disableClose ? 'cursor-pointer' : ''}`}
-        onClick={disableClose ? handleOverlayClick : undefined}
+        className={`modal ${!disableClose ? 'cursor-pointer' : ''}`}
+        onClick={handleOverlayClick}
       >
         <div className="modal-box prose relative cursor-default px-10 py-12" aria-modal="true">
           <div>{children}</div>
           <button
-            className="btn btn-sm btn-circle absolute right-2 top-2"
+            className="btn btn-sm btn-circle btn-outline absolute right-2 top-2"
             onClick={handleClose}
             aria-label="Close modal"
           >

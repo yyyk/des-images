@@ -11,6 +11,9 @@ export interface TokenData {
   dateHex: string;
   ciphertext: string;
   plaintext?: string;
+  status?: TOKEN_STATUS;
+  isOwner?: boolean;
+  tokenId?: string;
 }
 
 export interface PreviewFormData {

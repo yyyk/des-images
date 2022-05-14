@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useThemeContext } from 'src/shared/contexts/theme';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import DesImageCard from 'src/shared/components/desImageCard';
@@ -7,29 +6,23 @@ import Stats from 'src/shared/components/stats';
 import Subtitle from 'src/shared/components/subtitle';
 import { PreviewFormData, TokenData } from 'src/shared/interfaces';
 import Description from 'src/mod/components/description';
-import PreviewForm from './components/previewForm';
-import { getTokenData } from 'src/shared/utils/getTokenData';
-import { DEFAULT_DATE, DEFAULT_PLAINTEXT } from './constants';
+import ModPreviewForm from 'src/shared/components/modPreviewForm';
+import { getTokenData } from 'src/shared/utils/tokenDataHelper';
+import { destructDateInputValue } from 'src/shared/utils/destructDateInputValue';
+import { DEFAULT_DATE } from 'src/shared/constants';
+import { DEFAULT_PLAINTEXT } from 'src/mod/constants';
 
 const Mod = () => {
   const { setTheme } = useThemeContext();
-  const { isWalletInstalled, walletAddress, connectWallet } = useWalletContext();
+  const { walletAddress } = useWalletContext();
   const [tokenData, setTokenData] = useState<TokenData | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setTheme('black');
-    const arr = DEFAULT_DATE.split('-');
-    const year = arr[0];
-    const month = arr[1].padStart(2, '0');
-    const day = arr[2].padStart(2, '0');
-    setTokenData(getTokenData({ year, month, day, plaintext: DEFAULT_PLAINTEXT }));
+    setTokenData(getTokenData({ ...destructDateInputValue(DEFAULT_DATE), plaintext: DEFAULT_PLAINTEXT }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleConnectWallet = async () => {
-    connectWallet();
-  };
 
   const handleOnPreview = ({ year, month, day, plaintext, ciphertext }: PreviewFormData) => {
     setTokenData(getTokenData({ year, month, day, plaintext, ciphertext }));
@@ -40,30 +33,7 @@ const Mod = () => {
 
   return (
     <>
-      <header className="flex justify-between items-center flex-wrap">
-        <div className="flex justify-start items-end">
-          <h1 className="m-0">desImages</h1>
-          <div className="tooltip tooltip-bottom ml-1" data-tip="go back to official!">
-            <Link className="badge badge-outline font-normal no-underline" to="/">
-              mod
-            </Link>
-          </div>
-        </div>
-        {/* {isWalletInstalled && (
-          <div>
-            {walletAddress.length > 0 ? (
-              <span>{`Connected: ${String(walletAddress).substring(0, 6)}...${String(walletAddress).substring(
-                38,
-              )}`}</span>
-            ) : (
-              <button className="btn" onClick={handleConnectWallet}>
-                Connect Wallet
-              </button>
-            )}
-          </div>
-        )} */}
-      </header>
-      <div className="w-2/3 mx-auto mt-10">
+      <div className="w-2/3 mx-auto mt-0">
         <DesImageCard
           tokenData={{
             day: '1',
@@ -85,8 +55,8 @@ const Mod = () => {
       <div className="mt-10">
         <Description />
       </div>
-      <div className="mt-7">
-        <PreviewForm onSubmit={handleOnPreview} />
+      <div className="w-full mx-auto mt-7">
+        <ModPreviewForm onSubmit={handleOnPreview} defaultPlaintext="i slept a lot..." />
       </div>
       {tokenData && (
         <div ref={scrollRef} className="w-2/3 mx-auto mt-4 mb-5">

@@ -1,7 +1,21 @@
 import { useContractContext } from 'src/shared/contexts/contract';
+import { useEffect } from 'react';
 
 const Stats = () => {
-  const { totalEverMinted, totalSupply, cost } = useContractContext();
+  const { totalEverMinted, totalSupply, mintPrice, updateTotalEverMinted, updateTotalSupply, updateMintPrice } =
+    useContractContext();
+
+  useEffect(() => {
+    updateTotalEverMinted();
+    updateTotalSupply();
+    updateMintPrice();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!totalEverMinted || !totalSupply || !mintPrice) {
+    return null;
+  }
+
   return (
     <div className="stats stats-vertical md:stats-horizontal shadow w-full">
       <div className="stat">
@@ -51,7 +65,7 @@ const Stats = () => {
           </svg>
         </div>
         <div className="stat-title">Current Mint Price</div>
-        <div className="stat-value">{cost} ETH</div>
+        <div className="stat-value">{mintPrice} ETH</div>
       </div>
     </div>
   );

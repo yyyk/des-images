@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useThemeContext } from 'src/shared/contexts/theme';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { PreviewFormData, TokenData } from 'src/shared/interfaces';
@@ -9,12 +8,12 @@ import Description from 'src/main/components/description';
 import Supplement from 'src/main/components/supplement';
 import DesImageCard from 'src/shared/components/desImageCard';
 import Subtitle from 'src/shared/components/subtitle';
-import PreviewForm from 'src/main/components/previewForm';
-import { getTokenData } from 'src/shared/utils/getTokenData';
+import PreviewForm from 'src/shared/components/previewForm';
+import { getTokenData } from 'src/shared/utils/tokenDataHelper';
 
 const Main = () => {
   const { setTheme } = useThemeContext();
-  const { isWalletInstalled, walletAddress, connectWallet } = useWalletContext();
+  const { walletAddress } = useWalletContext();
   const [tokenData, setTokenData] = useState<TokenData>(defaultTokenData);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -22,10 +21,6 @@ const Main = () => {
     setTheme('lofi');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleConnectWallet = async () => {
-    connectWallet();
-  };
 
   const handleOnPreview = ({ year, month, day }: PreviewFormData) => {
     setTokenData(getTokenData({ year, month, day }));
@@ -36,30 +31,7 @@ const Main = () => {
 
   return (
     <>
-      <header className="flex justify-between items-center flex-wrap">
-        <div className="flex justify-start items-end">
-          <h1 className="m-0">desImages</h1>
-          <div className="tooltip tooltip-bottom ml-1" data-tip="try mod?">
-            <Link className="badge badge-ghost font-normal no-underline" to="/mod">
-              official
-            </Link>
-          </div>
-        </div>
-        {/* {isWalletInstalled && (
-          <div>
-            {walletAddress.length > 0 ? (
-              <span>{`Connected: ${String(walletAddress).substring(0, 6)}...${String(walletAddress).substring(
-                38,
-              )}`}</span>
-            ) : (
-              <button className="btn" onClick={handleConnectWallet}>
-                Connect Wallet
-              </button>
-            )}
-          </div>
-        )} */}
-      </header>
-      <div className="w-2/3 mx-auto mt-10">
+      <div className="w-2/3 mx-auto mt-0">
         <DesImageCard
           tokenData={{
             day: '1',
@@ -81,7 +53,7 @@ const Main = () => {
       <div className="mt-10">
         <Description />
       </div>
-      <div className="mt-7">
+      <div className="w-2/3 mx-auto mt-7">
         <PreviewForm onSubmit={handleOnPreview} />
       </div>
       <div ref={scrollRef} className="w-2/3 mx-auto mt-12">
