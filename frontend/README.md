@@ -74,3 +74,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 - Wallet modal
 - Check chain ID
 - Footer
+- index.html
