@@ -2,7 +2,6 @@ import { BigNumber, ethers } from 'ethers';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { useContractContext } from 'src/shared/contexts/contract';
-// import { useWalletContext } from 'src/shared/contexts/wallet';
 import { getTokenData, isSameTokenData } from 'src/shared/utils/tokenDataHelper';
 import { getTokenIds, getTokenStatus, isOwnerOf, tokenURI } from 'src/shared/services/contract';
 
@@ -18,28 +17,23 @@ const CatalogContext = createContext({} as ContextState);
 
 const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   const { contract } = useContractContext();
-  // const { walletAddress } = useWalletContext();
   const [tokenData, setTokenData] = useState<TokenData[]>([]);
   const [ownedTokenData, setOwnedTokenData] = useState<TokenData[]>([]);
 
   useEffect(() => {
     async function updateTokenDataStatus() {
-      if (!contract) {
-        setTokenData([]);
-        return;
-      }
       const result = [];
       for (const data of tokenData) {
         if (data) {
           let _data: TokenData = { ...data };
           if (data.status === undefined || data.status === null) {
-            const status = (await getTokenStatus(contract, data.dateHex, data.ciphertext)) ?? undefined;
+            const status = (contract && (await getTokenStatus(contract, data.dateHex, data.ciphertext))) ?? undefined;
             _data = { ..._data, status };
           }
           if (data.isOwner === undefined || data.isOwner === null) {
             const isOwner =
               data.status === TOKEN_STATUS.MINTED
-                ? (await isOwnerOf(contract, data.dateHex, data.ciphertext)) ?? false
+                ? (contract && (await isOwnerOf(contract, data.dateHex, data.ciphertext))) ?? false
                 : false;
             const tokenId = isOwner
               ? ethers.utils.solidityKeccak256(
@@ -97,19 +91,12 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       }
       setOwnedTokenData([]);
     }
-    if (contract) {
-      updateTokenDataStatus();
-      fetchOwnedTokenData();
-      // setTimeout(() => {
-      // });
-    }
+    updateTokenDataStatus();
+    fetchOwnedTokenData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
 
   const add = async (data: TokenData) => {
-    if (!contract) {
-      return false;
-    }
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, data));
     if (index < 0) {
       const index = ownedTokenData.findIndex((_data) => isSameTokenData(_data, data));
@@ -117,10 +104,10 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
         setTokenData([{ ...ownedTokenData[index] }, ...tokenData]);
         return true;
       }
-      const status = (await getTokenStatus(contract, data.dateHex, data.ciphertext)) ?? undefined;
+      const status = (contract && (await getTokenStatus(contract, data.dateHex, data.ciphertext))) ?? undefined;
       const isOwner =
         status === TOKEN_STATUS.MINTED
-          ? (await isOwnerOf(contract.current, data.dateHex, data.ciphertext)) ?? false
+          ? (contract && (await isOwnerOf(contract.current, data.dateHex, data.ciphertext))) ?? false
           : false;
       const tokenId = isOwner
         ? ethers.utils.solidityKeccak256(

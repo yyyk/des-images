@@ -61,11 +61,11 @@ const DesImageCard = ({
       </div>
       <div className={`card-body !gap-0 ${onMint && status === TOKEN_STATUS.FOR_SALE ? '!pb-5' : ''}`}>
         {onMint && status !== undefined && status !== null && (
-          <div className="badge badge-md badge-outline mb-2">
+          <div className="badge badge-md badge-outline mb-1">
             {status === TOKEN_STATUS.MINTED ? 'Minted' : status === TOKEN_STATUS.BURNED ? 'Burned' : 'Available'}
           </div>
         )}
-        <h2 className="card-title !mt-0 !mb-0.5">{date}</h2>
+        <h2 className="card-title !my-0">{date}</h2>
         {showPlaintext && <p className="w-full overflow-hidden text-ellipsis m-0 mb-2">{tokenData.plaintext}</p>}
         {/* {showCiphertext && <p className="w-full overflow-hidden text-ellipsis m-0 mb-2">{tokenData.ciphertext}</p>} */}
         {onMint && status === TOKEN_STATUS.FOR_SALE && (

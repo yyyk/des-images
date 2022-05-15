@@ -39,7 +39,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   const [contract, setContract] = useState<Contract | null>(null);
   // const contract = useRef<Contract | null>(null);
   // const contractWithSigner = useRef<Contract | null>(null);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
   const [totalEverMinted, setTotalEverMinted] = useState('');
   const [totalSupply, setTotalSupply] = useState('');
   const [mintPrice, setMintPrice] = useState('');

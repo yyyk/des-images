@@ -3,12 +3,14 @@ import DesImageCard from 'src/shared/components/desImageCard';
 import ModPreviewForm from 'src/shared/components/modPreviewForm';
 import { useCatalogContext } from 'src/shared/contexts/catalog';
 import { useThemeContext } from 'src/shared/contexts/theme';
+import { useWalletContext } from 'src/shared/contexts/wallet';
 import { PreviewFormData } from 'src/shared/interfaces';
 import { getTokenData } from 'src/shared/utils/tokenDataHelper';
 
 const Catalog = () => {
   const { setTheme } = useThemeContext();
   const { tokenData, ownedTokenData, add, minted, burned } = useCatalogContext();
+  const { walletAddress } = useWalletContext();
   const [tabIndex, setTabIndex] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
   const timeoutRef = useRef<any>(null);
@@ -39,9 +41,21 @@ const Catalog = () => {
           <button className={`tab tab-bordered ${tabIndex === 0 ? 'tab-active' : ''}`} onClick={() => setTabIndex(0)}>
             Catalog
           </button>
-          <button className={`tab tab-bordered ${tabIndex === 1 ? 'tab-active' : ''}`} onClick={() => setTabIndex(1)}>
-            Collection
-          </button>
+          {!walletAddress ? (
+            <div className="tooltip tooltip-top" data-tip="Please connect wallet">
+              <button
+                className={`tab tab-bordered ${tabIndex === 1 ? 'tab-active' : ''} disabled:pointer-events-none`}
+                onClick={() => setTabIndex(1)}
+                disabled={!walletAddress}
+              >
+                Collection
+              </button>
+            </div>
+          ) : (
+            <button className={`tab tab-bordered ${tabIndex === 1 ? 'tab-active' : ''}`} onClick={() => setTabIndex(1)}>
+              Collection
+            </button>
+          )}
         </div>
         <div className="flex nowrap overflow-x-clip px-6 -mx-6">
           <div

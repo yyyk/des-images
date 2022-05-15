@@ -19,18 +19,25 @@ const Header = () => {
           {pathname === '/' ? (
             'desImages'
           ) : (
-            <Link className="font-extrabold text-inherit no-underline hover:underline" to="/">
+            <Link className="block font-extrabold text-inherit no-underline hover:underline" to="/">
               desImages
             </Link>
           )}
         </h1>
-        <div className="tooltip tooltip-bottom ml-1" data-tip={pathname !== '/mod' ? 'mod?' : 'back to official'}>
+        <div
+          className="tooltip tooltip-bottom ml-1 mb-0.5"
+          data-tip={pathname !== '/mod' ? 'mod?' : 'back to official'}
+        >
           {pathname !== '/mod' ? (
-            <Link className="badge badge-ghost font-normal no-underline" to="/mod" state={{ previousPath: pathname }}>
+            <Link
+              className="block badge badge-ghost font-normal no-underline"
+              to="/mod"
+              state={{ previousPath: pathname }}
+            >
               official
             </Link>
           ) : (
-            <Link className="badge badge-outline font-normal no-underline" to="/">
+            <Link className="block badge badge-outline font-normal no-underline" to="/">
               mod
             </Link>
           )}
