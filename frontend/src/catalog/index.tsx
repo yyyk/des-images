@@ -68,7 +68,7 @@ const Catalog = () => {
                 tabIndex === 0 ? 'h-full' : 'h-0 overflow-hidden'
               }`}
             >
-              <div className="pt-4 pb-12">
+              <div className="pt-4 pb-11">
                 <ModPreviewForm onSubmit={handleOnPreview} defaultPlaintext="i am still alive" showHint={true} />
               </div>
               <ul className={`list-none p-0 grid gap-8 grid-cols-2 grid-rows-${Math.ceil(tokenData.length / 2)} mt-0`}>
