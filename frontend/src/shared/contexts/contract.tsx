@@ -46,7 +46,9 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   const [burnPrice, setBurnPrice] = useState('');
 
   useEffect(() => {
-    if (!isWalletInstalled || !signer) {
+    if (!isWalletInstalled || !walletAddress || !signer) {
+      contract && contract.removeAllListeners();
+      setContract(null);
       return;
     }
     const newContract = new ethers.Contract(CONTRACT_ADDRESS, DesImages.abi, signer);
@@ -55,7 +57,8 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       newContract.removeAllListeners();
     };
-  }, [isWalletInstalled, signer]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWalletInstalled, signer, walletAddress]);
 
   // useEffect(() => {
   //   if (!walletAddress || !signer) {

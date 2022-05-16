@@ -9,6 +9,7 @@ interface DesImageCardProps {
   tokenData: TokenData;
   showPlaintext?: boolean;
   showCiphertext?: boolean;
+  onRemove?: () => void;
   onMint?: (result: boolean) => void;
   onBurn?: (result: boolean) => void;
 }
@@ -17,6 +18,7 @@ const DesImageCard = ({
   tokenData,
   showPlaintext = false,
   showCiphertext = false,
+  onRemove,
   onMint,
   onBurn,
 }: DesImageCardProps) => {
@@ -50,6 +52,10 @@ const DesImageCard = ({
     }
   };
 
+  const handleRemove = () => {
+    onRemove && onRemove();
+  };
+
   return (
     <div
       className={`h-full card card-compact${
@@ -59,7 +65,20 @@ const DesImageCard = ({
       <div>
         <DesImageSvg date={date} ciphertext={tokenData.ciphertext} />
       </div>
-      <div className={`card-body !gap-0 ${onMint && status === TOKEN_STATUS.FOR_SALE ? '!pb-5' : ''}`}>
+      <div className={`relative card-body !gap-0 ${onMint && status === TOKEN_STATUS.FOR_SALE ? '!pb-5' : ''}`}>
+        {onRemove && (
+          <button className="btn btn-square btn-sm absolute right-4 top-4" onClick={handleRemove}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
         {onMint && status !== undefined && status !== null && (
           <div className="badge badge-md badge-outline mb-1">
             {status === TOKEN_STATUS.MINTED ? 'Minted' : status === TOKEN_STATUS.BURNED ? 'Burned' : 'Available'}

@@ -132,6 +132,12 @@ export const useWallet = () => {
     }
   }, [provider]);
 
+  useEffect(() => {
+    if (!walletAddress) {
+      handleDisconnect();
+    }
+  }, [walletAddress]);
+
   const handleAccountChange = (accounts: string[]) => {
     if (accounts && accounts.length > 0) {
       setWalletAddress(accounts[0]);

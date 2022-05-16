@@ -9,7 +9,7 @@ import { getTokenData } from 'src/shared/utils/tokenDataHelper';
 
 const Catalog = () => {
   const { setTheme } = useThemeContext();
-  const { tokenData, ownedTokenData, add, minted, burned } = useCatalogContext();
+  const { tokenData, ownedTokenData, add, remove, minted, burned } = useCatalogContext();
   const { walletAddress } = useWalletContext();
   const [tabIndex, setTabIndex] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
@@ -80,6 +80,7 @@ const Catalog = () => {
                       showCiphertext={true}
                       onMint={(res) => res && minted(data)}
                       onBurn={(res) => res && burned(data)}
+                      onRemove={() => remove(data)}
                     />
                   </li>
                 ))}

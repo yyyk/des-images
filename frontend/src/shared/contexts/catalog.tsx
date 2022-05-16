@@ -10,6 +10,7 @@ interface ContextState {
   tokenData: TokenData[];
   ownedTokenData: TokenData[];
   add: (data: TokenData) => Promise<boolean>;
+  remove: (data: TokenData) => void;
   minted: (data: TokenData) => void;
   burned: (data: TokenData) => void;
 }
@@ -38,23 +39,19 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       for (const data of tokenData) {
         if (data) {
           let _data: TokenData = { ...data };
-          if (data.status === undefined || data.status === null) {
-            const status = (contract && (await getTokenStatus(contract, data.dateHex, data.ciphertext))) ?? undefined;
-            _data = { ..._data, status };
-          }
-          if (data.isOwner === undefined || data.isOwner === null) {
-            const isOwner =
-              data.status === TOKEN_STATUS.MINTED
-                ? (contract && (await isOwnerOf(contract, data.dateHex, data.ciphertext))) ?? false
-                : false;
-            const tokenId = isOwner
-              ? ethers.utils.solidityKeccak256(
-                  ['uint32', 'uint128'],
-                  [parseInt(data.dateHex), BigNumber.from(data.ciphertext)],
-                )
-              : '';
-            _data = { ..._data, isOwner, tokenId };
-          }
+          const status = (contract && (await getTokenStatus(contract, data.dateHex, data.ciphertext))) ?? undefined;
+          _data = { ..._data, status };
+          const isOwner =
+            data.status === TOKEN_STATUS.MINTED
+              ? (contract && (await isOwnerOf(contract, data.dateHex, data.ciphertext))) ?? false
+              : false;
+          const tokenId = isOwner
+            ? ethers.utils.solidityKeccak256(
+                ['uint32', 'uint128'],
+                [parseInt(data.dateHex), BigNumber.from(data.ciphertext)],
+              )
+            : '';
+          _data = { ..._data, isOwner, tokenId };
           result.push(_data);
         }
       }
@@ -133,6 +130,13 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
+  const remove = (data: TokenData) => {
+    const index = tokenData.findIndex((_data) => isSameTokenData(_data, data));
+    if (index > -1) {
+      updateTokenData([...tokenData.slice(0, index), ...tokenData.slice(index + 1)]);
+    }
+  };
+
   const minted = (data: TokenData) => {
     const newData: TokenData = {
       ...data,
@@ -172,7 +176,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <CatalogContext.Provider value={{ tokenData, ownedTokenData, add, minted, burned }}>
+    <CatalogContext.Provider value={{ tokenData, ownedTokenData, add, remove, minted, burned }}>
       {children}
     </CatalogContext.Provider>
   );
