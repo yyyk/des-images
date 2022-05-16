@@ -8,6 +8,7 @@ interface ContextState {
   provider: Provider | null;
   providers: WalletProvider[];
   isWalletInstalled: boolean;
+  isInvalidChainId: boolean;
   walletAddress: string;
   connectWallet: (provider: WalletProvider) => void;
 }
@@ -15,7 +16,8 @@ interface ContextState {
 const WalletContext = createContext({} as ContextState);
 
 const WalletContextProvider = ({ children }: { children: ReactNode }) => {
-  const { providers, provider, signer, isWalletInstalled, walletAddress, connectWallet } = useWallet();
+  const { providers, provider, signer, isWalletInstalled, isInvalidChainId, walletAddress, connectWallet } =
+    useWallet();
 
   return (
     <WalletContext.Provider
@@ -24,6 +26,7 @@ const WalletContextProvider = ({ children }: { children: ReactNode }) => {
         provider,
         providers,
         isWalletInstalled,
+        isInvalidChainId,
         walletAddress,
         connectWallet,
       }}

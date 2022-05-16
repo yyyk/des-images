@@ -18,6 +18,7 @@ export const useWallet = () => {
   const [providers, setProviders] = useState<WalletProvider[]>([]);
   const [provider, setProvider] = useState<Provider | null>(null);
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner | null>(null);
+  const [isInvalidChainId, setIsInvalidChainId] = useState(false);
 
   useEffectOnce(() => {
     const isInstalled = !!window.ethereum;
@@ -109,6 +110,15 @@ export const useWallet = () => {
       const web3Provider = new ethers.providers.Web3Provider(provider.provider as ethers.providers.ExternalProvider);
       const _signer = web3Provider.getSigner();
       const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
+      const chainId = await web3Provider.send('eth_chainId', []);
+      if (
+        (process.env.NODE_ENV === 'production' && chainId !== '0x1') ||
+        (process.env.NODE_ENV === 'test' && chainId !== '0x4') ||
+        (process.env.NODE_ENV === 'development' && chainId !== '0x539')
+      ) {
+        setIsInvalidChainId(true);
+        return;
+      }
       // console.log(_address);
       if (_address && _address.length > 0) {
         localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, provider.type);
@@ -123,6 +133,7 @@ export const useWallet = () => {
 
   return {
     isWalletInstalled,
+    isInvalidChainId,
     walletAddress,
     connectWallet,
     providers,
