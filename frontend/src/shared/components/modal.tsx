@@ -55,7 +55,6 @@ const Modal = ({ children, open, disableClose = false, onClose }: ModalProps) =>
       }
       switch (e?.key) {
         case 'Escape':
-          e.preventDefault();
           handleClose(e);
           break;
         case 'Tab':
@@ -83,7 +82,7 @@ const Modal = ({ children, open, disableClose = false, onClose }: ModalProps) =>
   }, [open]);
 
   const handleOverlayClick = (e: MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
+    e.stopPropagation();
     if (!disableClose && e.target && overlayRef?.current === e.target) {
       handleClose(e);
     }
