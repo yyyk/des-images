@@ -75,3 +75,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 - Check chain ID
 - Footer
 - index.html
+- mobile layout (form)

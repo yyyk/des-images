@@ -71,7 +71,11 @@ const Catalog = () => {
               <div className="pt-4 pb-11">
                 <ModPreviewForm onSubmit={handleOnPreview} defaultPlaintext="i am still alive" showHint={true} />
               </div>
-              <ul className={`list-none p-0 grid gap-8 grid-cols-2 grid-rows-${Math.ceil(tokenData.length / 2)} mt-0`}>
+              <ul
+                className={`list-none p-0 grid gap-8 grid-cols-1 sm:grid-cols-2 grid-rows-${
+                  tokenData.length
+                } sm:grid-rows-${Math.ceil(tokenData.length / 2)} mt-0`}
+              >
                 {tokenData.map((data) => (
                   <li key={data.dateHex + (data.plaintext ?? '') + data.ciphertext} className="w-full m-0 p-0">
                     <DesImageCard
@@ -99,9 +103,9 @@ const Catalog = () => {
             >
               {ownedTokenData.length > 0 ? (
                 <ul
-                  className={`list-none px-0 pb-0 pt-4 grid gap-8 grid-cols-2 grid-rows-${Math.ceil(
-                    tokenData.length / 2,
-                  )} mt-0`}
+                  className={`list-none px-0 pb-0 pt-4 grid gap-8 grid-cols-1 sm:grid-cols-2 grid-rows-${
+                    tokenData.length
+                  } sm:grid-rows-${Math.ceil(tokenData.length / 2)} mt-0`}
                 >
                   {ownedTokenData.map((data) => (
                     <li key={data.dateHex + (data.plaintext ?? '') + data.ciphertext} className="w-full m-0 p-0">
