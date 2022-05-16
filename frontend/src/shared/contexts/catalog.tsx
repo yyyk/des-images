@@ -4,7 +4,7 @@ import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { useContractContext } from 'src/shared/contexts/contract';
 import { getTokenData, isSameTokenData } from 'src/shared/utils/tokenDataHelper';
 import { getTokenIds, getTokenStatus, isOwnerOf, tokenURI } from 'src/shared/services/contract';
-// import { useEffectOnce } from 'src/shared/utils/hookHelper';
+import { useEffectOnce } from 'src/shared/utils/hookHelper';
 
 interface ContextState {
   tokenData: TokenData[];
@@ -19,7 +19,7 @@ const CatalogContext = createContext({} as ContextState);
 
 const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   const { contract } = useContractContext();
-  const [tokenData, setTokenData] = useState<TokenData[]>(JSON.parse(window.localStorage.getItem('tokenData') ?? '[]'));
+  const [tokenData, setTokenData] = useState<TokenData[]>([]);
   const [ownedTokenData, setOwnedTokenData] = useState<TokenData[]>([]);
 
   const updateTokenData = (data: TokenData[]) => {
@@ -27,11 +27,17 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     window.localStorage.setItem('tokenData', JSON.stringify(data));
   };
 
-  // TODO:
-  // useEffectOnce(() => {
-  //   console.log(JSON.parse(window.localStorage.getItem('tokenData') ?? '[]'));
-  //   setTokenData(JSON.parse(window.localStorage.getItem('tokenData') ?? '[]'));
-  // });
+  useEffectOnce(() => {
+    const storedData = window.localStorage.getItem('tokenData');
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData);
+        if (Array.isArray(parsedData)) {
+          setTokenData(parsedData);
+        }
+      } catch (err) {}
+    }
+  });
 
   useEffect(() => {
     async function updateTokenDataStatus() {
@@ -100,7 +106,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       }
       setOwnedTokenData([]);
     }
-    updateTokenDataStatus();
+    tokenData && tokenData.length > 0 && updateTokenDataStatus();
     fetchOwnedTokenData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
