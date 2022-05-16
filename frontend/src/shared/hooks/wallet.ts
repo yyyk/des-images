@@ -9,6 +9,7 @@ import {
   LOCAL_STORAGE_WALLET_KEY,
   MAINNET_CHAIN_ID,
 } from 'src/shared/constants';
+import { useEffectOnce } from 'src/shared/utils/hookHelper';
 
 // async function getAccount(needRequest = false): Promise<string> {
 //   const eth = window.ethereum;
@@ -95,11 +96,11 @@ export const useWallet = () => {
   const [provider, setProvider] = useState<any | null>(null);
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner | null>(null);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const isInstalled = !!window.ethereum;
     setIsWalletInstalled(isInstalled);
     setProviders(getProviders());
-  }, []);
+  });
 
   useEffect(() => {
     if (!isWalletInstalled) {
@@ -141,7 +142,7 @@ export const useWallet = () => {
 
   const handleDisconnect = () => {
     console.log('wallet disconnected');
-    localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, '');
+    localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
     setWalletAddress('');
     setSigner(null);
     setProvider(null);
@@ -196,7 +197,7 @@ export const useWallet = () => {
       setWalletAddress(_address[0]);
       return;
     }
-    localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, '');
+    localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
   };
 
   return {

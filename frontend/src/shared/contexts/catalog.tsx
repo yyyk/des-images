@@ -4,6 +4,7 @@ import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { useContractContext } from 'src/shared/contexts/contract';
 import { getTokenData, isSameTokenData } from 'src/shared/utils/tokenDataHelper';
 import { getTokenIds, getTokenStatus, isOwnerOf, tokenURI } from 'src/shared/services/contract';
+// import { useEffectOnce } from 'src/shared/utils/hookHelper';
 
 interface ContextState {
   tokenData: TokenData[];
@@ -17,8 +18,19 @@ const CatalogContext = createContext({} as ContextState);
 
 const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   const { contract } = useContractContext();
-  const [tokenData, setTokenData] = useState<TokenData[]>([]);
+  const [tokenData, setTokenData] = useState<TokenData[]>(JSON.parse(window.localStorage.getItem('tokenData') ?? '[]'));
   const [ownedTokenData, setOwnedTokenData] = useState<TokenData[]>([]);
+
+  const updateTokenData = (data: TokenData[]) => {
+    setTokenData(data);
+    window.localStorage.setItem('tokenData', JSON.stringify(data));
+  };
+
+  // TODO:
+  // useEffectOnce(() => {
+  //   console.log(JSON.parse(window.localStorage.getItem('tokenData') ?? '[]'));
+  //   setTokenData(JSON.parse(window.localStorage.getItem('tokenData') ?? '[]'));
+  // });
 
   useEffect(() => {
     async function updateTokenDataStatus() {
@@ -46,7 +58,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
           result.push(_data);
         }
       }
-      setTokenData(result);
+      updateTokenData(result);
     }
     async function fetchOwnedTokenData() {
       if (!contract) {
@@ -101,7 +113,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     if (index < 0) {
       const index = ownedTokenData.findIndex((_data) => isSameTokenData(_data, data));
       if (index > -1) {
-        setTokenData([{ ...ownedTokenData[index] }, ...tokenData]);
+        updateTokenData([{ ...ownedTokenData[index] }, ...tokenData]);
         return true;
       }
       const status = (contract && (await getTokenStatus(contract, data.dateHex, data.ciphertext))) ?? undefined;
@@ -115,7 +127,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
             [parseInt(data.dateHex), BigNumber.from(data.ciphertext)],
           )
         : '';
-      setTokenData([{ ...data, isOwner, status, tokenId }, ...tokenData]);
+      updateTokenData([{ ...data, isOwner, status, tokenId }, ...tokenData]);
       return true;
     }
     return false;
@@ -135,7 +147,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     };
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, newData));
     if (index > -1) {
-      setTokenData([...tokenData.slice(0, index), { ...newData }, ...tokenData.slice(index + 1)]);
+      updateTokenData([...tokenData.slice(0, index), { ...newData }, ...tokenData.slice(index + 1)]);
     }
     setOwnedTokenData([{ ...newData }, ...ownedTokenData]);
   };
@@ -154,7 +166,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     };
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, newData));
     if (index > -1) {
-      setTokenData([...tokenData.slice(0, index), { ...newData }, ...tokenData.slice(index + 1)]);
+      updateTokenData([...tokenData.slice(0, index), { ...newData }, ...tokenData.slice(index + 1)]);
     }
     setOwnedTokenData(ownedTokenData.filter((_data) => !isSameTokenData(_data, newData)));
   };
