@@ -1,16 +1,15 @@
 import { useContractContext } from 'src/shared/contexts/contract';
-import { useEffect } from 'react';
+import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 
 const Stats = () => {
   const { totalEverMinted, totalSupply, mintPrice, updateTotalEverMinted, updateTotalSupply, updateMintPrice } =
     useContractContext();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     updateTotalEverMinted();
     updateTotalSupply();
     updateMintPrice();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   if (!totalEverMinted || !totalSupply || !mintPrice) {
     return null;

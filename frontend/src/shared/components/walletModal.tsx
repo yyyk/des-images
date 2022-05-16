@@ -1,6 +1,7 @@
 import { MouseEvent } from 'react';
 import Modal from 'src/shared/components/modal';
 import { useWalletContext } from 'src/shared/contexts/wallet';
+import { WalletProvider } from 'src/shared/interfaces';
 
 interface WalletModalProps {
   open: boolean;
@@ -11,7 +12,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
   const { providers, connectWallet } = useWalletContext();
   // console.log(providers);
 
-  const handleConnectWallet = (provider: any) => async (e: MouseEvent) => {
+  const handleConnectWallet = (provider: WalletProvider) => async (e: MouseEvent) => {
     e.preventDefault();
     try {
       await connectWallet(provider);

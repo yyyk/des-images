@@ -1,9 +1,10 @@
-import { MouseEvent, useEffect } from 'react';
+import { MouseEvent, useState } from 'react';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import DesImageSvg from 'src/shared/components/desImageSvg';
 import { useContractContext } from 'src/shared/contexts/contract';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { useThemeContext } from 'src/shared/contexts/theme';
+import { useEffectOnce } from '../utils/hookHelpers';
 
 interface DesImageCardProps {
   tokenData: TokenData;
@@ -24,31 +25,37 @@ const DesImageCard = ({
 }: DesImageCardProps) => {
   const { theme } = useThemeContext();
   const { walletAddress } = useWalletContext();
-  const { isLoading, isPaused, mint, burn, mintPrice, burnPrice, updateMintPrice, updateBurnPrice, updateIsPaused } =
+  const { isPaused, mint, burn, mintPrice, burnPrice, updateMintPrice, updateBurnPrice, updateIsPaused } =
     useContractContext();
+  const [isLoading, setIsLoading] = useState(false);
   const date = `#${tokenData.year}${String(tokenData.month).padStart(2, '0')}${String(tokenData.day).padStart(2, '0')}`;
   const status = tokenData.status;
 
-  useEffect(() => {
+  useEffectOnce(() => {
+    setIsLoading(true);
     updateIsPaused();
     updateMintPrice();
     updateBurnPrice();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setIsLoading(false);
+  });
 
   const handleOnMint = async (e: MouseEvent) => {
     e.preventDefault();
     if (walletAddress && tokenData) {
+      setIsLoading(true);
       const res = await mint(tokenData.dateHex, tokenData.ciphertext);
       onMint && onMint(res);
+      setIsLoading(false);
     }
   };
 
   const handleOnBurn = async (e: MouseEvent) => {
     e.preventDefault();
     if (walletAddress && tokenData && tokenData.tokenId) {
+      setIsLoading(true);
       const res = await burn(tokenData.tokenId);
       onBurn && onBurn(res);
+      setIsLoading(false);
     }
   };
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useThemeContext } from 'src/shared/contexts/theme';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { PreviewFormData, TokenData } from 'src/shared/interfaces';
@@ -9,7 +9,8 @@ import Supplement from 'src/main/components/supplement';
 import DesImageCard from 'src/shared/components/desImageCard';
 import Subtitle from 'src/shared/components/subtitle';
 import PreviewForm from 'src/shared/components/previewForm';
-import { getTokenData } from 'src/shared/utils/tokenDataHelper';
+import { getTokenData } from 'src/shared/utils/tokenDataHelpers';
+import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 
 const Main = () => {
   const { setTheme } = useThemeContext();
@@ -17,10 +18,9 @@ const Main = () => {
   const [tokenData, setTokenData] = useState<TokenData>(defaultTokenData);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     setTheme('lofi');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const handleOnPreview = ({ year, month, day }: PreviewFormData) => {
     setTokenData(getTokenData({ year, month, day }));

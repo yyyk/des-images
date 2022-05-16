@@ -22,3 +22,4 @@ export const HARDHAT_CHAIN_ID = 1337;
 export const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS ?? '';
 
 export const LOCAL_STORAGE_WALLET_KEY = 'wallet';
+export const LOCAL_STORAGE_TOKEN_DATA_KEY = 'tokenData';

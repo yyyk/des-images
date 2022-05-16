@@ -1,3 +1,14 @@
+import WalletConnectProvider from '@walletconnect/web3-provider';
+import { ethers } from 'ethers';
+
+export type Provider = ethers.providers.Provider | WalletConnectProvider;
+
+export interface WalletProvider {
+  type: string;
+  name: string;
+  provider: Provider;
+}
+
 export enum TOKEN_STATUS {
   FOR_SALE = 0,
   MINTED,

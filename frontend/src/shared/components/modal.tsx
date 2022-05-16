@@ -1,6 +1,7 @@
-import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useThemeContext } from 'src/shared/contexts/theme';
+import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 
 const focusableElements =
   'a[href]:not(.disabled), button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled])';
@@ -18,16 +19,19 @@ const Modal = ({ children, open, disableClose = false, onClose }: ModalProps) =>
   const overlayRef = useRef(null as null | HTMLDivElement);
   const lastActiveElementRef = useRef(null as null | Element);
 
-  useLayoutEffect(() => {
+  // useLayoutEffect(() => {
+  //   let element = document.getElementById('modal');
+  //   setWrapperElement(element ?? null);
+  // }, []);
+
+  useEffectOnce(() => {
     let element = document.getElementById('modal');
     setWrapperElement(element ?? null);
-  }, []);
 
-  useEffect(() => {
     return () => {
       document.body.style.overflow = '';
     };
-  }, []);
+  });
 
   useEffect(() => {
     if (open) {

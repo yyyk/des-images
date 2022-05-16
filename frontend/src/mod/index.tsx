@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useThemeContext } from 'src/shared/contexts/theme';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import DesImageCard from 'src/shared/components/desImageCard';
@@ -7,10 +7,11 @@ import Subtitle from 'src/shared/components/subtitle';
 import { PreviewFormData, TokenData } from 'src/shared/interfaces';
 import Description from 'src/mod/components/description';
 import ModPreviewForm from 'src/shared/components/modPreviewForm';
-import { getTokenData } from 'src/shared/utils/tokenDataHelper';
+import { getTokenData } from 'src/shared/utils/tokenDataHelpers';
 import { destructDateInputValue } from 'src/shared/utils/destructDateInputValue';
 import { DEFAULT_DATE } from 'src/shared/constants';
 import { DEFAULT_PLAINTEXT } from 'src/mod/constants';
+import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 
 const Mod = () => {
   const { setTheme } = useThemeContext();
@@ -18,11 +19,10 @@ const Mod = () => {
   const [tokenData, setTokenData] = useState<TokenData | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     setTheme('black');
     setTokenData(getTokenData({ ...destructDateInputValue(DEFAULT_DATE), plaintext: DEFAULT_PLAINTEXT }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   const handleOnPreview = ({ year, month, day, plaintext, ciphertext }: PreviewFormData) => {
     setTokenData(getTokenData({ year, month, day, plaintext, ciphertext }));
