@@ -1,6 +1,7 @@
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber, Contract, ethers } from 'ethers';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { decrypt, encrypt } from 'src/shared/utils/des';
+import { getTokenStatus as _getTokenStatus, isOwnerOf } from '../services/contract';
 
 function toHexString(value: string): string {
   return parseInt(value).toString(16);
@@ -67,4 +68,36 @@ export function getTokenId(data: TokenData): string {
     ['uint32', 'uint128'],
     [parseInt(data.dateHex), BigNumber.from(data.ciphertext)],
   );
+}
+
+export async function getTokenStatus(
+  contract: Contract | null | undefined,
+  data: TokenData,
+): Promise<TOKEN_STATUS | undefined> {
+  return (contract && (await _getTokenStatus(contract, data.dateHex, data.ciphertext))) ?? undefined;
+}
+
+export async function getIsOwner(contract: Contract | null | undefined, data: TokenData): Promise<boolean> {
+  return data.status === TOKEN_STATUS.MINTED
+    ? (contract && (await isOwnerOf(contract, data.dateHex, data.ciphertext))) ?? false
+    : false;
+}
+
+export async function updateTokenDataStatus(
+  contract: Contract | null | undefined,
+  tokenData: TokenData[],
+): Promise<TokenData[]> {
+  const result: TokenData[] = [];
+  for (const data of tokenData) {
+    if (data) {
+      let _data: TokenData = { ...data };
+      const status = await getTokenStatus(contract, data);
+      _data = { ..._data, status };
+      const isOwner = await getIsOwner(contract, data);
+      const tokenId = isOwner ? getTokenId(data) : '';
+      _data = { ..._data, isOwner, tokenId };
+      result.push(_data);
+    }
+  }
+  return result;
 }

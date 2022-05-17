@@ -54,44 +54,53 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWalletInstalled, signer, walletAddress]);
 
+  useEffect(() => {
+    updateIsPaused();
+    updateTotalEverMinted();
+    updateTotalSupply();
+    updateMintPrice();
+    updateBurnPrice();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract]);
+
   const updateIsPaused = async () => {
     if (!contract) {
+      setIsPaused(true);
       return;
     }
-    const res = await _isPaused(contract);
-    setIsPaused(res ?? false);
+    setIsPaused((await _isPaused(contract)) ?? true);
   };
 
   const updateTotalEverMinted = async () => {
     if (!contract) {
+      setTotalEverMinted('');
       return;
     }
-    const res = await getTotalEverMinted(contract);
-    setTotalEverMinted(res ?? '');
+    setTotalEverMinted((await getTotalEverMinted(contract)) ?? '');
   };
 
   const updateTotalSupply = async () => {
     if (!contract) {
+      setTotalSupply('');
       return;
     }
-    const res = await getTotalSupply(contract);
-    setTotalSupply(res ?? '');
+    setTotalSupply((await getTotalSupply(contract)) ?? '');
   };
 
   const updateMintPrice = async () => {
     if (!contract) {
+      setMintPrice('');
       return;
     }
-    const res = await getCurrentPrice(contract);
-    setMintPrice(res ?? '');
+    setMintPrice((await getCurrentPrice(contract)) ?? '');
   };
 
   const updateBurnPrice = async () => {
     if (!contract) {
+      setBurnPrice('');
       return;
     }
-    const res = await currentBurnReward(contract);
-    setBurnPrice(res ?? '');
+    setBurnPrice((await currentBurnReward(contract)) ?? '');
   };
 
   const mint = async (dateHex: string, ciphertext: string): Promise<boolean> => {
@@ -101,16 +110,14 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     const cost = await getCurrentPrice(contract);
     setMintPrice(cost);
     // TODO: add 0.01 eth buffer
-    const res = await _mint(contract, walletAddress, dateHex, ciphertext, cost);
-    return res;
+    return await _mint(contract, walletAddress, dateHex, ciphertext, cost);
   };
 
   const burn = async (tokenId: string): Promise<boolean> => {
     if (!contract) {
       return false;
     }
-    const res = await _burn(contract, tokenId);
-    return res;
+    return await _burn(contract, tokenId);
   };
 
   return (
