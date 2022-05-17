@@ -1,11 +1,10 @@
 import { ethers } from 'ethers';
 import { createContext, ReactNode, useContext } from 'react';
 import { useWallet } from 'src/shared/hooks/wallet';
-import { Provider, WalletProvider } from 'src/shared/interfaces';
+import { WalletProvider } from 'src/shared/interfaces';
 
 interface ContextState {
   signer: ethers.providers.JsonRpcSigner | null;
-  provider: Provider | null;
   providers: WalletProvider[];
   isWalletInstalled: boolean;
   isInvalidChainId: boolean;
@@ -16,14 +15,12 @@ interface ContextState {
 const WalletContext = createContext({} as ContextState);
 
 const WalletContextProvider = ({ children }: { children: ReactNode }) => {
-  const { providers, provider, signer, isWalletInstalled, isInvalidChainId, walletAddress, connectWallet } =
-    useWallet();
+  const { providers, signer, isWalletInstalled, isInvalidChainId, walletAddress, connectWallet } = useWallet();
 
   return (
     <WalletContext.Provider
       value={{
         signer,
-        provider,
         providers,
         isWalletInstalled,
         isInvalidChainId,

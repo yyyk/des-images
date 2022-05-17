@@ -60,7 +60,7 @@ export const useWallet = () => {
     if (accounts && accounts.length > 0) {
       setWalletAddress(accounts[0]);
     } else {
-      setWalletAddress('');
+      _handleDisconnect();
     }
   };
 
@@ -79,6 +79,7 @@ export const useWallet = () => {
     setIsInvalidChainId(false);
   };
 
+  // TODO: needs refactor
   const connectWallet = async (
     provider: WalletProvider,
     needRequest = true,
@@ -128,6 +129,7 @@ export const useWallet = () => {
       ) {
         _handleDisconnect();
         setIsInvalidChainId(true);
+        setProvider(provider.provider);
         // throw new Error('Invalid Chain ID!');
         return {
           success: false,
@@ -163,7 +165,6 @@ export const useWallet = () => {
     walletAddress,
     connectWallet,
     providers,
-    provider,
     signer,
   };
 };

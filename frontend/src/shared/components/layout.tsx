@@ -6,12 +6,12 @@ import Header from 'src/shared/components/header';
 // import Footer from 'src/shared/components/footer';
 
 const Layout = ({ children }: { children: ReactNode }) => {
-  const { walletAddress, isInvalidChainId } = useWalletContext();
+  const { isInvalidChainId } = useWalletContext();
   const { theme } = useThemeContext();
 
   return (
     <div data-theme={theme} className="min-h-screen flex flex-col flex-nowrap">
-      {walletAddress && isInvalidChainId && <AlertBanner />}
+      {isInvalidChainId && <AlertBanner />}
       <div className="px-3 py-0 flex flex-col flex-nowrap grow">
         <Header />
         <main className="prose w-full mx-auto mt-0 pt-0 pb-14 flex flex-col flex-nowrap grow">{children}</main>
