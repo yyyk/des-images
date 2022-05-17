@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react';
-import DesImageCard from 'src/shared/components/desImageCard';
-import ModPreviewForm from 'src/shared/components/modPreviewForm';
-import { useCatalogContext } from 'src/shared/contexts/catalog';
 import { useThemeContext } from 'src/shared/contexts/theme';
 import { useWalletContext } from 'src/shared/contexts/wallet';
+import { useCatalogContext } from 'src/shared/contexts/catalog';
 import { PreviewFormData } from 'src/shared/interfaces';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import { getTokenData } from 'src/shared/utils/tokenDataHelpers';
+import DesImageCard from 'src/shared/components/desImageCard';
+import ModPreviewForm from 'src/shared/components/modPreviewForm';
 
 const Catalog = () => {
   const { setTheme } = useThemeContext();

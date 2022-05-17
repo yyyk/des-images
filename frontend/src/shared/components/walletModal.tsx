@@ -1,7 +1,7 @@
 import { MouseEvent } from 'react';
-import Modal from 'src/shared/components/modal';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { WalletProvider } from 'src/shared/interfaces';
+import Modal from 'src/shared/components/modal';
 import MetaMaskLogo from 'src/shared/components/logos/metamask';
 import CoinbaseWalletLogo from 'src/shared/components/logos/coinbaseWallet';
 import WalletConnectLogo from 'src/shared/components/logos/walletConnect';
@@ -24,6 +24,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
     }
   };
 
+  // TODO: refactor
   return (
     <Modal open={open} onClose={onClose}>
       <ul className="list-none p-0 m-0">

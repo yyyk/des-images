@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
+import { useEffect, useState } from 'react';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import {
   ETH_MAINNET_JSONRPC_URL,
@@ -8,8 +8,8 @@ import {
   LOCAL_STORAGE_WALLET_KEY,
   MAINNET_CHAIN_ID,
 } from 'src/shared/constants';
-import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import { ChainId, Provider, WalletProvider } from 'src/shared/interfaces';
+import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import { getProviders } from 'src/shared/utils/walletHelpers';
 
 export const useWallet = () => {

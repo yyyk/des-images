@@ -1,7 +1,7 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { decrypt, encrypt } from 'src/shared/utils/des';
-import { getTokenStatus as _getTokenStatus, isOwnerOf } from '../services/contract';
+import { getTokenStatus as _getTokenStatus, isOwnerOf } from 'src/shared/services/contract';
 
 function toHexString(value: string): string {
   return parseInt(value).toString(16);

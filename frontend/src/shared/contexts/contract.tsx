@@ -1,6 +1,7 @@
 import { ethers, Contract } from 'ethers';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import DesImages from 'src/abi/DesImages.json';
+import { useWalletContext } from 'src/shared/contexts/wallet';
+import { CONTRACT_ADDRESS } from 'src/shared/constants';
 import {
   isPaused as _isPaused,
   mint as _mint,
@@ -10,8 +11,7 @@ import {
   getCurrentPrice,
   currentBurnReward,
 } from 'src/shared/services/contract';
-import { useWalletContext } from 'src/shared/contexts/wallet';
-import { CONTRACT_ADDRESS } from 'src/shared/constants';
+import DesImages from 'src/abi/DesImages.json';
 
 interface ContextState {
   contract: Contract | null;

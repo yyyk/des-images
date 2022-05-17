@@ -1,6 +1,8 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { useContractContext } from 'src/shared/contexts/contract';
+import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
+import { getTokenIds, tokenURI } from 'src/shared/services/contract';
+import { LOCAL_STORAGE_TOKEN_DATA_KEY } from 'src/shared/constants';
 import {
   convertTokenURIToTokenData,
   getIsOwner,
@@ -9,9 +11,7 @@ import {
   isSameTokenData,
   updateTokenDataStatus,
 } from 'src/shared/utils/tokenDataHelpers';
-import { getTokenIds, tokenURI } from 'src/shared/services/contract';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
-import { LOCAL_STORAGE_TOKEN_DATA_KEY } from 'src/shared/constants';
 
 interface ContextState {
   tokenData: TokenData[];

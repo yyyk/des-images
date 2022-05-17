@@ -1,10 +1,10 @@
 import { MouseEvent, useState } from 'react';
-import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
-import DesImageSvg from 'src/shared/components/desImageSvg';
 import { useContractContext } from 'src/shared/contexts/contract';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { useThemeContext } from 'src/shared/contexts/theme';
-import { useEffectOnce } from '../utils/hookHelpers';
+import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
+import { useEffectOnce } from 'src/shared/utils/hookHelpers';
+import DesImageSvg from 'src/shared/components/desImageSvg';
 
 interface DesImageCardProps {
   tokenData: TokenData;

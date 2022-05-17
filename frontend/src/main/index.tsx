@@ -3,14 +3,14 @@ import { useThemeContext } from 'src/shared/contexts/theme';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { PreviewFormData, TokenData } from 'src/shared/interfaces';
 import { defaultTokenData } from 'src/shared/constants';
+import { useEffectOnce } from 'src/shared/utils/hookHelpers';
+import { getTokenData } from 'src/shared/utils/tokenDataHelpers';
 import Stats from 'src/shared/components/stats';
 import Description from 'src/main/components/description';
 import Supplement from 'src/main/components/supplement';
 import DesImageCard from 'src/shared/components/desImageCard';
 import Subtitle from 'src/shared/components/subtitle';
 import PreviewForm from 'src/shared/components/previewForm';
-import { getTokenData } from 'src/shared/utils/tokenDataHelpers';
-import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 
 const Main = () => {
   const { setTheme } = useThemeContext();

@@ -1,5 +1,5 @@
-import { ethers } from 'ethers';
 import { createContext, ReactNode, useContext } from 'react';
+import { ethers } from 'ethers';
 import { useWallet } from 'src/shared/hooks/wallet';
 import { WalletProvider } from 'src/shared/interfaces';
 
