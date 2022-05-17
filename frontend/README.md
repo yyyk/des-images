@@ -72,7 +72,7 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 ### TODOs
 
 - Wallet modal
-- Check chain ID
 - Footer
 - index.html
 - mobile layout (form)
+- error handling

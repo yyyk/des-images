@@ -71,7 +71,7 @@ const TextInput = ({
               (textType === TextType.CIPHERTEXT &&
                 (!text.isValidCiphertext ||
                   (text.ciphertext.length !== 0 && text.ciphertext.length !== CIPHERTEXT_LENGTH)))
-              ? 'input-error'
+              ? 'input-warning'
               : (textType === TextType.PLAINTEXT && text.plaintext.length === PLAINTEXT_LENGTH) ||
                 (textType === TextType.CIPHERTEXT && text.ciphertext.length === CIPHERTEXT_LENGTH)
               ? 'input-success'

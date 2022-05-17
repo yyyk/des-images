@@ -9,7 +9,7 @@ import {
   MAINNET_CHAIN_ID,
 } from 'src/shared/constants';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
-import { Provider, WalletProvider } from 'src/shared/interfaces';
+import { ChainId, Provider, WalletProvider } from 'src/shared/interfaces';
 import { getProviders } from 'src/shared/utils/walletHelpers';
 
 export const useWallet = () => {
@@ -76,6 +76,7 @@ export const useWallet = () => {
     setSigner(null);
     setProvider(null);
     setProviders(getProviders());
+    setIsInvalidChainId(false);
   };
 
   const connectWallet = async (provider: WalletProvider, needRequest = true) => {
@@ -103,7 +104,7 @@ export const useWallet = () => {
             ...providers.slice(index + 1),
           ]);
         }
-        throw new Error(err);
+        throw new Error(err?.message ?? err);
       }
     }
     try {
@@ -112,9 +113,10 @@ export const useWallet = () => {
       const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
       const chainId = await web3Provider.send('eth_chainId', []);
       if (
-        (process.env.NODE_ENV === 'production' && chainId !== '0x1') ||
-        (process.env.NODE_ENV === 'test' && chainId !== '0x4') ||
-        (process.env.NODE_ENV === 'development' && chainId !== '0x539')
+        (process.env.NODE_ENV === 'production' && chainId !== ChainId.MAIN_NET) ||
+        // TODO:
+        // (process.env.NODE_ENV === 'test' && chainId !== ChainId.RINKEBY) ||
+        (process.env.NODE_ENV === 'development' && chainId !== ChainId.LOCALHOST)
       ) {
         setIsInvalidChainId(true);
         return;
@@ -127,7 +129,9 @@ export const useWallet = () => {
         setWalletAddress(_address[0]);
         return;
       }
-    } catch (err) {}
+    } catch (err: any) {
+      throw new Error(err?.message ?? err);
+    }
     localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
   };
 

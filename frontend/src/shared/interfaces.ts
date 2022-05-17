@@ -1,12 +1,27 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ethers } from 'ethers';
 
-export type Provider = ethers.providers.Provider | WalletConnectProvider;
+export type Provider = ethers.providers.BaseProvider | WalletConnectProvider;
 
 export interface WalletProvider {
   type: string;
   name: string;
   provider: Provider;
+}
+
+export type ChainName = 'mainnet' | 'rinkeby' | 'ropsten' | 'localhost' | 'hardhat';
+
+export enum ChainId {
+  MAIN_NET = '0x1',
+  ROPSTEN = '0x3',
+  RINKEBY = '0x4',
+  LOCALHOST = '0x539',
+  HARD_HAT = '0x7a69',
+}
+
+export interface Chain {
+  id: ChainId;
+  name: ChainName;
 }
 
 export enum TOKEN_STATUS {
