@@ -18,13 +18,10 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
   const handleConnectWallet = (provider: WalletProvider) => async (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    try {
-      await connectWallet(provider);
-    } catch (err) {
-      // console.dir(err);
-      return;
+    const res = await connectWallet(provider);
+    if (res.success || (!res.success && res.error?.type === 'InvalidChainIdError')) {
+      onClose();
     }
-    onClose();
   };
 
   return (

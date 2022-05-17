@@ -36,6 +36,8 @@ const Modal = ({ children, open, disableClose = false, onClose }: ModalProps) =>
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
     }
   }, [open]);
 

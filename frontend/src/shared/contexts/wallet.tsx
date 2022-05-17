@@ -10,7 +10,7 @@ interface ContextState {
   isWalletInstalled: boolean;
   isInvalidChainId: boolean;
   walletAddress: string;
-  connectWallet: (provider: WalletProvider) => void;
+  connectWallet: (provider: WalletProvider) => Promise<{ success: boolean; error?: { type: string; message: string } }>;
 }
 
 const WalletContext = createContext({} as ContextState);

@@ -79,9 +79,12 @@ export const useWallet = () => {
     setIsInvalidChainId(false);
   };
 
-  const connectWallet = async (provider: WalletProvider, needRequest = true) => {
+  const connectWallet = async (
+    provider: WalletProvider,
+    needRequest = true,
+  ): Promise<{ success: boolean; error?: { type: string; message: string } }> => {
     if (!provider?.provider) {
-      return;
+      return { success: false };
     }
     if (provider?.type === 'wallet-connect') {
       try {
@@ -104,9 +107,14 @@ export const useWallet = () => {
             ...providers.slice(index + 1),
           ]);
         }
-        throw new Error(err?.message ?? err);
+        // throw new Error(err?.message ?? err);
+        return {
+          success: false,
+          error: err,
+        };
       }
     }
+    let error: any = undefined;
     try {
       const web3Provider = new ethers.providers.Web3Provider(provider.provider as ethers.providers.ExternalProvider);
       const _signer = web3Provider.getSigner();
@@ -118,9 +126,16 @@ export const useWallet = () => {
         // (process.env.NODE_ENV === 'test' && chainId !== ChainId.RINKEBY) ||
         (process.env.NODE_ENV === 'development' && chainId !== ChainId.LOCALHOST)
       ) {
+        _handleDisconnect();
         setIsInvalidChainId(true);
-        localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
-        throw new Error('Invalid Chain ID!');
+        // throw new Error('Invalid Chain ID!');
+        return {
+          success: false,
+          error: {
+            type: 'InvalidChainIdError',
+            message: 'Invalid Chain ID',
+          },
+        };
       }
       // console.log(_address);
       if (_address && _address.length > 0) {
@@ -128,12 +143,18 @@ export const useWallet = () => {
         setProvider(provider.provider);
         setSigner(_signer);
         setWalletAddress(_address[0]);
-        return;
+        return { success: true };
       }
+      error = { type: 'NoAddressFound', message: 'No address found.' };
     } catch (err: any) {
-      throw new Error(err?.message ?? err);
+      error = err;
+      // throw new Error(err?.message ?? err);
     }
-    localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
+    _handleDisconnect();
+    return {
+      success: false,
+      error,
+    };
   };
 
   return {
