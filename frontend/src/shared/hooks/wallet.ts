@@ -119,7 +119,8 @@ export const useWallet = () => {
         (process.env.NODE_ENV === 'development' && chainId !== ChainId.LOCALHOST)
       ) {
         setIsInvalidChainId(true);
-        return;
+        localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
+        throw new Error('Invalid Chain ID!');
       }
       // console.log(_address);
       if (_address && _address.length > 0) {
