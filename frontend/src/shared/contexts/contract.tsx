@@ -50,7 +50,6 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           if (event?.blockNumber <= startBlockNumber) {
             return;
           }
-          console.log('minted', event?.blockNumber);
           setTotalSupply(totalSupply.toString());
           setTotalEverMinted(totalEverMinted.toString());
           await _updateIsPaused(newContract);
@@ -62,7 +61,6 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
         if (event?.blockNumber <= startBlockNumber) {
           return;
         }
-        console.log('burned', event?.blockNumber);
         setTotalSupply(totalSupply.toString());
         await _updateIsPaused(newContract);
         await _updateMintPrice(newContract);
@@ -114,7 +112,6 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const _updateMintPrice = async (contract: Contract | null) => {
-    console.log('contract', contract);
     if (!contract) {
       setMintPrice('');
       return;
