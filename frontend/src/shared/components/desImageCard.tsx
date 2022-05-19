@@ -3,7 +3,6 @@ import { useContractContext } from 'src/shared/contexts/contract';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { useThemeContext } from 'src/shared/contexts/theme';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
-import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import DesImageSvg from 'src/shared/components/desImageSvg';
 
 interface DesImageCardProps {
@@ -25,19 +24,10 @@ const DesImageCard = ({
 }: DesImageCardProps) => {
   const { theme } = useThemeContext();
   const { walletAddress } = useWalletContext();
-  const { isPaused, mint, burn, mintPrice, burnPrice, updateMintPrice, updateBurnPrice, updateIsPaused } =
-    useContractContext();
+  const { isPaused, mintPrice, burnPrice, mint, burn } = useContractContext();
   const [isLoading, setIsLoading] = useState(false);
   const date = `#${tokenData.year}${String(tokenData.month).padStart(2, '0')}${String(tokenData.day).padStart(2, '0')}`;
   const status = tokenData.status;
-
-  useEffectOnce(() => {
-    setIsLoading(true);
-    updateIsPaused();
-    updateMintPrice();
-    updateBurnPrice();
-    setIsLoading(false);
-  });
 
   const handleOnMint = async (e: MouseEvent) => {
     e.preventDefault();

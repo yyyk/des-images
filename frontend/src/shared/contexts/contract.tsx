@@ -22,11 +22,6 @@ interface ContextState {
   burnPrice: string;
   mint: (dateHex: string, ciphertext: string) => Promise<boolean>;
   burn: (tokenId: string) => Promise<boolean>;
-  updateIsPaused: () => void;
-  updateTotalEverMinted: () => void;
-  updateTotalSupply: () => void;
-  updateMintPrice: () => void;
-  updateBurnPrice: () => void;
 }
 
 const ContractContext = createContext({} as ContextState);
@@ -47,6 +42,34 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     const newContract = new ethers.Contract(CONTRACT_ADDRESS, DesImages.abi, signer);
+    async function setupListeners() {
+      const startBlockNumber = await newContract.provider.getBlockNumber();
+      newContract.on(
+        newContract.filters.Minted(),
+        async (to, tokenId, mintPrice, totalSupply, totalEverMinted, event) => {
+          if (event?.blockNumber <= startBlockNumber) {
+            return;
+          }
+          console.log('minted', event?.blockNumber);
+          setTotalSupply(totalSupply.toString());
+          setTotalEverMinted(totalEverMinted.toString());
+          await _updateIsPaused(newContract);
+          await _updateMintPrice(newContract);
+          await _updateBurnPrice(newContract);
+        },
+      );
+      newContract.on(newContract.filters.Burned(), async (from, tokenId, burnReward, totalSupply, event) => {
+        if (event?.blockNumber <= startBlockNumber) {
+          return;
+        }
+        console.log('burned', event?.blockNumber);
+        setTotalSupply(totalSupply.toString());
+        await _updateIsPaused(newContract);
+        await _updateMintPrice(newContract);
+        await _updateBurnPrice(newContract);
+      });
+    }
+    setupListeners();
     setContract(newContract);
     return () => {
       newContract.removeAllListeners();
@@ -55,15 +78,18 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   }, [isWalletInstalled, signer, walletAddress]);
 
   useEffect(() => {
-    updateIsPaused();
-    updateTotalEverMinted();
-    updateTotalSupply();
-    updateMintPrice();
-    updateBurnPrice();
+    async function setup() {
+      await _updateIsPaused(contract);
+      await _updateTotalEverMinted(contract);
+      await _updateTotalSupply(contract);
+      await _updateMintPrice(contract);
+      await _updateBurnPrice(contract);
+    }
+    setup();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
 
-  const updateIsPaused = async () => {
+  const _updateIsPaused = async (contract: Contract | null) => {
     if (!contract) {
       setIsPaused(true);
       return;
@@ -71,7 +97,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     setIsPaused((await _isPaused(contract)) ?? true);
   };
 
-  const updateTotalEverMinted = async () => {
+  const _updateTotalEverMinted = async (contract: Contract | null) => {
     if (!contract) {
       setTotalEverMinted('');
       return;
@@ -79,7 +105,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     setTotalEverMinted((await getTotalEverMinted(contract)) ?? '');
   };
 
-  const updateTotalSupply = async () => {
+  const _updateTotalSupply = async (contract: Contract | null) => {
     if (!contract) {
       setTotalSupply('');
       return;
@@ -87,7 +113,8 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     setTotalSupply((await getTotalSupply(contract)) ?? '');
   };
 
-  const updateMintPrice = async () => {
+  const _updateMintPrice = async (contract: Contract | null) => {
+    console.log('contract', contract);
     if (!contract) {
       setMintPrice('');
       return;
@@ -95,7 +122,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     setMintPrice((await getCurrentPrice(contract)) ?? '');
   };
 
-  const updateBurnPrice = async () => {
+  const _updateBurnPrice = async (contract: Contract | null) => {
     if (!contract) {
       setBurnPrice('');
       return;
@@ -131,11 +158,6 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
         burnPrice,
         mint,
         burn,
-        updateIsPaused,
-        updateTotalEverMinted,
-        updateTotalSupply,
-        updateMintPrice,
-        updateBurnPrice,
       }}
     >
       {children}

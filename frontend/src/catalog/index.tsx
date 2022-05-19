@@ -15,6 +15,7 @@ const Catalog = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
   const timeoutRef = useRef<any>(null);
+  const scrollRef = useRef<HTMLLIElement>(null);
 
   useEffectOnce(() => {
     setTheme('lofi');
@@ -31,7 +32,11 @@ const Catalog = () => {
       timeoutRef.current = setTimeout(() => {
         setShowAlert(false);
       }, 3000);
+      return;
     }
+    setTimeout(() => {
+      scrollRef?.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    });
   };
 
   return (
@@ -76,8 +81,12 @@ const Catalog = () => {
                   tokenData.length
                 } sm:grid-rows-${Math.ceil(tokenData.length / 2)} mt-0`}
               >
-                {tokenData.map((data) => (
-                  <li key={data.dateHex + (data.plaintext ?? '') + data.ciphertext} className="w-full m-0 p-0">
+                {tokenData.map((data, index) => (
+                  <li
+                    ref={index === 0 ? scrollRef : undefined}
+                    key={data.dateHex + (data.plaintext ?? '') + data.ciphertext}
+                    className="w-full m-0 p-0"
+                  >
                     <DesImageCard
                       tokenData={data}
                       showPlaintext={true}

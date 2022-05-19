@@ -1,15 +1,7 @@
 import { useContractContext } from 'src/shared/contexts/contract';
-import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 
 const Stats = () => {
-  const { totalEverMinted, totalSupply, mintPrice, updateTotalEverMinted, updateTotalSupply, updateMintPrice } =
-    useContractContext();
-
-  useEffectOnce(() => {
-    updateTotalEverMinted();
-    updateTotalSupply();
-    updateMintPrice();
-  });
+  const { totalEverMinted, totalSupply, mintPrice } = useContractContext();
 
   if (!totalEverMinted || !totalSupply || !mintPrice) {
     return null;
