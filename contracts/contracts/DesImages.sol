@@ -50,6 +50,7 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         uint256 totalSupply,
         uint256 totalEverMinted
     );
+
     event Burned(
         address indexed from,
         uint256 indexed tokenId,
