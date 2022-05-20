@@ -39,11 +39,9 @@ describe("DesImages", function () {
         // console.log(await wallets[1].getBalance());
         // console.log(await waffle.provider.getBalance(desImages.address));
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
-        const tx = await desImages
-          .connect(wallets[1])
-          .mint(wallets[1].address, date, ciphertext, {
-            value: ethers.utils.parseEther("0.1"),
-          });
+        const tx = await desImages.connect(wallets[1]).mint(date, ciphertext, {
+          value: ethers.utils.parseEther("0.1"),
+        });
         const receipt = await tx.wait();
         const ev = receipt.events.filter((ev: any) => ev.event === "Minted");
         expect(ev[0].args.to).to.equal(wallets[1].address);
@@ -106,17 +104,15 @@ describe("DesImages", function () {
     describe("Security:", function () {
       it("prevents from minting existing tokens", async function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
-        const tx = await desImages
-          .connect(wallets[1])
-          .mint(wallets[1].address, date, ciphertext, {
-            value: ethers.utils.parseEther("0.1"),
-          });
+        const tx = await desImages.connect(wallets[1]).mint(date, ciphertext, {
+          value: ethers.utils.parseEther("0.1"),
+        });
         await tx.wait();
         let result = false;
         try {
           const tx = await desImages
             .connect(wallets[2])
-            .mint(wallets[2].address, date, ciphertext, {
+            .mint(date, ciphertext, {
               value: ethers.utils.parseEther("0.2"),
             });
           await tx.wait();
@@ -133,7 +129,7 @@ describe("DesImages", function () {
             try {
               const tx = await desImages
                 .connect(wallets[1])
-                .mint(wallets[1].address, date, ciphertext, {
+                .mint(date, ciphertext, {
                   value: ethers.utils.parseEther("0.2"),
                 });
               await tx.wait();
@@ -150,7 +146,7 @@ describe("DesImages", function () {
             try {
               const tx = await desImages
                 .connect(wallets[1])
-                .mint(wallets[1].address, date, ciphertext, {
+                .mint(date, ciphertext, {
                   value: ethers.utils.parseEther("0.2"),
                 });
               await tx.wait();
@@ -167,7 +163,7 @@ describe("DesImages", function () {
             try {
               const tx = await desImages
                 .connect(wallets[1])
-                .mint(wallets[1].address, date, ciphertext, {
+                .mint(date, ciphertext, {
                   value: ethers.utils.parseEther("0.2"),
                 });
               await tx.wait();
@@ -182,7 +178,7 @@ describe("DesImages", function () {
             try {
               const tx = await desImages
                 .connect(wallets[1])
-                .mint(wallets[1].address, date, ciphertext, {
+                .mint(date, ciphertext, {
                   value: ethers.utils.parseEther("0.2"),
                 });
               await tx.wait();
@@ -199,7 +195,7 @@ describe("DesImages", function () {
             try {
               const tx = await desImages
                 .connect(wallets[1])
-                .mint(wallets[1].address, date, ciphertext, {
+                .mint(date, ciphertext, {
                   value: ethers.utils.parseEther("0.2"),
                 });
               await tx.wait();
@@ -216,7 +212,7 @@ describe("DesImages", function () {
             try {
               const tx = await desImages
                 .connect(wallets[1])
-                .mint(wallets[1].address, date, ciphertext, {
+                .mint(date, ciphertext, {
                   value: ethers.utils.parseEther("0.2"),
                 });
               await tx.wait();
@@ -244,7 +240,7 @@ describe("DesImages", function () {
         try {
           const tx = await desImages
             .connect(wallets[1])
-            .mint(wallets[1].address, date, BigNumber.from(value), {
+            .mint(date, BigNumber.from(value), {
               value: ethers.utils.parseEther("0.2"),
             });
           await tx.wait();
@@ -260,7 +256,7 @@ describe("DesImages", function () {
         try {
           const tx = await desImages
             .connect(wallets[1])
-            .mint(wallets[1].address, date, BigNumber.from(value), {
+            .mint(date, BigNumber.from(value), {
               value: ethers.utils.parseEther("0.2"),
             });
           await tx.wait();
@@ -292,7 +288,7 @@ describe("DesImages", function () {
         );
         const tx = await desImages
           .connect(wallets[1])
-          .mint(wallets[1].address, _date, _ciphertext, {
+          .mint(_date, _ciphertext, {
             value: ethers.utils.parseEther("0.1"),
           });
         await tx.wait();
@@ -330,11 +326,9 @@ describe("DesImages", function () {
     describe("Expected:", function () {
       it("burn tokens", async function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
-        let tx = await desImages
-          .connect(wallets[1])
-          .mint(wallets[1].address, date, ciphertext, {
-            value: ethers.utils.parseEther("0.1"),
-          });
+        let tx = await desImages.connect(wallets[1]).mint(date, ciphertext, {
+          value: ethers.utils.parseEther("0.1"),
+        });
         let receipt = await tx.wait();
         let ev = receipt.events.filter((ev: any) => ev.event === "Minted");
         const tokenId = ev[0].args.tokenId.toHexString();
@@ -352,11 +346,9 @@ describe("DesImages", function () {
     describe("Security:", function () {
       it("prevents from minting burned tokens", async function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
-        let tx = await desImages
-          .connect(wallets[1])
-          .mint(wallets[1].address, date, ciphertext, {
-            value: ethers.utils.parseEther("0.1"),
-          });
+        let tx = await desImages.connect(wallets[1]).mint(date, ciphertext, {
+          value: ethers.utils.parseEther("0.1"),
+        });
         const receipt = await tx.wait();
         const ev = receipt.events.filter((ev: any) => ev.event === "Minted");
         const tokenId = ev[0].args.tokenId.toHexString();
@@ -366,7 +358,7 @@ describe("DesImages", function () {
         try {
           const tx = await desImages
             .connect(wallets[1])
-            .mint(wallets[1].address, date, ciphertext, {
+            .mint(date, ciphertext, {
               value: ethers.utils.parseEther("0.2"),
             });
           await tx.wait();
@@ -380,6 +372,9 @@ describe("DesImages", function () {
 
       // TODO:
       // it("prevents from burning burned tokens", async function () {});
+
+      // TODO:
+      // it("prevents from burning other people's tokens", async function () {});
 
       it("prevents from re-entrancy", async function () {
         const date = 8274177;
@@ -404,11 +399,9 @@ describe("DesImages", function () {
           2,
           2
         );
-        let tx = await desImages
-          .connect(wallets[1])
-          .mint(wallets[1].address, _date, _ciphertext, {
-            value: ethers.utils.parseEther("0.1"),
-          });
+        let tx = await desImages.connect(wallets[1]).mint(_date, _ciphertext, {
+          value: ethers.utils.parseEther("0.1"),
+        });
         await tx.wait();
         // console.log(await wallets[2].getBalance());
         // console.log(await waffle.provider.getBalance(maliciousBurner.address));
@@ -451,11 +444,9 @@ describe("DesImages", function () {
   describe("tokenURI()", function () {
     it("gets tokenURI", async function () {
       const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
-      const tx = await desImages
-        .connect(wallets[1])
-        .mint(wallets[1].address, date, ciphertext, {
-          value: ethers.utils.parseEther("0.1"),
-        });
+      const tx = await desImages.connect(wallets[1]).mint(date, ciphertext, {
+        value: ethers.utils.parseEther("0.1"),
+      });
       const receipt = await tx.wait();
       const ev = receipt.events.filter((ev: any) => ev.event === "Minted");
       const tokenId = ev[0].args.tokenId.toHexString();
@@ -469,11 +460,9 @@ describe("DesImages", function () {
     describe("Security:", function () {
       it("fails to get burned tokenURI", async function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
-        let tx = await desImages
-          .connect(wallets[1])
-          .mint(wallets[1].address, date, ciphertext, {
-            value: ethers.utils.parseEther("0.1"),
-          });
+        let tx = await desImages.connect(wallets[1]).mint(date, ciphertext, {
+          value: ethers.utils.parseEther("0.1"),
+        });
         const receipt = await tx.wait();
         const ev = receipt.events.filter((ev: any) => ev.event === "Minted");
         const tokenId = ev[0].args.tokenId.toHexString();

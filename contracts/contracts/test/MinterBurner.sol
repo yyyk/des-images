@@ -47,7 +47,6 @@ contract MinterBurner is IERC721Receiver {
 
     function mint(address _address) public payable {
         DesImages(_address).mint{value: address(this).balance}(
-            msg.sender,
             date,
             ciphertext
         );

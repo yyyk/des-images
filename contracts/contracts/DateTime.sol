@@ -11,40 +11,42 @@ library DateTime {
     uint256 constant SECONDS_PER_DAY = 24 * 60 * 60;
     int256 constant OFFSET19700101 = 2440588;
 
-    function isLeapYear(uint256 year) internal pure returns (bool leapYear) {
-        leapYear = ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+    function isLeapYear(uint256 year_) internal pure returns (bool leapYear) {
+        leapYear =
+            ((year_ % 4 == 0) && (year_ % 100 != 0)) ||
+            (year_ % 400 == 0);
     }
 
-    function getDaysInMonth(uint256 year, uint256 month)
+    function getDaysInMonth(uint256 year_, uint256 month_)
         internal
         pure
         returns (uint256)
     {
         if (
-            month == 1 ||
-            month == 3 ||
-            month == 5 ||
-            month == 7 ||
-            month == 8 ||
-            month == 10 ||
-            month == 12
+            month_ == 1 ||
+            month_ == 3 ||
+            month_ == 5 ||
+            month_ == 7 ||
+            month_ == 8 ||
+            month_ == 10 ||
+            month_ == 12
         ) {
             return 31;
-        } else if (month != 2) {
+        } else if (month_ != 2) {
             return 30;
         } else {
-            return isLeapYear(year) ? 29 : 28;
+            return isLeapYear(year_) ? 29 : 28;
         }
     }
 
     function isValidDate(
-        uint256 year,
-        uint256 month,
-        uint256 day
+        uint256 year_,
+        uint256 month_,
+        uint256 day_
     ) internal pure returns (bool) {
-        if (month > 0 && month <= 12) {
-            uint256 daysInMonth = getDaysInMonth(year, month);
-            if (day > 0 && day <= daysInMonth) {
+        if (month_ > 0 && month_ <= 12) {
+            uint256 daysInMonth = getDaysInMonth(year_, month_);
+            if (day_ > 0 && day_ <= daysInMonth) {
                 return true;
             }
         }
@@ -52,14 +54,14 @@ library DateTime {
     }
 
     function timestampFromDate(
-        uint256 _year,
-        uint256 _month,
-        uint256 _day
+        uint256 year_,
+        uint256 month_,
+        uint256 day_
     ) internal pure returns (uint256) {
-        require(_year >= 1970);
-        int256 year = int256(_year);
-        int256 month = int256(_month);
-        int256 day = int256(_day);
+        require(year_ >= 1970);
+        int256 year = int256(year_);
+        int256 month = int256(month_);
+        int256 day = int256(day_);
 
         int256 totalDays = day -
             32075 +

@@ -27,7 +27,7 @@ interface ContextState {
 const ContractContext = createContext({} as ContextState);
 
 const ContractContextProvider = ({ children }: { children: ReactNode }) => {
-  const { isWalletInstalled, walletAddress, signer } = useWalletContext();
+  const { isWalletInstalled, signer } = useWalletContext();
   const [contract, setContract] = useState<Contract | null>(null);
   const [isPaused, setIsPaused] = useState(true);
   const [totalEverMinted, setTotalEverMinted] = useState('');
@@ -36,7 +36,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   const [burnPrice, setBurnPrice] = useState('');
 
   useEffect(() => {
-    if (!isWalletInstalled || !walletAddress || !signer) {
+    if (!isWalletInstalled || !signer) {
       contract && contract.removeAllListeners();
       setContract(null);
       return;
@@ -73,7 +73,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       newContract.removeAllListeners();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isWalletInstalled, signer, walletAddress]);
+  }, [isWalletInstalled, signer]);
 
   useEffect(() => {
     async function setup() {
@@ -134,7 +134,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     const cost = await getCurrentPrice(contract);
     setMintPrice(cost);
     // TODO: add 0.01 eth buffer
-    return await _mint(contract, walletAddress, dateHex, ciphertext, cost);
+    return await _mint(contract, dateHex, ciphertext, cost);
   };
 
   const burn = async (tokenId: string): Promise<boolean> => {

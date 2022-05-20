@@ -10,10 +10,10 @@ library TokenURI {
 
     bytes constant HEX_TABLE = "0123456789abcdef";
 
-    function generateTitle(uint32 date) internal pure returns (bytes memory) {
-        uint8 day = uint8(date & 0xff);
-        uint8 month = uint8((date >> 8) & 0xf);
-        uint16 year = uint16((date >> 12) & 0xffff);
+    function generateTitle(uint32 date_) internal pure returns (bytes memory) {
+        uint8 day = uint8(date_ & 0xff);
+        uint8 month = uint8((date_ >> 8) & 0xf);
+        uint16 year = uint16((date_ >> 12) & 0xffff);
         return
             abi.encodePacked(
                 "desImages#",
@@ -27,19 +27,19 @@ library TokenURI {
             );
     }
 
-    function generateFill(uint8 index, uint128 ciphertext)
+    function generateFill(uint8 index_, uint128 ciphertext_)
         internal
         pure
         returns (bytes memory)
     {
-        uint8 i = index * 8;
-        uint128 value = ciphertext >> i;
+        uint8 i = index_ * 8;
+        uint128 value = ciphertext_ >> i;
         bytes memory r = abi.encodePacked(HEX_TABLE[value & 0xf]);
         bytes memory l = abi.encodePacked(HEX_TABLE[(value >> 4) & 0xf]);
         return abi.encodePacked('fill="#', l, r, l, r, l, r, '"');
     }
 
-    function generateRects(uint128 ciphertext)
+    function generateRects(uint128 ciphertext_)
         internal
         pure
         returns (bytes memory)
@@ -57,7 +57,7 @@ library TokenURI {
                 '" height="',
                 size,
                 '" ',
-                generateFill(i, ciphertext),
+                generateFill(i, ciphertext_),
                 ' stroke="none"/>',
                 rects
             );
@@ -65,12 +65,12 @@ library TokenURI {
         return rects;
     }
 
-    function generateTokenURI(uint32 date, uint128 ciphertext)
+    function generateTokenURI(uint32 date_, uint128 ciphertext_)
         internal
         pure
         returns (string memory)
     {
-        bytes memory title = generateTitle(date);
+        bytes memory title = generateTitle(date_);
         return
             string(
                 abi.encodePacked(
@@ -87,7 +87,7 @@ library TokenURI {
                                         '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="512" height="512" viewBox="0 0 128 128"><title>',
                                         title,
                                         "</title>",
-                                        generateRects(ciphertext),
+                                        generateRects(ciphertext_),
                                         "</svg>"
                                     )
                                 )

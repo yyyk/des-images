@@ -56,15 +56,9 @@ export async function getTokenStatus(contract: Contract, dateHex: string, cipher
   }
 }
 
-export async function mint(
-  contract: Contract,
-  walletAddress: string,
-  dateHex: string,
-  ciphertext: string,
-  cost: string,
-): Promise<boolean> {
+export async function mint(contract: Contract, dateHex: string, ciphertext: string, cost: string): Promise<boolean> {
   try {
-    const tx = await contract.mint(walletAddress, parseInt(dateHex), BigNumber.from(ciphertext), {
+    const tx = await contract.mint(parseInt(dateHex), BigNumber.from(ciphertext), {
       value: ethers.utils.parseEther(cost),
     });
     const receipt = await tx.wait();

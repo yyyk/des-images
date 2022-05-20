@@ -14,6 +14,7 @@ error DesImages__FutureDate();
 error DesImages__NotEnouthETHSent();
 error DesImages__TokenNotForSale();
 error DesImages__TokenNotForBurn();
+error DesImages__TokenNotOwned();
 error DesImages__CreatorTransferFail();
 error DesImages__OwnerTransferFail();
 
@@ -68,10 +69,10 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         _;
     }
 
-    modifier validDate(uint32 date) {
-        uint8 day = uint8(date & 0xff);
-        uint8 month = uint8((date >> 8) & 0xf);
-        uint16 year = uint16((date >> 12) & 0xffff);
+    modifier validDate(uint32 date_) {
+        uint8 day = uint8(date_ & 0xff);
+        uint8 month = uint8((date_ >> 8) & 0xf);
+        uint16 year = uint16((date_ >> 12) & 0xffff);
         if (
             year < 2020 ||
             year > 9999 ||
@@ -106,12 +107,12 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         paused = false;
     }
 
-    function getTokenStatus(uint32 date, uint128 ciphertext)
+    function getTokenStatus(uint32 date_, uint128 ciphertext_)
         external
         view
         returns (Status)
     {
-        uint256 tokenId = _getTokenId(date, ciphertext);
+        uint256 tokenId = _getTokenId(date_, ciphertext_);
         return _tokenValues[tokenId].status;
     }
 
@@ -125,114 +126,110 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         return _getReserveCut(_currentMintPrice - LINEAR_COEFFICIENT);
     }
 
-    function _getReserveCut(uint256 mintPrice) private pure returns (uint256) {
-        return (mintPrice * RESERVE_CUT_OVER_10000) / 10000; // 0.5%
+    function _getReserveCut(uint256 mintPrice_) private pure returns (uint256) {
+        return (mintPrice_ * RESERVE_CUT_OVER_10000) / 10000; // 0.5%
     }
 
-    function _getTokenId(uint32 date, uint128 ciphertext)
+    function _getTokenId(uint32 date_, uint128 ciphertext_)
         private
         pure
         returns (uint256)
     {
-        return uint256(keccak256(abi.encodePacked(date, ciphertext)));
+        return uint256(keccak256(abi.encodePacked(date_, ciphertext_)));
     }
 
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId)
+    function tokenURI(uint256 tokenId_)
         public
         view
         virtual
         override
         returns (string memory)
     {
-        require(_exists(tokenId), "ERC721: URI query for nonexistent token");
+        require(_exists(tokenId_), "ERC721: URI query for nonexistent token");
 
-        TokenValue storage _tokenValue = _tokenValues[tokenId];
+        TokenValue storage tokenValue = _tokenValues[tokenId_];
         return
-            TokenURI.generateTokenURI(_tokenValue.date, _tokenValue.ciphertext);
+            TokenURI.generateTokenURI(tokenValue.date, tokenValue.ciphertext);
     }
 
     function tokenIdsOf() external view returns (uint256[] memory) {
         return _userOwnedTokens[msg.sender];
     }
 
-    function _addUserOwnedToken(address user, uint256 tokenId) private {
-        uint256[] storage userOwnedTokens = _userOwnedTokens[user];
-        _tokenIndex[tokenId] = userOwnedTokens.length;
-        userOwnedTokens.push(tokenId);
+    function _addUserOwnedToken(address user_, uint256 tokenId_) private {
+        uint256[] storage userOwnedTokens = _userOwnedTokens[user_];
+        _tokenIndex[tokenId_] = userOwnedTokens.length;
+        userOwnedTokens.push(tokenId_);
     }
 
     function _removeUserOwnedToken(
-        address user,
-        uint256 tokenId,
-        bool isBurn
+        address user_,
+        uint256 tokenId_,
+        bool isBurn_
     ) private {
-        uint256[] storage userOwnedTokens = _userOwnedTokens[user];
+        uint256[] storage userOwnedTokens = _userOwnedTokens[user_];
         uint256 lastTokenIndex = userOwnedTokens.length - 1;
-        uint256 tokenIndex = _tokenIndex[tokenId];
+        uint256 tokenIndex = _tokenIndex[tokenId_];
         if (tokenIndex != lastTokenIndex) {
             for (uint256 i = tokenIndex; i < lastTokenIndex; ++i) {
-                uint256 _tokenId = userOwnedTokens[i + 1];
-                userOwnedTokens[i] = _tokenId;
-                _tokenIndex[_tokenId] = i;
+                uint256 tokenId = userOwnedTokens[i + 1];
+                userOwnedTokens[i] = tokenId;
+                _tokenIndex[tokenId] = i;
             }
             // uint256 lastTokenId = userOwnedTokens[lastTokenIndex];
             // userOwnedTokens[tokenIndex] = lastTokenId;
             // _tokenIndex[lastTokenId] = tokenIndex;
         }
         userOwnedTokens.pop();
-        if (isBurn) {
-            delete _tokenIndex[tokenId];
+        if (isBurn_) {
+            delete _tokenIndex[tokenId_];
         }
     }
 
     function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
+        address from_,
+        address to_,
+        uint256 tokenId_
     ) internal virtual override {
-        super._beforeTokenTransfer(from, to, tokenId);
+        super._beforeTokenTransfer(from_, to_, tokenId_);
 
-        if (from == address(0)) {
+        if (from_ == address(0)) {
             // mint
-            _addUserOwnedToken(to, tokenId);
-        } else if (to == address(0)) {
+            _addUserOwnedToken(to_, tokenId_);
+        } else if (to_ == address(0)) {
             // burn
-            _removeUserOwnedToken(from, tokenId, true);
-        } else if (from != to) {
+            _removeUserOwnedToken(from_, tokenId_, true);
+        } else if (from_ != to_) {
             // transfer
-            _removeUserOwnedToken(from, tokenId, false);
-            _addUserOwnedToken(to, tokenId);
+            _removeUserOwnedToken(from_, tokenId_, false);
+            _addUserOwnedToken(to_, tokenId_);
         }
     }
 
     /*
      * This allows to mint hacks intentionally.
      */
-    function mint(
-        address recipient,
-        uint32 date,
-        uint128 ciphertext
-    )
+    function mint(uint32 date_, uint128 ciphertext_)
         external
         payable
         nonReentrant
         whenNotPaused
-        validDate(date)
+        validDate(date_)
         returns (uint256)
     {
         uint256 mintPrice = currentMintPrice();
         if (msg.value < mintPrice) {
             revert DesImages__NotEnouthETHSent();
         }
-        uint256 tokenId = _getTokenId(date, ciphertext);
+        uint256 tokenId = _getTokenId(date_, ciphertext_);
         if (_tokenValues[tokenId].status != Status.FOR_SALE) {
             revert DesImages__TokenNotForSale();
         }
-        _safeMint(recipient, tokenId);
-        _tokenValues[tokenId] = TokenValue(Status.MINTED, ciphertext, date);
+        _safeMint(msg.sender, tokenId);
+        _tokenValues[tokenId] = TokenValue(Status.MINTED, ciphertext_, date_);
         totalEverMinted += 1;
         totalSupply += 1;
 
@@ -255,7 +252,7 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         }
 
         emit Minted(
-            recipient,
+            msg.sender,
             tokenId,
             mintPrice,
             totalSupply,
@@ -265,13 +262,16 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         return tokenId;
     }
 
-    function burn(uint256 tokenId) external nonReentrant {
-        TokenValue storage tokenValue = _tokenValues[tokenId];
+    function burn(uint256 tokenId_) external nonReentrant {
+        if (msg.sender != ERC721.ownerOf(tokenId_)) {
+            revert DesImages__TokenNotOwned();
+        }
+        TokenValue storage tokenValue = _tokenValues[tokenId_];
         if (tokenValue.status != Status.MINTED) {
             revert DesImages__TokenNotForBurn();
         }
         uint256 burnReward = currentBurnReward();
-        super._burn(tokenId);
+        super._burn(tokenId_);
         tokenValue.status = Status.BURNED;
         totalSupply -= 1;
 
@@ -280,6 +280,6 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         if (!success) {
             revert DesImages__OwnerTransferFail();
         }
-        emit Burned(msg.sender, tokenId, burnReward, totalSupply);
+        emit Burned(msg.sender, tokenId_, burnReward, totalSupply);
     }
 }
