@@ -103,7 +103,7 @@ export async function isOwnerOf(contract: Contract, dateHex: string, ciphertext:
 
 export async function getTokenIds(contract: Contract): Promise<string[]> {
   try {
-    const ids = await contract.getTokenIds();
+    const ids = await contract.tokenIdsOf();
     return ids.map((id: BigNumber) => id.toHexString());
   } catch (err: any) {
     console.error(err);

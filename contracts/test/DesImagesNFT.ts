@@ -504,4 +504,5 @@ describe("DesImages", function () {
   // paused
   // unpaused
   // .ownerOf(tokenId)
+  // tokenIdsOf
 });

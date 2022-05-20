@@ -154,17 +154,17 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
             TokenURI.generateTokenURI(_tokenValue.date, _tokenValue.ciphertext);
     }
 
-    function getTokenIds() external view returns (uint256[] memory) {
+    function tokenIdsOf() external view returns (uint256[] memory) {
         return _userOwnedTokens[msg.sender];
     }
 
-    function addUserOwnedToken(address user, uint256 tokenId) private {
+    function _addUserOwnedToken(address user, uint256 tokenId) private {
         uint256[] storage userOwnedTokens = _userOwnedTokens[user];
         _tokenIndex[tokenId] = userOwnedTokens.length;
         userOwnedTokens.push(tokenId);
     }
 
-    function removeUserOwnedToken(
+    function _removeUserOwnedToken(
         address user,
         uint256 tokenId,
         bool isBurn
@@ -197,14 +197,14 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
 
         if (from == address(0)) {
             // mint
-            addUserOwnedToken(to, tokenId);
+            _addUserOwnedToken(to, tokenId);
         } else if (to == address(0)) {
             // burn
-            removeUserOwnedToken(from, tokenId, true);
+            _removeUserOwnedToken(from, tokenId, true);
         } else if (from != to) {
             // transfer
-            removeUserOwnedToken(from, tokenId, false);
-            addUserOwnedToken(to, tokenId);
+            _removeUserOwnedToken(from, tokenId, false);
+            _addUserOwnedToken(to, tokenId);
         }
     }
 

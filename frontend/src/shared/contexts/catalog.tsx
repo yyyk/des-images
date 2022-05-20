@@ -43,7 +43,19 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
 
   const _updateTokenData = (data: TokenData[]) => {
     setTokenData(data);
-    window.localStorage.setItem(LOCAL_STORAGE_TOKEN_DATA_KEY, JSON.stringify(data));
+    window.localStorage.setItem(
+      LOCAL_STORAGE_TOKEN_DATA_KEY,
+      JSON.stringify(
+        data.map(({ day, month, year, dateHex, ciphertext, plaintext }) => ({
+          day,
+          month,
+          year,
+          dateHex,
+          ciphertext,
+          plaintext,
+        })),
+      ),
+    );
   };
 
   const _updateTokenDataStatus = async () => {
