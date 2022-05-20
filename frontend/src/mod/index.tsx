@@ -33,7 +33,7 @@ const Mod = () => {
 
   return (
     <>
-      <div className="w-2/3 mx-auto mt-0">
+      <div className="w-2/3 mt-0 mx-auto">
         <DesImageCard
           tokenData={{
             day: '1',
@@ -44,22 +44,22 @@ const Mod = () => {
           }}
         />
       </div>
-      <div className="mx-0 mb-0 mt-10 text-center">
+      <div className="mt-6 sm:mt-10 mb-0 mx-0 px-3 sm:px-0 text-center">
         <Subtitle />
       </div>
       {walletAddress && (
-        <div className="mt-6 grow flex flex-col flex-nowrap justify-end">
+        <div className="mt-6 grow flex flex-col flex-nowrap justify-end px-3 sm:px-0">
           <Stats />
         </div>
       )}
-      <div className="mt-10">
+      <div className="mt-6 sm:mt-10">
         <Description />
       </div>
-      <div className="w-full mx-auto mt-7">
+      <div className="w-full mt-6 sm:mt-7 mx-auto px-3 sm:px-0">
         <ModPreviewForm onSubmit={handleOnPreview} defaultPlaintext="i slept a lot..." />
       </div>
       {tokenData && (
-        <div ref={scrollRef} className="w-2/3 mx-auto mt-4 mb-5">
+        <div ref={scrollRef} className="w-2/3 mt-11 sm:mt-4 sm:mb-5 mx-auto">
           <DesImageCard tokenData={tokenData} />
         </div>
       )}

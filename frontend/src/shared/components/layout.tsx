@@ -12,9 +12,9 @@ const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <div data-theme={theme} className="min-h-screen flex flex-col flex-nowrap">
       {isInvalidChainId && <AlertBanner />}
-      <div className="px-3 py-0 flex flex-col flex-nowrap grow">
+      <div className="flex flex-col flex-nowrap grow px-3 py-0">
         <Header />
-        <main className="prose w-full mx-auto mt-0 pt-0 pb-14 flex flex-col flex-nowrap grow">{children}</main>
+        <main className="prose w-full mt-0 mx-auto pt-0 pb-14 flex flex-col flex-nowrap grow">{children}</main>
         <Footer />
       </div>
     </div>

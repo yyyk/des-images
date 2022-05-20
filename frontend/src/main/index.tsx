@@ -31,7 +31,7 @@ const Main = () => {
 
   return (
     <>
-      <div className="w-2/3 mx-auto mt-0">
+      <div className="w-2/3 mt-0 mx-auto">
         <DesImageCard
           tokenData={{
             day: '1',
@@ -42,24 +42,24 @@ const Main = () => {
           }}
         />
       </div>
-      <div className="mx-0 mb-0 mt-10 text-center">
+      <div className="mt-6 sm:mt-10 mx-0 mb-0 px-3 sm:px-0 text-center">
         <Subtitle />
       </div>
       {walletAddress && (
-        <div className="mt-6 grow flex flex-col flex-nowrap justify-end">
+        <div className="mt-6 grow flex flex-col flex-nowrap justify-end px-3 sm:px-0">
           <Stats />
         </div>
       )}
-      <div className="mt-10">
+      <div className="mt-6 sm:mt-10">
         <Description />
       </div>
-      <div className="w-2/3 mx-auto mt-7">
+      <div className="w-full sm:w-2/3 mt-5 sm:mt-7 mx-auto px-3 sm:px-0">
         <PreviewForm onSubmit={handleOnPreview} />
       </div>
-      <div ref={scrollRef} className="w-2/3 mx-auto mt-12">
+      <div ref={scrollRef} className="w-2/3 mt-12 mx-auto">
         <DesImageCard tokenData={tokenData} />
       </div>
-      <div className="mt-12 mb-5">
+      <div className="mt-12 sm:mt-12 mb-0 sm:mb-5">
         <Supplement />
       </div>
     </>

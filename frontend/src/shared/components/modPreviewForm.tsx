@@ -13,6 +13,29 @@ import TextInput from 'src/shared/components/textInput';
 import DateInput from 'src/shared/components/dateInput';
 import TextTypeSelect from 'src/shared/components/textTypeSelect';
 
+const KeyLabel = () => (
+  <label className="label" htmlFor="">
+    <span className="label-text">Key</span>
+  </label>
+);
+
+const TypeSelect = ({ showHint, onChange }: { showHint: boolean; onChange: (value: TextType) => void }) => (
+  <>
+    <TextTypeSelect defaultValue={TextType.PLAINTEXT} onChange={onChange} />
+    {showHint && (
+      <div className="tooltip tooltip-top ml-0.5" data-tip="have you clicked 'official'?">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fillRule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </div>
+    )}
+  </>
+);
+
 interface ModPreviewFormProps {
   defaultPlaintext?: string;
   defaultCiphertext?: string;
@@ -61,33 +84,26 @@ const ModPreviewForm = ({
 
   return (
     <form onSubmit={handleOnPreview} className="flex flex-col justify-start items-start">
-      <div className="flex justify-start items-center w-full mx-auto mb-1">
+      <div className="hidden sm:flex justify-start items-center w-full mx-auto mb-1">
         <div className="w-3/12">
-          <label className="label" htmlFor="">
-            <span className="label-text">Key</span>
-          </label>
+          <KeyLabel />
         </div>
         <div className="grow mx-4 flex flex-row justify-start items-start">
-          <TextTypeSelect defaultValue={TextType.PLAINTEXT} onChange={(value) => setTextType(value)} />
-          {showHint && (
-            <div className="tooltip tooltip-top ml-0.5" data-tip="have you clicked 'official'?">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-          )}
+          <TypeSelect showHint={showHint} onChange={(value) => setTextType(value)} />
         </div>
         <div className="w-2/12"></div>
       </div>
-      <div className="flex justify-start items-start w-full mx-auto">
-        <div className="w-3/12">
+      <div className="flex flex-col sm:flex-row justify-start items-start w-full mx-auto">
+        <div className="w-full sm:w-3/12">
+          <div className="w-full block sm:hidden px-2">
+            <KeyLabel />
+          </div>
           <DateInput defaultValue={defaultDate} showLabel={false} onChange={(value) => setDate(value)} />
         </div>
-        <div className="grow mx-4">
+        <div className="w-full sm:w-auto grow mx-0 sm:mx-4 mt-4 sm:mt-0">
+          <div className="flex sm:hidden flex-row justify-start items-start mb-1">
+            <TypeSelect showHint={showHint} onChange={(value) => setTextType(value)} />
+          </div>
           <TextInput
             defaultValue={{ plaintext: defaultPlaintext, ciphertext: defaultCiphertext }}
             textType={textType}
@@ -95,7 +111,7 @@ const ModPreviewForm = ({
           />
         </div>
         <button
-          className="btn w-2/12"
+          className="btn w-full sm:w-2/12 mt-2 sm:mt-0"
           type="submit"
           disabled={
             isLoading ||

@@ -3,67 +3,83 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import WalletModal from 'src/shared/components/walletModal';
 
+const HomeLink = () => (
+  <Link className="block font-extrabold text-inherit no-underline hover:underline" to="/">
+    desImages
+  </Link>
+);
+
+const OfficialBadgeLink = ({ pathname }: { pathname: string }) => (
+  <Link className="block badge badge-ghost font-normal no-underline" to="/mod" state={{ previousPath: pathname }}>
+    official
+  </Link>
+);
+
+const ModBadgeLink = () => (
+  <Link className="block badge badge-outline font-normal no-underline" to="/">
+    mod
+  </Link>
+);
+
+const CatalogLink = () => (
+  <Link className="btn btn-md ml-auto" to="/catalog">
+    to the catalog
+  </Link>
+);
+
+const GoBackButton = () => {
+  const navigate = useNavigate();
+  return (
+    <button className="btn btn-md ml-auto" onClick={() => navigate(-1)}>
+      go back
+    </button>
+  );
+};
+
+const WalletAddress = () => {
+  const { walletAddress } = useWalletContext();
+  return (
+    <span className="ml-auto">{`Connected: ${String(walletAddress).substring(0, 6)}...${String(walletAddress).substring(
+      38,
+    )}`}</span>
+  );
+};
+
+const ConnectWalletButton = () => {
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
+  return (
+    <>
+      <>
+        <button className="btn btn-md ml-auto" onClick={() => setWalletModalOpen(true)}>
+          Connect Wallet
+        </button>
+        <WalletModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
+      </>
+    </>
+  );
+};
+
 const Header = () => {
   const { pathname, state } = useLocation();
-  const navigate = useNavigate();
   const { walletAddress } = useWalletContext();
-  const [walletModalOpen, setWalletModalOpen] = useState(false);
 
   return (
     <header
-      style={{ minHeight: '120px' }}
-      className="prose w-full flex justify-between items-center flex-wrap pt-8 pb-10 mx-auto"
+      style={{ minHeight: '48px' }}
+      className="prose w-full flex justify-between items-center flex-wrap mt-6 sm:mt-8 mb-8 sm:mb-10 mx-auto"
     >
       <div className="flex justify-start items-end">
-        <h1 className="m-0">
-          {pathname === '/' ? (
-            'desImages'
-          ) : (
-            <Link className="block font-extrabold text-inherit no-underline hover:underline" to="/">
-              desImages
-            </Link>
-          )}
-        </h1>
+        <h1 className="m-0">{pathname === '/' ? 'desImages' : <HomeLink />}</h1>
         <div
           className="tooltip tooltip-bottom ml-1 mb-0.5"
           data-tip={pathname !== '/mod' ? 'mod?' : 'back to official'}
         >
-          {pathname !== '/mod' ? (
-            <Link
-              className="block badge badge-ghost font-normal no-underline"
-              to="/mod"
-              state={{ previousPath: pathname }}
-            >
-              official
-            </Link>
-          ) : (
-            <Link className="block badge badge-outline font-normal no-underline" to="/">
-              mod
-            </Link>
-          )}
+          {pathname !== '/mod' ? <OfficialBadgeLink pathname={pathname} /> : <ModBadgeLink />}
         </div>
       </div>
-      {pathname === '/' && (
-        <Link className="btn btn-md" to="/catalog">
-          to the catalog
-        </Link>
-      )}
-      {pathname === '/mod' && (state as any)?.previousPath === '/catalog' && (
-        <button className="btn btn-md" onClick={() => navigate(-1)}>
-          go back
-        </button>
-      )}
-      {pathname === '/catalog' &&
-        (walletAddress.length > 0 ? (
-          <span>{`Connected: ${String(walletAddress).substring(0, 6)}...${String(walletAddress).substring(38)}`}</span>
-        ) : (
-          <>
-            <button className="btn btn-md" onClick={() => setWalletModalOpen(true)}>
-              Connect Wallet
-            </button>
-            <WalletModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
-          </>
-        ))}
+      {pathname === '/' && <CatalogLink />}
+      {pathname === '/mod' && (state as any)?.previousPath === '/catalog' && <GoBackButton />}
+      {pathname === '/catalog' && (walletAddress.length > 0 ? <WalletAddress /> : <ConnectWalletButton />)}
     </header>
   );
 };
