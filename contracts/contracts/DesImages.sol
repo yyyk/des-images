@@ -11,7 +11,7 @@ import "./TokenURI.sol";
 
 error DesImages__InvalidDate();
 error DesImages__FutureDate();
-error DesImages__NotEnouthETHSent();
+error DesImages__NotEnoughETHSent();
 error DesImages__TokenNotForSale();
 error DesImages__TokenNotForBurn();
 error DesImages__TokenNotOwned();
@@ -179,6 +179,7 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
                 userOwnedTokens[i] = tokenId;
                 _tokenIndex[tokenId] = i;
             }
+            // // ignore-order solution
             // uint256 lastTokenId = userOwnedTokens[lastTokenIndex];
             // userOwnedTokens[tokenIndex] = lastTokenId;
             // _tokenIndex[lastTokenId] = tokenIndex;
@@ -209,8 +210,8 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         }
     }
 
-    /*
-     * This allows to mint hacks intentionally.
+    /* TODO: more description
+     * This allows to mint 'hacks' intentionally.
      */
     function mint(uint32 date_, uint128 ciphertext_)
         external
@@ -222,7 +223,7 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
     {
         uint256 mintPrice = currentMintPrice();
         if (msg.value < mintPrice) {
-            revert DesImages__NotEnouthETHSent();
+            revert DesImages__NotEnoughETHSent();
         }
         uint256 tokenId = _getTokenId(date_, ciphertext_);
         if (_tokenValues[tokenId].status != Status.FOR_SALE) {
@@ -233,7 +234,6 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         totalEverMinted += 1;
         totalSupply += 1;
 
-        // payable(owner()).transfer(mintPrice.sub(_getReserveCut(mintPrice)));
         (bool success, ) = payable(owner()).call{
             value: mintPrice - _getReserveCut(mintPrice)
         }("");
@@ -242,11 +242,10 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         }
 
         if (msg.value > mintPrice) {
-            // payable(msg.sender).transfer(msg.value.sub(mintPrice));
-            (bool _success, ) = payable(msg.sender).call{
+            (success, ) = payable(msg.sender).call{
                 value: msg.value - mintPrice
             }("");
-            if (!_success) {
+            if (!success) {
                 revert DesImages__OwnerTransferFail();
             }
         }
@@ -275,7 +274,6 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         tokenValue.status = Status.BURNED;
         totalSupply -= 1;
 
-        // payable(msg.sender).transfer(burnReward);
         (bool success, ) = payable(msg.sender).call{value: burnReward}("");
         if (!success) {
             revert DesImages__OwnerTransferFail();

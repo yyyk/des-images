@@ -21,6 +21,9 @@ contract MinterBurner is IERC721Receiver {
     ROLE public role;
     bool public isBurning;
 
+    event Minted(address indexed to, uint256 indexed tokenId);
+    event Burned(address indexed from, uint256 indexed tokenId);
+
     constructor(
         uint32 _date,
         uint128 _ciphertext,
@@ -46,16 +49,17 @@ contract MinterBurner is IERC721Receiver {
     }
 
     function mint(address _address) public payable {
-        DesImages(_address).mint{value: address(this).balance}(
-            date,
-            ciphertext
-        );
+        uint256 _tokenId = DesImages(_address).mint{
+            value: address(this).balance
+        }(date, ciphertext);
+        emit Minted(address(this), _tokenId);
     }
 
     function burn(address _address) public {
         isBurning = true;
         DesImages(_address).burn(tokenId);
         isBurning = false;
+        emit Burned(address(this), tokenId);
     }
 
     fallback() external payable {
