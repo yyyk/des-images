@@ -1,4 +1,4 @@
-# des Images
+# desImages
 
 ### `/contract`
 
@@ -6,4 +6,4 @@ contains solidity files
 
 ### `/frontend`
 
-contains react based frontend app
+contains react frontend app
