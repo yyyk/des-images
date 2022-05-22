@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { Contract } from "ethers";
 import { ethers } from "hardhat";
 
-describe("DesImages", function () {
+describe("DesImages--pause", function () {
   let desImages: Contract;
   let signers: SignerWithAddress[];
 

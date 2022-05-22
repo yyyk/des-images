@@ -6,17 +6,21 @@ import { ethers, waffle } from "hardhat";
 import { getDateAndCiphertext } from "test/utils/getDateAndCiphertext";
 import { getTokenId } from "test/utils/getTokenId";
 
-describe("DesImages", function () {
+describe("DesImages--mint", function () {
   let desImages: Contract;
   let signers: SignerWithAddress[];
   let wallets: Wallet[];
+  let user: Wallet;
+  let mintPrice: BigNumber;
 
   beforeEach(async function () {
     signers = await ethers.getSigners();
     wallets = waffle.provider.getWallets();
+    user = wallets[1];
     const DesImages = await ethers.getContractFactory("DesImages");
     desImages = await DesImages.deploy();
     await desImages.deployed();
+    mintPrice = await desImages.currentMintPrice();
 
     const [owner] = signers;
     const paused = await desImages.paused();
@@ -27,13 +31,6 @@ describe("DesImages", function () {
 
   describe("mint()", function () {
     describe("Expected:", function () {
-      let user: Wallet, mintPrice: BigNumber;
-
-      beforeEach(async function () {
-        user = wallets[1];
-        mintPrice = await desImages.currentMintPrice();
-      });
-
       it("mints a token", async function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
         expect(await desImages.getTokenStatus(date, ciphertext)).to.equal(0);
@@ -162,13 +159,6 @@ describe("DesImages", function () {
     });
 
     describe("Security:", function () {
-      let user: Wallet, mintPrice: BigNumber;
-
-      beforeEach(async function () {
-        user = wallets[1];
-        mintPrice = await desImages.currentMintPrice();
-      });
-
       it("fails if not enough ether is sent", async function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
         await expect(

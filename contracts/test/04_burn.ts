@@ -6,17 +6,23 @@ import { ethers, waffle } from "hardhat";
 import { getDateAndCiphertext } from "test/utils/getDateAndCiphertext";
 import { getTokenId } from "test/utils/getTokenId";
 
-describe("DesImages", function () {
+describe("DesImages--burn", function () {
   let desImages: Contract;
   let signers: SignerWithAddress[];
   let wallets: Wallet[];
+  let user: Wallet;
+  let mintPrice: BigNumber;
+  let burnReward: BigNumber;
 
   beforeEach(async function () {
     signers = await ethers.getSigners();
     wallets = waffle.provider.getWallets();
+    user = wallets[1];
     const DesImages = await ethers.getContractFactory("DesImages");
     desImages = await DesImages.deploy();
     await desImages.deployed();
+    mintPrice = await desImages.currentMintPrice();
+    burnReward = await desImages.currentBurnReward();
 
     const [owner] = signers;
     const paused = await desImages.paused();
@@ -27,14 +33,6 @@ describe("DesImages", function () {
 
   describe("burn()", function () {
     describe("Expected:", function () {
-      let user: Wallet, mintPrice: BigNumber, burnReward: BigNumber;
-
-      beforeEach(async function () {
-        user = wallets[1];
-        mintPrice = await desImages.currentMintPrice();
-        burnReward = await desImages.currentBurnReward();
-      });
-
       it("burns a token", async function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
         const tokenId = BigNumber.from(getTokenId(date, ciphertext));
@@ -125,13 +123,6 @@ describe("DesImages", function () {
     });
 
     describe("Security:", function () {
-      let user: Wallet, mintPrice: BigNumber;
-
-      beforeEach(async function () {
-        user = wallets[1];
-        mintPrice = await desImages.currentMintPrice();
-      });
-
       it("prevents from burning non-minted tokens", async function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
         const tokenId = BigNumber.from(getTokenId(date, ciphertext));
