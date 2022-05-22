@@ -13,7 +13,7 @@ error DesImages__InvalidDate();
 error DesImages__FutureDate();
 error DesImages__NotEnoughETHSent();
 error DesImages__TokenNotForSale();
-error DesImages__TokenNotForBurn();
+// error DesImages__TokenNotForBurn();
 error DesImages__TokenNotOwned();
 error DesImages__CreatorTransferFail();
 error DesImages__OwnerTransferFail();
@@ -265,13 +265,13 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         if (msg.sender != ERC721.ownerOf(tokenId_)) {
             revert DesImages__TokenNotOwned();
         }
-        TokenValue storage tokenValue = _tokenValues[tokenId_];
-        if (tokenValue.status != Status.MINTED) {
-            revert DesImages__TokenNotForBurn();
-        }
+        // TokenValue storage tokenValue = _tokenValues[tokenId_];
+        // if (tokenValue.status != Status.MINTED) {
+        //     revert DesImages__TokenNotForBurn();
+        // }
         uint256 burnReward = currentBurnReward();
         super._burn(tokenId_);
-        tokenValue.status = Status.BURNED;
+        _tokenValues[tokenId_].status = Status.BURNED;
         totalSupply -= 1;
 
         (bool success, ) = payable(msg.sender).call{value: burnReward}("");
