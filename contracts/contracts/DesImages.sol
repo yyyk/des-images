@@ -18,6 +18,9 @@ error DesImages__TokenNotOwned();
 error DesImages__CreatorTransferFail();
 error DesImages__OwnerTransferFail();
 
+/// @title DesImages
+/// @author
+/// @notice
 contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
     enum Status {
         FOR_SALE,
@@ -36,13 +39,11 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
     uint256 private constant RESERVE_CUT_OVER_10000 = 9950; // 99.5%
     uint96 private constant ROYALTY_OVER_10000 = 500; // 5%
 
-    mapping(uint256 => uint256) private _tokenIndex;
-    mapping(address => uint256[]) private _userOwnedTokens;
     mapping(uint256 => TokenValue) private _tokenValues;
 
-    uint256 public totalSupply = 0;
-    uint256 public totalEverMinted = 0;
-    bool public paused = false;
+    uint256 public totalSupply;
+    uint256 public totalEverMinted;
+    bool public paused;
 
     event Minted(
         address indexed to,
@@ -69,6 +70,9 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         _;
     }
 
+    /// @notice Multiplies 2 numbers together
+    /// @param date_ the first uint.
+    /// @dev This function does not currently check
     modifier validDate(uint32 date_) {
         uint8 day = uint8(date_ & 0xff);
         uint8 month = uint8((date_ >> 8) & 0xf);
@@ -107,27 +111,32 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         paused = false;
     }
 
-    function getTokenStatus(uint32 date_, uint128 ciphertext_)
-        external
-        view
-        returns (Status)
-    {
-        uint256 tokenId = _getTokenId(date_, ciphertext_);
-        return _tokenValues[tokenId].status;
+    /// @notice Multiplies 2 numbers together
+    /// @param tokenId_ the second uint.
+    /// @return Status the product of (x * y)
+    /// @dev This function does not currently check
+    function getTokenStatus(uint256 tokenId_) external view returns (Status) {
+        return _tokenValues[tokenId_].status;
     }
 
+    /// @notice Multiplies 2 numbers together
+    /// @return uint256 the product of (x * y)
+    /// @dev This function does not currently check
     function currentMintPrice() public view returns (uint256) {
         uint256 _totalSupply = totalSupply;
         return INITIAL_PRICE + _totalSupply * LINEAR_COEFFICIENT;
     }
 
+    /// @notice Multiplies 2 numbers together
+    /// @return uint256 the product of (x * y)
+    /// @dev This function does not currently check
     function currentBurnReward() public view returns (uint256) {
         uint256 _currentMintPrice = currentMintPrice();
         return _getReserveCut(_currentMintPrice - LINEAR_COEFFICIENT);
     }
 
     function _getReserveCut(uint256 mintPrice_) private pure returns (uint256) {
-        return (mintPrice_ * RESERVE_CUT_OVER_10000) / 10000; // 0.5%
+        return (mintPrice_ * RESERVE_CUT_OVER_10000) / 10000; // 99.5%
     }
 
     function _getTokenId(uint32 date_, uint128 ciphertext_)
@@ -138,13 +147,13 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         return uint256(keccak256(abi.encodePacked(date_, ciphertext_)));
     }
 
-    /**
-     * @dev See {IERC721Metadata-tokenURI}.
-     */
+    /// @notice Multiplies 2 numbers together
+    /// @param tokenId_ the first uint.
+    /// @return uint256 the product of (x * y)
+    /// @dev See {IERC721Metadata-tokenURI}.
     function tokenURI(uint256 tokenId_)
         public
         view
-        virtual
         override
         returns (string memory)
     {
@@ -155,64 +164,14 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
             TokenURI.generateTokenURI(tokenValue.date, tokenValue.ciphertext);
     }
 
-    function tokenIdsOf() external view returns (uint256[] memory) {
-        return _userOwnedTokens[msg.sender];
-    }
-
-    function _addUserOwnedToken(address user_, uint256 tokenId_) private {
-        uint256[] storage userOwnedTokens = _userOwnedTokens[user_];
-        _tokenIndex[tokenId_] = userOwnedTokens.length;
-        userOwnedTokens.push(tokenId_);
-    }
-
-    function _removeUserOwnedToken(
-        address user_,
-        uint256 tokenId_,
-        bool isBurn_
-    ) private {
-        uint256[] storage userOwnedTokens = _userOwnedTokens[user_];
-        uint256 lastTokenIndex = userOwnedTokens.length - 1;
-        uint256 tokenIndex = _tokenIndex[tokenId_];
-        if (tokenIndex != lastTokenIndex) {
-            for (uint256 i = tokenIndex; i < lastTokenIndex; ++i) {
-                uint256 tokenId = userOwnedTokens[i + 1];
-                userOwnedTokens[i] = tokenId;
-                _tokenIndex[tokenId] = i;
-            }
-            // // ignore-order solution
-            // uint256 lastTokenId = userOwnedTokens[lastTokenIndex];
-            // userOwnedTokens[tokenIndex] = lastTokenId;
-            // _tokenIndex[lastTokenId] = tokenIndex;
-        }
-        userOwnedTokens.pop();
-        if (isBurn_) {
-            delete _tokenIndex[tokenId_];
-        }
-    }
-
-    function _beforeTokenTransfer(
-        address from_,
-        address to_,
-        uint256 tokenId_
-    ) internal virtual override {
-        super._beforeTokenTransfer(from_, to_, tokenId_);
-
-        if (from_ == address(0)) {
-            // mint
-            _addUserOwnedToken(to_, tokenId_);
-        } else if (to_ == address(0)) {
-            // burn
-            _removeUserOwnedToken(from_, tokenId_, true);
-        } else if (from_ != to_) {
-            // transfer
-            _removeUserOwnedToken(from_, tokenId_, false);
-            _addUserOwnedToken(to_, tokenId_);
-        }
-    }
-
     /* TODO: more description
      * This allows to mint 'hacks' intentionally.
      */
+    /// @notice Multiplies 2 numbers together
+    /// @param date_ the first uint.
+    /// @param ciphertext_ the first uint.
+    /// @return uint256 the product of (x * y)
+    /// @dev See {IERC721Metadata-tokenURI}.
     function mint(uint32 date_, uint128 ciphertext_)
         external
         payable
@@ -261,6 +220,9 @@ contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
         return tokenId;
     }
 
+    /// @notice Multiplies 2 numbers together
+    /// @param tokenId_ the first uint.
+    /// @dev See {IERC721Metadata-tokenURI}.
     function burn(uint256 tokenId_) external nonReentrant {
         if (msg.sender != ERC721.ownerOf(tokenId_)) {
             revert DesImages__TokenNotOwned();

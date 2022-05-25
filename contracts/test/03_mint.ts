@@ -33,28 +33,25 @@ describe("DesImages--mint", function () {
     describe("Expected:", function () {
       it("mints a token", async function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
-        expect(await desImages.getTokenStatus(date, ciphertext)).to.equal(0);
+        const tokenId = BigNumber.from(getTokenId(date, ciphertext));
+        expect(await desImages.getTokenStatus(tokenId)).to.equal(0);
 
         const tx = await desImages.connect(user).mint(date, ciphertext, {
           value: mintPrice,
         });
         const receipt = await tx.wait();
         const ev = receipt.events.filter((ev: any) => ev.event === "Minted");
-        const tokenId = BigNumber.from(getTokenId(date, ciphertext));
         expect(ev[0].args.to).to.equal(wallets[1].address);
         expect(ev[0].args.tokenId).to.equal(tokenId);
         expect(ev[0].args.mintPrice).to.equal(mintPrice);
         expect(ev[0].args.totalSupply.toString()).to.equal("1");
         expect(ev[0].args.totalEverMinted.toString()).to.equal("1");
 
-        expect(await desImages.getTokenStatus(date, ciphertext)).to.equal(1);
+        expect(await desImages.getTokenStatus(tokenId)).to.equal(1);
         expect(await desImages.ownerOf(tokenId)).to.equal(wallets[1].address);
         expect(await desImages.balanceOf(wallets[1].address)).to.equal(
           BigNumber.from(1)
         );
-        const tokenIds = await desImages.connect(user).tokenIdsOf();
-        expect(tokenIds.length).to.equal(1);
-        expect(tokenIds[0]).to.equal(tokenId);
       });
 
       it("mints a token from a contract", async function () {

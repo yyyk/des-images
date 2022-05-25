@@ -51,13 +51,11 @@ describe("DesImages--burn", function () {
         expect(ev[0].args.burnReward).to.equal(burnReward);
         expect(ev[0].args.totalSupply.toString()).to.equal("0");
 
-        expect(await desImages.getTokenStatus(date, ciphertext)).to.equal(2);
+        expect(await desImages.getTokenStatus(tokenId)).to.equal(2);
         await expect(desImages.ownerOf(tokenId)).to.be.reverted;
         expect(await desImages.balanceOf(user.address)).to.equal(
           BigNumber.from(0)
         );
-        const tokenIds = await desImages.connect(user).tokenIdsOf();
-        expect(tokenIds.length).to.equal(0);
       });
 
       it("burns a token from a contract", async function () {
@@ -127,7 +125,7 @@ describe("DesImages--burn", function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
         const tokenId = BigNumber.from(getTokenId(date, ciphertext));
 
-        expect(await desImages.getTokenStatus(date, ciphertext)).to.equal(0);
+        expect(await desImages.getTokenStatus(tokenId)).to.equal(0);
         await expect(desImages.connect(user).burn(tokenId)).to.be.reverted;
       });
 
@@ -142,7 +140,7 @@ describe("DesImages--burn", function () {
         tx = await desImages.connect(user).burn(tokenId);
         await tx.wait();
 
-        expect(await desImages.getTokenStatus(date, ciphertext)).to.equal(2);
+        expect(await desImages.getTokenStatus(tokenId)).to.equal(2);
         await expect(desImages.connect(user).burn(tokenId)).to.be.reverted;
       });
 
@@ -155,7 +153,7 @@ describe("DesImages--burn", function () {
         });
         await tx.wait();
 
-        expect(await desImages.getTokenStatus(date, ciphertext)).to.equal(1);
+        expect(await desImages.getTokenStatus(tokenId)).to.equal(1);
         await expect(desImages.connect(user).burn(tokenId)).to.be.revertedWith(
           "DesImages__TokenNotOwned"
         );

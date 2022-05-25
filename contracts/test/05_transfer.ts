@@ -104,4 +104,6 @@ describe("DesImages--transfer", function () {
       });
     });
   });
+
+  // TODO: approve
 });

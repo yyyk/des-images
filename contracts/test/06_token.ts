@@ -32,17 +32,19 @@ describe("DesImages--token-utility", function () {
   describe("getTokenStatus()", function () {
     it("returns 0 for tokens for sale", async function () {
       const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
-      const status = await desImages.getTokenStatus(date, ciphertext);
+      const tokenId = BigNumber.from(getTokenId(date, ciphertext));
+      const status = await desImages.getTokenStatus(tokenId);
       expect(status).to.equal(0);
     });
 
     it("returns 1 for minted tokens", async function () {
       const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
+      const tokenId = BigNumber.from(getTokenId(date, ciphertext));
       const tx = await desImages.connect(user).mint(date, ciphertext, {
         value: mintPrice,
       });
       await tx.wait();
-      const status = await desImages.getTokenStatus(date, ciphertext);
+      const status = await desImages.getTokenStatus(tokenId);
       expect(status).to.equal(1);
     });
 
@@ -55,7 +57,7 @@ describe("DesImages--token-utility", function () {
       await tx.wait();
       tx = await desImages.connect(user).burn(tokenId);
       await tx.wait();
-      const status = await desImages.getTokenStatus(date, ciphertext);
+      const status = await desImages.getTokenStatus(tokenId);
       expect(status).to.equal(2);
     });
   });
@@ -174,68 +176,6 @@ describe("DesImages--token-utility", function () {
     });
   });
 
-  describe("tokenIdsOf()", function () {
-    it("returns tokenIds owned by the caller", async function () {
-      // before mint
-      expect((await desImages.connect(user).tokenIdsOf()).length).to.equal(0);
-
-      // mint
-      const { date: d1, ciphertext: c1 } = getDateAndCiphertext(2020, 1, 1);
-      const tokenId1 = BigNumber.from(getTokenId(d1, c1));
-      let tx = await desImages.connect(user).mint(d1, c1, {
-        value: mintPrice,
-      });
-      await tx.wait();
-      expect((await desImages.connect(user).tokenIdsOf()).length).to.equal(1);
-      expect(
-        await desImages.connect(user).tokenIdsOf()
-      ).to.have.deep.ordered.members([tokenId1]);
-
-      // another mint
-      mintPrice = await desImages.currentMintPrice();
-      const { date: d2, ciphertext: c2 } = getDateAndCiphertext(2020, 1, 2);
-      const tokenId2 = BigNumber.from(getTokenId(d2, c2));
-      tx = await desImages.connect(user).mint(d2, c2, {
-        value: mintPrice,
-      });
-      await tx.wait();
-      expect((await desImages.connect(user).tokenIdsOf()).length).to.equal(2);
-      expect(
-        await desImages.connect(user).tokenIdsOf()
-      ).to.have.deep.ordered.members([tokenId1, tokenId2]);
-
-      // burn
-      tx = await desImages.connect(user).burn(tokenId1);
-      await tx.wait();
-      expect((await desImages.connect(user).tokenIdsOf()).length).to.equal(1);
-      expect(
-        await desImages.connect(user).tokenIdsOf()
-      ).to.have.deep.ordered.members([tokenId2]);
-
-      // transfer
-      const receiver = wallets[2];
-      const { date: d3, ciphertext: c3 } = getDateAndCiphertext(2020, 1, 3);
-      const tokenId3 = BigNumber.from(getTokenId(d3, c3));
-      mintPrice = await desImages.currentMintPrice();
-      tx = await desImages.connect(receiver).mint(d3, c3, {
-        value: mintPrice,
-      });
-      await tx.wait();
-
-      tx = await desImages
-        .connect(user)
-        .transferFrom(user.address, receiver.address, tokenId2);
-      await tx.wait();
-      expect((await desImages.connect(user).tokenIdsOf()).length).to.equal(0);
-      expect((await desImages.connect(receiver).tokenIdsOf()).length).to.equal(
-        2
-      );
-      expect(
-        await desImages.connect(receiver).tokenIdsOf()
-      ).to.have.deep.ordered.members([tokenId3, tokenId2]);
-    });
-  });
-
   describe("IERC721Metadata:", function () {
     describe("tokenURI()", function () {
       describe("Expected:", function () {
@@ -296,6 +236,4 @@ describe("DesImages--token-utility", function () {
       });
     });
   });
-
-  // TODO: approve??
 });

@@ -8,8 +8,8 @@ pragma solidity 0.8.13;
 // ----------------------------------------------------------------------------
 
 library DateTime {
-    uint256 constant SECONDS_PER_DAY = 24 * 60 * 60;
-    int256 constant OFFSET19700101 = 2440588;
+    uint256 private constant SECONDS_PER_DAY = 24 * 60 * 60;
+    int256 private constant OFFSET19700101 = 2440588;
 
     function isLeapYear(uint256 year_) internal pure returns (bool leapYear) {
         leapYear =
