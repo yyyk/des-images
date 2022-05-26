@@ -2,6 +2,7 @@ import { BigNumber, Contract, ethers } from 'ethers';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { decrypt, encrypt } from 'src/shared/utils/des';
 import { getTokenStatus as _getTokenStatus, isOwnerOf } from 'src/shared/services/contract';
+import { LOCAL_STORAGE_TOKEN_DATA_KEY } from '../constants';
 
 function toHexString(value: string): string {
   return parseInt(value).toString(16);
@@ -54,8 +55,8 @@ export function convertTokenURIToTokenData(uri: string, tokenId: string): TokenD
           })
           .join('')}`,
       }),
-      isOwner: true,
-      status: TOKEN_STATUS.MINTED,
+      isOwner: true, // TODO: is it ok?
+      status: TOKEN_STATUS.MINTED, // TODO: is it ok?
       tokenId,
     };
   } catch (err: any) {
@@ -63,11 +64,8 @@ export function convertTokenURIToTokenData(uri: string, tokenId: string): TokenD
   }
 }
 
-export function getTokenId(data: TokenData): string {
-  return ethers.utils.solidityKeccak256(
-    ['uint32', 'uint128'],
-    [parseInt(data.dateHex), BigNumber.from(data.ciphertext)],
-  );
+export function getTokenId(dateHex: string, ciphertext: string): string {
+  return ethers.utils.solidityKeccak256(['uint32', 'uint128'], [parseInt(dateHex), BigNumber.from(ciphertext)]);
 }
 
 export async function getTokenStatus(
@@ -91,13 +89,42 @@ export async function updateTokenDataStatus(
   for (const data of tokenData) {
     if (data) {
       let _data: TokenData = { ...data };
-      const status = await getTokenStatus(contract, data);
+      const status = await getTokenStatus(contract, _data);
       _data = { ..._data, status };
-      const isOwner = await getIsOwner(contract, data);
-      const tokenId = isOwner ? getTokenId(data) : '';
+      const isOwner = await getIsOwner(contract, _data);
+      const tokenId = isOwner ? getTokenId(_data.dateHex, _data.ciphertext) : '';
       _data = { ..._data, isOwner, tokenId };
       result.push(_data);
     }
   }
   return result;
+}
+
+export function writeTokenDataToLocalStorage(data: TokenData[]): void {
+  window.localStorage.setItem(
+    LOCAL_STORAGE_TOKEN_DATA_KEY,
+    JSON.stringify(
+      data.map(({ day, month, year, dateHex, ciphertext, plaintext }) => ({
+        day,
+        month,
+        year,
+        dateHex,
+        ciphertext,
+        plaintext,
+      })),
+    ),
+  );
+}
+
+export function getTokenDataFromLocalStorage(): TokenData[] {
+  const storedData = window.localStorage.getItem(LOCAL_STORAGE_TOKEN_DATA_KEY);
+  if (storedData) {
+    try {
+      const parsedData = JSON.parse(storedData);
+      if (Array.isArray(parsedData)) {
+        return parsedData;
+      }
+    } catch (err) {}
+  }
+  return [];
 }

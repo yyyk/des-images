@@ -76,3 +76,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 - add 0.01 ETH buffer
 - cloudflare tracking
 - tests
+- loading state

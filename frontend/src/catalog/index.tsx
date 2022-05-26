@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useThemeContext } from 'src/shared/contexts/theme';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
@@ -13,6 +13,12 @@ const Catalog = () => {
   useEffectOnce(() => {
     setTheme('lofi');
   });
+
+  useEffect(() => {
+    if (!walletAddress) {
+      setTabIndex(0);
+    }
+  }, [walletAddress]);
 
   return (
     <>

@@ -1,5 +1,6 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { TOKEN_STATUS } from 'src/shared/interfaces';
+import { getTokenId } from '../utils/tokenDataHelpers';
 
 // paused
 export async function isPaused(contract: Contract): Promise<boolean> {
@@ -49,7 +50,8 @@ export async function currentBurnReward(contract: Contract): Promise<string> {
 
 export async function getTokenStatus(contract: Contract, dateHex: string, ciphertext: string): Promise<TOKEN_STATUS> {
   try {
-    return await contract.getTokenStatus(parseInt(dateHex), BigNumber.from(ciphertext));
+    const tokenId = getTokenId(dateHex, ciphertext);
+    return await contract.getTokenStatus(BigNumber.from(tokenId));
   } catch (err: any) {
     console.error(err);
     throw new Error(err?.message ?? '');
@@ -61,9 +63,10 @@ export async function mint(contract: Contract, dateHex: string, ciphertext: stri
     const tx = await contract.mint(parseInt(dateHex), BigNumber.from(ciphertext), {
       value: ethers.utils.parseEther(cost),
     });
-    const receipt = await tx.wait();
-    const ev = receipt.events.filter((ev: any) => ev.event === 'Minted');
-    console.log(ev?.[0]?.args?.tokenId?.toHexString());
+    await tx.wait();
+    // const receipt = await tx.wait();
+    // const ev = receipt.events.filter((ev: any) => ev.event === 'Minted');
+    // console.log(ev?.[0]?.args?.tokenId?.toHexString());
     return true;
   } catch (err) {
     console.error(err);
@@ -74,9 +77,10 @@ export async function mint(contract: Contract, dateHex: string, ciphertext: stri
 export async function burn(contract: Contract, tokenId: string): Promise<boolean> {
   try {
     const tx = await contract.burn(BigNumber.from(tokenId));
-    const receipt = await tx.wait();
-    const ev = receipt.events.filter((ev: any) => ev.event === 'Burned');
-    console.log(ev?.[0]?.args?.tokenId?.toHexString());
+    await tx.wait();
+    // const receipt = await tx.wait();
+    // const ev = receipt.events.filter((ev: any) => ev.event === 'Burned');
+    // console.log(ev?.[0]?.args?.tokenId?.toHexString());
     return true;
   } catch (err) {
     console.error(err);
@@ -86,19 +90,7 @@ export async function burn(contract: Contract, tokenId: string): Promise<boolean
 
 export async function isOwnerOf(contract: Contract, dateHex: string, ciphertext: string): Promise<boolean> {
   try {
-    return await contract.ownerOf(
-      ethers.utils.solidityKeccak256(['uint32', 'uint128'], [parseInt(dateHex), BigNumber.from(ciphertext)]),
-    );
-  } catch (err: any) {
-    console.error(err);
-    throw new Error(err?.message ?? '');
-  }
-}
-
-export async function getTokenIds(contract: Contract): Promise<string[]> {
-  try {
-    const ids = await contract.tokenIdsOf();
-    return ids.map((id: BigNumber) => id.toHexString());
+    return await contract.ownerOf(BigNumber.from(getTokenId(dateHex, ciphertext)));
   } catch (err: any) {
     console.error(err);
     throw new Error(err?.message ?? '');

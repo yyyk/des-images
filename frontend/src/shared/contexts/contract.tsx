@@ -1,9 +1,8 @@
-import { ethers, Contract } from 'ethers';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { ethers, Contract, BigNumber } from 'ethers';
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { CONTRACT_ADDRESS } from 'src/shared/constants';
 import {
-  isPaused as _isPaused,
   mint as _mint,
   burn as _burn,
   getTotalEverMinted,
@@ -12,6 +11,7 @@ import {
   currentBurnReward,
 } from 'src/shared/services/contract';
 import DesImages from 'src/abi/DesImages.json';
+import { calcBurnReward, calcMintPrice, getIsPaused, queryTokenIds } from 'src/shared/utils/contractHelpers';
 
 interface ContextState {
   contract: Contract | null;
@@ -20,6 +20,7 @@ interface ContextState {
   totalSupply: string;
   mintPrice: string;
   burnPrice: string;
+  ownedTokenIds: string[];
   mint: (dateHex: string, ciphertext: string) => Promise<boolean>;
   burn: (tokenId: string) => Promise<boolean>;
 }
@@ -27,13 +28,105 @@ interface ContextState {
 const ContractContext = createContext({} as ContextState);
 
 const ContractContextProvider = ({ children }: { children: ReactNode }) => {
-  const { isWalletInstalled, signer } = useWalletContext();
+  const { isWalletInstalled, signer, walletAddress } = useWalletContext();
   const [contract, setContract] = useState<Contract | null>(null);
   const [isPaused, setIsPaused] = useState(true);
   const [totalEverMinted, setTotalEverMinted] = useState('');
   const [totalSupply, setTotalSupply] = useState('');
   const [mintPrice, setMintPrice] = useState('');
   const [burnPrice, setBurnPrice] = useState('');
+  const ownedTokenIds = useRef<string[]>([]);
+
+  const _updateOwnedTokenIds = (from: string, to: string, tokenId: BigNumber) => {
+    const _tokenId = tokenId.toHexString();
+    const index = ownedTokenIds.current.findIndex((id) => id === _tokenId);
+    if (from.toLowerCase() === walletAddress.toLowerCase()) {
+      // remove
+      if (index > -1) {
+        ownedTokenIds.current = [...ownedTokenIds.current.slice(0, index), ...ownedTokenIds.current.slice(index + 1)];
+      }
+      // console.log('remove', _tokenId, index);
+    } else if (to.toLowerCase() === walletAddress.toLowerCase()) {
+      // add
+      // console.log('add', _tokenId, index);
+      if (index === -1) {
+        ownedTokenIds.current = ownedTokenIds.current.concat(_tokenId);
+      }
+    }
+  };
+
+  const _eventHandler = (type: string, contract: Contract, startBlockNumber: number) => {
+    switch (type) {
+      case 'Transfer':
+        return async (from: string, to: string, tokenId: BigNumber, event: any) => {
+          if (event?.blockNumber <= startBlockNumber) {
+            return;
+          }
+          _updateOwnedTokenIds(from, to, tokenId);
+          setIsPaused(await getIsPaused(contract));
+        };
+      case 'Minted':
+        return async (
+          _to: string,
+          _tokenId: BigNumber,
+          _mintPrice: BigNumber,
+          totalSupply: BigNumber,
+          totalEverMinted: BigNumber,
+          event: any,
+        ) => {
+          if (event?.blockNumber <= startBlockNumber) {
+            return;
+          }
+          setTotalSupply(totalSupply.toString());
+          setTotalEverMinted(totalEverMinted.toString());
+          setMintPrice(calcMintPrice(totalSupply));
+          setBurnPrice(calcBurnReward(totalSupply));
+        };
+      case 'Burned':
+        return async (
+          _from: string,
+          _tokenId: BigNumber,
+          _burnReward: BigNumber,
+          totalSupply: BigNumber,
+          event: any,
+        ) => {
+          if (event?.blockNumber <= startBlockNumber) {
+            return;
+          }
+          setTotalSupply(totalSupply.toString());
+          setMintPrice(calcMintPrice(totalSupply));
+          setBurnPrice(calcBurnReward(totalSupply));
+        };
+      default:
+        return () => {};
+    }
+  };
+
+  const _setupContractListeners = async (contract: Contract) => {
+    const startBlockNumber = await contract.provider.getBlockNumber();
+    contract.on(contract.filters.Transfer(), _eventHandler('Transfer', contract, startBlockNumber));
+    contract.on(contract.filters.Minted(), _eventHandler('Minted', contract, startBlockNumber));
+    contract.on(contract.filters.Burned(), _eventHandler('Burned', contract, startBlockNumber));
+  };
+
+  const _queryTokenIds = async (contract: Contract, walletAddress: string) => {
+    // TODO: set loading
+    ownedTokenIds.current = await queryTokenIds(contract, walletAddress);
+    // TODO: unset loading
+  };
+
+  const _setup = async (contract: Contract | null) => {
+    setIsPaused(await getIsPaused(contract));
+    setTotalEverMinted(!contract ? '' : (await getTotalEverMinted(contract)) ?? '');
+    setTotalSupply(!contract ? '' : (await getTotalSupply(contract)) ?? '');
+    setMintPrice(!contract ? '' : (await getCurrentPrice(contract)) ?? '');
+    setBurnPrice(!contract ? '' : (await currentBurnReward(contract)) ?? '');
+  };
+
+  useEffect(() => {
+    _setup(contract);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract]);
 
   useEffect(() => {
     if (!isWalletInstalled || !signer) {
@@ -42,32 +135,8 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     const newContract = new ethers.Contract(CONTRACT_ADDRESS, DesImages.abi, signer);
-    async function setupListeners() {
-      const startBlockNumber = await newContract.provider.getBlockNumber();
-      newContract.on(
-        newContract.filters.Minted(),
-        async (to, tokenId, mintPrice, totalSupply, totalEverMinted, event) => {
-          if (event?.blockNumber <= startBlockNumber) {
-            return;
-          }
-          setTotalSupply(totalSupply.toString());
-          setTotalEverMinted(totalEverMinted.toString());
-          await _updateIsPaused(newContract);
-          await _updateMintPrice(newContract);
-          await _updateBurnPrice(newContract);
-        },
-      );
-      newContract.on(newContract.filters.Burned(), async (from, tokenId, burnReward, totalSupply, event) => {
-        if (event?.blockNumber <= startBlockNumber) {
-          return;
-        }
-        setTotalSupply(totalSupply.toString());
-        await _updateIsPaused(newContract);
-        await _updateMintPrice(newContract);
-        await _updateBurnPrice(newContract);
-      });
-    }
-    setupListeners();
+    _queryTokenIds(newContract, walletAddress);
+    _setupContractListeners(newContract);
     setContract(newContract);
     return () => {
       newContract.removeAllListeners();
@@ -75,71 +144,20 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWalletInstalled, signer]);
 
-  useEffect(() => {
-    async function setup() {
-      await _updateIsPaused(contract);
-      await _updateTotalEverMinted(contract);
-      await _updateTotalSupply(contract);
-      await _updateMintPrice(contract);
-      await _updateBurnPrice(contract);
-    }
-    setup();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract]);
-
-  const _updateIsPaused = async (contract: Contract | null) => {
-    if (!contract) {
-      setIsPaused(true);
-      return;
-    }
-    setIsPaused((await _isPaused(contract)) ?? true);
-  };
-
-  const _updateTotalEverMinted = async (contract: Contract | null) => {
-    if (!contract) {
-      setTotalEverMinted('');
-      return;
-    }
-    setTotalEverMinted((await getTotalEverMinted(contract)) ?? '');
-  };
-
-  const _updateTotalSupply = async (contract: Contract | null) => {
-    if (!contract) {
-      setTotalSupply('');
-      return;
-    }
-    setTotalSupply((await getTotalSupply(contract)) ?? '');
-  };
-
-  const _updateMintPrice = async (contract: Contract | null) => {
-    if (!contract) {
-      setMintPrice('');
-      return;
-    }
-    setMintPrice((await getCurrentPrice(contract)) ?? '');
-  };
-
-  const _updateBurnPrice = async (contract: Contract | null) => {
-    if (!contract) {
-      setBurnPrice('');
-      return;
-    }
-    setBurnPrice((await currentBurnReward(contract)) ?? '');
-  };
-
   const mint = async (dateHex: string, ciphertext: string): Promise<boolean> => {
     if (!contract) {
-      return false;
+      return Promise.resolve(false);
     }
     const cost = await getCurrentPrice(contract);
     setMintPrice(cost);
     // TODO: add 0.01 eth buffer
+    // ethers.utils.formatEther(ethers.utils.parseEther(cost).add(ethers.utils.parseEther('0.01'))).toString()
     return await _mint(contract, dateHex, ciphertext, cost);
   };
 
   const burn = async (tokenId: string): Promise<boolean> => {
     if (!contract) {
-      return false;
+      return Promise.resolve(false);
     }
     return await _burn(contract, tokenId);
   };
@@ -153,6 +171,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
         totalSupply,
         mintPrice,
         burnPrice,
+        ownedTokenIds: ownedTokenIds.current,
         mint,
         burn,
       }}

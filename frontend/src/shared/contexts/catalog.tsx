@@ -1,17 +1,19 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useContractContext } from 'src/shared/contexts/contract';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
-import { getTokenIds, tokenURI } from 'src/shared/services/contract';
-import { LOCAL_STORAGE_TOKEN_DATA_KEY } from 'src/shared/constants';
+import { tokenURI } from 'src/shared/services/contract';
 import {
   convertTokenURIToTokenData,
   getIsOwner,
+  getTokenDataFromLocalStorage,
   getTokenId,
   getTokenStatus,
   isSameTokenData,
   updateTokenDataStatus,
+  writeTokenDataToLocalStorage,
 } from 'src/shared/utils/tokenDataHelpers';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
+import { Contract } from 'ethers';
 
 interface ContextState {
   tokenData: TokenData[];
@@ -25,73 +27,55 @@ interface ContextState {
 const CatalogContext = createContext({} as ContextState);
 
 const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
-  const { contract } = useContractContext();
+  const { contract, ownedTokenIds } = useContractContext();
   const [tokenData, setTokenData] = useState<TokenData[]>([]);
   const [ownedTokenData, setOwnedTokenData] = useState<TokenData[]>([]);
 
-  useEffectOnce(() => {
-    const storedData = window.localStorage.getItem(LOCAL_STORAGE_TOKEN_DATA_KEY);
-    if (storedData) {
-      try {
-        const parsedData = JSON.parse(storedData);
-        if (Array.isArray(parsedData)) {
-          setTokenData(parsedData);
-        }
-      } catch (err) {}
-    }
-  });
-
   const _updateTokenData = (data: TokenData[]) => {
     setTokenData(data);
-    window.localStorage.setItem(
-      LOCAL_STORAGE_TOKEN_DATA_KEY,
-      JSON.stringify(
-        data.map(({ day, month, year, dateHex, ciphertext, plaintext }) => ({
-          day,
-          month,
-          year,
-          dateHex,
-          ciphertext,
-          plaintext,
-        })),
-      ),
-    );
+    writeTokenDataToLocalStorage(data);
   };
 
-  const _updateTokenDataStatus = async () => {
-    _updateTokenData(await updateTokenDataStatus(contract, tokenData));
+  const _updateTokenDataStatus = async (contract: Contract | null, data: TokenData[]) => {
+    _updateTokenData(await updateTokenDataStatus(contract, data));
   };
 
-  const _fetchOwnedTokenData = async () => {
-    if (!contract) {
+  // TODO:
+  const _fetchOwnedTokenData = async (contract: Contract | null, ownedTokenIds: string[]) => {
+    if (!contract || !ownedTokenIds || ownedTokenIds.length === 0) {
       setOwnedTokenData([]);
       return;
     }
-    const ids = await getTokenIds(contract);
-    if (ids && Array.isArray(ids)) {
-      const res = [];
-      for (const id of ids) {
-        if (id) {
-          try {
-            const uri = await tokenURI(contract, id);
-            const data = convertTokenURIToTokenData(uri, id);
-            res.unshift(data);
-          } catch (err) {
-            console.error(err);
-          }
-        }
-      }
-      setOwnedTokenData(res);
+    // const ids = await getTokenIds(contract);
+    const ids = ownedTokenIds?.reverse();
+    if (!ids || !Array.isArray(ids)) {
+      setOwnedTokenData([]);
       return;
     }
-    setOwnedTokenData([]);
+    const res = [];
+    for (const id of ids) {
+      if (id) {
+        try {
+          const uri = await tokenURI(contract, id);
+          const data = convertTokenURIToTokenData(uri, id);
+          res.unshift(data);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
+    setOwnedTokenData(res);
   };
 
+  useEffectOnce(() => {
+    setTokenData(getTokenDataFromLocalStorage());
+  });
+
   useEffect(() => {
-    tokenData && tokenData.length > 0 && _updateTokenDataStatus();
-    _fetchOwnedTokenData();
+    tokenData && tokenData.length > 0 && _updateTokenDataStatus(contract, tokenData);
+    _fetchOwnedTokenData(contract, ownedTokenIds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract]);
+  }, [contract, ownedTokenIds]);
 
   const add = async (data: TokenData) => {
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, data));
@@ -103,7 +87,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       }
       const status = await getTokenStatus(contract, data);
       const isOwner = await getIsOwner(contract, data);
-      const tokenId = isOwner ? getTokenId(data) : '';
+      const tokenId = isOwner ? getTokenId(data.dateHex, data.ciphertext) : '';
       _updateTokenData([{ ...data, isOwner, status, tokenId }, ...tokenData]);
       return true;
     }
@@ -122,7 +106,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       ...data,
       isOwner: true,
       status: TOKEN_STATUS.MINTED,
-      tokenId: data.tokenId || getTokenId(data),
+      tokenId: data.tokenId || getTokenId(data.dateHex, data.ciphertext),
     };
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, newData));
     if (index > -1) {
@@ -136,7 +120,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       ...data,
       isOwner: false,
       status: TOKEN_STATUS.BURNED,
-      tokenId: data.tokenId || getTokenId(data),
+      tokenId: data.tokenId || getTokenId(data.dateHex, data.ciphertext),
     };
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, newData));
     if (index > -1) {

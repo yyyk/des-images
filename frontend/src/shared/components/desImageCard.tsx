@@ -27,7 +27,7 @@ const DesImageCard = ({
   const { isPaused, mintPrice, burnPrice, mint, burn } = useContractContext();
   const [isLoading, setIsLoading] = useState(false);
   const date = `#${tokenData.year}${String(tokenData.month).padStart(2, '0')}${String(tokenData.day).padStart(2, '0')}`;
-  const status = tokenData.status;
+  const { status, isOwner } = tokenData;
 
   const handleOnMint = async (e: MouseEvent) => {
     e.preventDefault();
@@ -102,7 +102,7 @@ const DesImageCard = ({
             </div>
           </div>
         )}
-        {onBurn && tokenData.isOwner && status === TOKEN_STATUS.MINTED && (
+        {onBurn && isOwner && status === TOKEN_STATUS.MINTED && (
           <div className="card-actions justify-end">
             <div
               className={'tooltip tooltip-left'}

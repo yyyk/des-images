@@ -2,7 +2,7 @@ const PreviewAlert = ({ showAlert }: { showAlert: boolean }) => (
   <div
     className={`fixed bottom-0 right-1/2 translate-x-2/4 ${
       showAlert ? 'translate-y-0 mb-4' : 'translate-y-full mt-4'
-    } w-1/2 z-10 transition-transform alert alert-warning shadow-lg`}
+    } ${showAlert ? 'visible' : 'invisible'} w-1/2 z-10 transition-transform alert alert-warning shadow-lg`}
   >
     <div>
       <svg
