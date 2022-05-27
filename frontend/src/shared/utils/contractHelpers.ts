@@ -1,5 +1,5 @@
 import { BigNumber, Contract, ethers } from 'ethers';
-import { isPaused } from 'src/shared/services/contract';
+import { BASE_MINT_PRICE, MINT_PRICE_COEF, RESERVE_CUT_OVER_10000 } from 'src/shared/constants';
 
 // TODO: replace with subgraph?
 export async function queryTokenIds(contract: Contract, walletAddress: string): Promise<string[]> {
@@ -39,24 +39,20 @@ export async function queryTokenIds(contract: Contract, walletAddress: string): 
 }
 
 export function calcMintPrice(totalSupply: BigNumber): string {
-  const basePrice = ethers.utils.parseEther('0.01');
-  const coef = ethers.utils.parseEther('0.001');
+  const basePrice = ethers.utils.parseEther(BASE_MINT_PRICE);
+  const coef = ethers.utils.parseEther(MINT_PRICE_COEF);
   return ethers.utils.formatEther(basePrice.add(coef.mul(totalSupply))).toString();
 }
 
 export function calcBurnReward(totalSupply: BigNumber): string {
-  const basePrice = ethers.utils.parseEther('0.01');
-  const coef = ethers.utils.parseEther('0.001');
+  const basePrice = ethers.utils.parseEther(BASE_MINT_PRICE);
+  const coef = ethers.utils.parseEther(MINT_PRICE_COEF);
   return ethers.utils
     .formatEther(
       basePrice
         .add(coef.mul(totalSupply.sub(1)))
-        .mul(9950)
+        .mul(RESERVE_CUT_OVER_10000)
         .div(10000),
     )
     .toString();
-}
-
-export async function getIsPaused(contract: Contract | null): Promise<boolean> {
-  return !contract ? true : (await isPaused(contract)) ?? true;
 }

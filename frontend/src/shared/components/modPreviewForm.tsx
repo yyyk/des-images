@@ -8,7 +8,7 @@ import {
 } from 'src/shared/constants';
 import { TextType } from 'src/mod/interfaces';
 import { PreviewFormData } from 'src/shared/interfaces';
-import { destructDateInputValue } from 'src/shared/utils/destructDateInputValue';
+import { destructDateInputValue } from 'src/shared/utils/formHelpers';
 import TextInput from 'src/shared/components/textInput';
 import DateInput from 'src/shared/components/dateInput';
 import TextTypeSelect from 'src/shared/components/textTypeSelect';
@@ -111,7 +111,7 @@ const ModPreviewForm = ({
           />
         </div>
         <button
-          className="btn w-full sm:w-2/12 mt-2 sm:mt-0"
+          className={`btn w-full sm:w-2/12 mt-2 sm:mt-0 ${isLoading ? 'loading' : ''}`}
           type="submit"
           disabled={
             isLoading ||

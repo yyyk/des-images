@@ -1,8 +1,7 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { TOKEN_STATUS } from 'src/shared/interfaces';
-import { getTokenId } from '../utils/tokenDataHelpers';
+import { getTokenId } from 'src/shared/utils/tokenDataHelpers';
 
-// paused
 export async function isPaused(contract: Contract): Promise<boolean> {
   try {
     return await contract.paused();
@@ -88,8 +87,12 @@ export async function burn(contract: Contract, tokenId: string): Promise<boolean
   }
 }
 
-export async function isOwnerOf(contract: Contract, dateHex: string, ciphertext: string): Promise<boolean> {
+export async function getOwnerOf(contract: Contract, dateHex: string, ciphertext: string): Promise<string> {
   try {
+    const status = await getTokenStatus(contract, dateHex, ciphertext);
+    if (status === 0 || status === 2) {
+      return '';
+    }
     return await contract.ownerOf(BigNumber.from(getTokenId(dateHex, ciphertext)));
   } catch (err: any) {
     console.error(err);

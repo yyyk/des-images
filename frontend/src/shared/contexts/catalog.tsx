@@ -1,11 +1,10 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useContractContext } from 'src/shared/contexts/contract';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
-import { tokenURI } from 'src/shared/services/contract';
 import {
-  convertTokenURIToTokenData,
-  getIsOwner,
+  getOwnerOf,
   getTokenDataFromLocalStorage,
+  getTokenDataFromTokenIds,
   getTokenId,
   getTokenStatus,
   isSameTokenData,
@@ -14,6 +13,7 @@ import {
 } from 'src/shared/utils/tokenDataHelpers';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import { Contract } from 'ethers';
+import { useWalletContext } from 'src/shared/contexts/wallet';
 
 interface ContextState {
   tokenData: TokenData[];
@@ -27,6 +27,7 @@ interface ContextState {
 const CatalogContext = createContext({} as ContextState);
 
 const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
+  const { walletAddress } = useWalletContext();
   const { contract, ownedTokenIds } = useContractContext();
   const [tokenData, setTokenData] = useState<TokenData[]>([]);
   const [ownedTokenData, setOwnedTokenData] = useState<TokenData[]>([]);
@@ -36,35 +37,17 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     writeTokenDataToLocalStorage(data);
   };
 
-  const _updateTokenDataStatus = async (contract: Contract | null, data: TokenData[]) => {
-    _updateTokenData(await updateTokenDataStatus(contract, data));
+  const _updateTokenDataStatus = async (contract: Contract | null, data: TokenData[], walletAddress: string) => {
+    _updateTokenData(await updateTokenDataStatus(contract, data, walletAddress));
   };
 
-  // TODO:
   const _fetchOwnedTokenData = async (contract: Contract | null, ownedTokenIds: string[]) => {
     if (!contract || !ownedTokenIds || ownedTokenIds.length === 0) {
       setOwnedTokenData([]);
       return;
     }
-    // const ids = await getTokenIds(contract);
     const ids = ownedTokenIds?.reverse();
-    if (!ids || !Array.isArray(ids)) {
-      setOwnedTokenData([]);
-      return;
-    }
-    const res = [];
-    for (const id of ids) {
-      if (id) {
-        try {
-          const uri = await tokenURI(contract, id);
-          const data = convertTokenURIToTokenData(uri, id);
-          res.unshift(data);
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    }
-    setOwnedTokenData(res);
+    setOwnedTokenData(await getTokenDataFromTokenIds(contract, ids));
   };
 
   useEffectOnce(() => {
@@ -72,31 +55,30 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
-    tokenData && tokenData.length > 0 && _updateTokenDataStatus(contract, tokenData);
+    tokenData && tokenData.length > 0 && _updateTokenDataStatus(contract, tokenData, walletAddress);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract]);
+
+  useEffect(() => {
     _fetchOwnedTokenData(contract, ownedTokenIds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract, ownedTokenIds]);
 
   const add = async (data: TokenData) => {
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, data));
-    if (index < 0) {
-      const index = ownedTokenData.findIndex((_data) => isSameTokenData(_data, data));
-      if (index > -1) {
-        _updateTokenData([{ ...ownedTokenData[index] }, ...tokenData]);
-        return true;
-      }
-      const status = await getTokenStatus(contract, data);
-      const isOwner = await getIsOwner(contract, data);
-      const tokenId = isOwner ? getTokenId(data.dateHex, data.ciphertext) : '';
-      _updateTokenData([{ ...data, isOwner, status, tokenId }, ...tokenData]);
-      return true;
+    if (index >= 0) {
+      return false;
     }
-    return false;
+    const status = !contract ? undefined : await getTokenStatus(contract, data);
+    const isOwner = !contract ? false : (await getOwnerOf(contract, data)) === walletAddress;
+    const tokenId = isOwner ? getTokenId(data.dateHex, data.ciphertext) : '';
+    _updateTokenData([{ ...data, isOwner, status, tokenId }, ...tokenData]);
+    return true;
   };
 
   const remove = (data: TokenData) => {
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, data));
-    if (index > -1) {
+    if (index >= 0) {
       _updateTokenData([...tokenData.slice(0, index), ...tokenData.slice(index + 1)]);
     }
   };
@@ -109,7 +91,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       tokenId: data.tokenId || getTokenId(data.dateHex, data.ciphertext),
     };
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, newData));
-    if (index > -1) {
+    if (index >= 0) {
       _updateTokenData([...tokenData.slice(0, index), { ...newData }, ...tokenData.slice(index + 1)]);
     }
     setOwnedTokenData([{ ...newData }, ...ownedTokenData]);

@@ -1,8 +1,8 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { decrypt, encrypt } from 'src/shared/utils/des';
-import { getTokenStatus as _getTokenStatus, isOwnerOf } from 'src/shared/services/contract';
-import { LOCAL_STORAGE_TOKEN_DATA_KEY } from '../constants';
+import { getTokenStatus as _getTokenStatus, getOwnerOf as _getOwnerOf, tokenURI } from 'src/shared/services/contract';
+import { LOCAL_STORAGE_TOKEN_DATA_KEY } from 'src/shared/constants';
 
 function toHexString(value: string): string {
   return parseInt(value).toString(16);
@@ -37,7 +37,12 @@ export function isSameTokenData(d1: TokenData, d2: TokenData): boolean {
   return d1.dateHex === d2.dateHex && d1.ciphertext === d2.ciphertext;
 }
 
-export function convertTokenURIToTokenData(uri: string, tokenId: string): TokenData {
+export function convertTokenURIToTokenData(
+  uri: string,
+  tokenId: string,
+  isOwner = true,
+  status = TOKEN_STATUS.MINTED,
+): TokenData {
   try {
     const json = JSON.parse(atob(uri?.replace('data:application/json;base64,', '') ?? ''));
     const date = json?.name?.replace('desImages#', '');
@@ -55,13 +60,32 @@ export function convertTokenURIToTokenData(uri: string, tokenId: string): TokenD
           })
           .join('')}`,
       }),
-      isOwner: true, // TODO: is it ok?
-      status: TOKEN_STATUS.MINTED, // TODO: is it ok?
+      isOwner,
+      status,
       tokenId,
     };
   } catch (err: any) {
     throw new Error(err);
   }
+}
+
+export async function getTokenDataFromTokenIds(contract: Contract, ids: string[]): Promise<TokenData[]> {
+  const res: TokenData[] = [];
+  if (!ids || !Array.isArray(ids)) {
+    return res;
+  }
+  for (const id of ids) {
+    if (id) {
+      try {
+        const uri = await tokenURI(contract, id);
+        const data = convertTokenURIToTokenData(uri, id);
+        res.unshift(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+  return res;
 }
 
 export function getTokenId(dateHex: string, ciphertext: string): string {
@@ -72,18 +96,29 @@ export async function getTokenStatus(
   contract: Contract | null | undefined,
   data: TokenData,
 ): Promise<TOKEN_STATUS | undefined> {
-  return (contract && (await _getTokenStatus(contract, data.dateHex, data.ciphertext))) ?? undefined;
+  if (!contract) {
+    return undefined;
+  }
+  try {
+    return await _getTokenStatus(contract, data.dateHex, data.ciphertext);
+  } catch (err) {}
+  return undefined;
 }
 
-export async function getIsOwner(contract: Contract | null | undefined, data: TokenData): Promise<boolean> {
-  return data.status === TOKEN_STATUS.MINTED
-    ? (contract && (await isOwnerOf(contract, data.dateHex, data.ciphertext))) ?? false
-    : false;
+export async function getOwnerOf(contract: Contract | null | undefined, data: TokenData): Promise<string> {
+  if (!contract) {
+    return '';
+  }
+  try {
+    return await _getOwnerOf(contract, data.dateHex, data.ciphertext);
+  } catch (err) {}
+  return '';
 }
 
 export async function updateTokenDataStatus(
-  contract: Contract | null | undefined,
+  contract: Contract | null,
   tokenData: TokenData[],
+  walletAddress: string,
 ): Promise<TokenData[]> {
   const result: TokenData[] = [];
   for (const data of tokenData) {
@@ -91,7 +126,7 @@ export async function updateTokenDataStatus(
       let _data: TokenData = { ...data };
       const status = await getTokenStatus(contract, _data);
       _data = { ..._data, status };
-      const isOwner = await getIsOwner(contract, _data);
+      const isOwner = !contract ? false : (await getOwnerOf(contract, _data)) === walletAddress;
       const tokenId = isOwner ? getTokenId(_data.dateHex, _data.ciphertext) : '';
       _data = { ..._data, isOwner, tokenId };
       result.push(_data);

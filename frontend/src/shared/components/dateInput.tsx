@@ -7,13 +7,15 @@ interface DateInputProps {
   onChange?: (value: string) => void;
 }
 
+const DEFAULT_MIN_DATE = '2020-01-01';
+
 const DateInput = ({ showLabel = true, defaultValue, onChange }: DateInputProps) => {
   const [date, setDate] = useState(
     defaultValue ?? `${defaultTokenData.year}-${defaultTokenData.month}-${defaultTokenData.day}`,
   );
-
-  const maxDate = `${new Date().getUTCFullYear()}-${String(new Date().getUTCMonth() + 1).padStart(2, '0')}-${String(
-    new Date().getUTCDate(),
+  const dateObj = new Date();
+  const maxDate = `${dateObj.getUTCFullYear()}-${String(dateObj.getUTCMonth() + 1).padStart(2, '0')}-${String(
+    dateObj.getUTCDate(),
   ).padStart(2, '0')}`;
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +38,7 @@ const DateInput = ({ showLabel = true, defaultValue, onChange }: DateInputProps)
         name=""
         id=""
         value={date}
-        min="2020-01-01"
+        min={DEFAULT_MIN_DATE}
         max={maxDate}
         onChange={handleOnChange}
       />

@@ -49,3 +49,11 @@ export interface PreviewFormData {
   plaintext?: string;
   ciphertext?: string;
 }
+
+export interface ContractState {
+  isPaused: boolean;
+  totalEverMinted: string;
+  totalSupply: string;
+  mintPrice: string;
+  burnPrice: string;
+}

@@ -4,7 +4,9 @@ import UpIcon from 'src/shared/components/icons/upIcon';
 import LightningIcon from 'src/shared/components/icons/lightningIcon';
 
 const Stats = () => {
-  const { totalEverMinted, totalSupply, mintPrice } = useContractContext();
+  const {
+    contractState: { totalEverMinted, totalSupply, mintPrice },
+  } = useContractContext();
 
   if (!totalEverMinted || !totalSupply || !mintPrice) {
     return null;

@@ -5,7 +5,7 @@ import { DEFAULT_DATE } from 'src/shared/constants';
 import { DEFAULT_PLAINTEXT } from 'src/mod/constants';
 import { PreviewFormData, TokenData } from 'src/shared/interfaces';
 import { getTokenData } from 'src/shared/utils/tokenDataHelpers';
-import { destructDateInputValue } from 'src/shared/utils/destructDateInputValue';
+import { destructDateInputValue } from 'src/shared/utils/formHelpers';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import DesImageCard from 'src/shared/components/desImageCard';
 import Stats from 'src/shared/components/stats';

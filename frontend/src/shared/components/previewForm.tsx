@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { defaultTokenData } from 'src/shared/constants';
 import { PreviewFormData } from 'src/shared/interfaces';
-import { destructDateInputValue } from 'src/shared/utils/destructDateInputValue';
+import { destructDateInputValue } from 'src/shared/utils/formHelpers';
 import DateInput from 'src/shared/components/dateInput';
 
 interface PreviewFormProps {
@@ -28,7 +28,7 @@ const PreviewForm = ({
       <div className="grow">
         <DateInput defaultValue={defaultValue} onChange={(value) => setDate(value)} />
       </div>
-      <button className="btn ml-4" type="submit" disabled={isLoading}>
+      <button className={`btn ml-4 ${isLoading ? 'loading' : ''}`} type="submit" disabled={isLoading}>
         Preview
       </button>
     </form>

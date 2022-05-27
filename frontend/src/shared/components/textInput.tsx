@@ -25,31 +25,54 @@ const TextInput = ({
     isValidPlaintext: isValidPlaintext(defaultValue.plaintext),
     isValidCiphertext: isValidCiphertext(defaultValue.ciphertext),
   });
-  const [isTextInputFocused, setIsTextInputFocused] = useState(false);
+
+  const inputStateClasses =
+    (textType === TextType.PLAINTEXT && text.plaintext.length === PLAINTEXT_LENGTH && text.isValidPlaintext) ||
+    (textType === TextType.CIPHERTEXT && text.ciphertext.length === CIPHERTEXT_LENGTH && text.isValidCiphertext)
+      ? 'focus:input-success'
+      : (textType === TextType.PLAINTEXT && text.plaintext.length === 0) ||
+        (textType === TextType.CIPHERTEXT && text.ciphertext.length === 0)
+      ? ''
+      : 'focus:input-warning';
+
+  const hintText =
+    (textType === TextType.PLAINTEXT && !text.isValidPlaintext) ||
+    (textType === TextType.CIPHERTEXT && !text.isValidCiphertext)
+      ? 'Invalid text'
+      : textType === TextType.PLAINTEXT && text.plaintext.length <= PLAINTEXT_LENGTH
+      ? `${PLAINTEXT_LENGTH - text.plaintext.length} characters left`
+      : textType === TextType.PLAINTEXT
+      ? `${text.plaintext.length - PLAINTEXT_LENGTH} characters over`
+      : text.ciphertext.length <= CIPHERTEXT_LENGTH
+      ? `${CIPHERTEXT_LENGTH - text.ciphertext.length} characters left`
+      : `${text.ciphertext.length - CIPHERTEXT_LENGTH} characters over`;
 
   const handleTextInputOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value ?? '';
     let result = { ...text };
-    if (textType === TextType.PLAINTEXT) {
-      const formattedValue = value
-        .replace(/(\\x[0-9a-fA-F]{2})/g, (str) => latin1Table[str.toLowerCase()] ?? '')
-        .replace(/\\[btnvfr]/g, (str) => latin1Table[str.toLowerCase()] ?? '');
-      result = {
-        ...result,
-        plaintext: formattedValue,
-        plaintextRaw: value,
-        isValidPlaintext: isValidPlaintext(formattedValue),
-      };
-    } else if (textType === TextType.CIPHERTEXT) {
-      if (value.length <= 2) {
-        setText({ ...text, ciphertext: '0x' });
-        return;
-      }
-      result = {
-        ...result,
-        ciphertext: new RegExp(/^0x/).test(value) ? value : `0x${value}`,
-        isValidCiphertext: isValidCiphertext(value),
-      };
+    switch (textType) {
+      case TextType.PLAINTEXT:
+        const formattedValue = value
+          .replace(/(\\x[0-9a-fA-F]{2})/g, (str) => latin1Table[str.toLowerCase()] ?? '')
+          .replace(/\\[btnvfr]/g, (str) => latin1Table[str.toLowerCase()] ?? '');
+        result = {
+          ...result,
+          plaintext: formattedValue,
+          plaintextRaw: value,
+          isValidPlaintext: isValidPlaintext(formattedValue),
+        };
+        break;
+      case TextType.CIPHERTEXT:
+        if (value.length <= 2) {
+          setText({ ...text, ciphertext: '0x' });
+          return;
+        }
+        result = {
+          ...result,
+          ciphertext: new RegExp(/^0x/).test(value) ? value : `0x${value}`,
+          isValidCiphertext: isValidCiphertext(value),
+        };
+        break;
     }
     setText(result);
     onChange &&
@@ -63,44 +86,16 @@ const TextInput = ({
   return (
     <>
       <input
-        className={`input input-bordered w-full ${
-          isTextInputFocused
-            ? (textType === TextType.PLAINTEXT &&
-                (!text.isValidPlaintext ||
-                  (text.plaintext.length !== 0 && text.plaintext.length !== PLAINTEXT_LENGTH))) ||
-              (textType === TextType.CIPHERTEXT &&
-                (!text.isValidCiphertext ||
-                  (text.ciphertext.length !== 0 && text.ciphertext.length !== CIPHERTEXT_LENGTH)))
-              ? 'input-warning'
-              : (textType === TextType.PLAINTEXT && text.plaintext.length === PLAINTEXT_LENGTH) ||
-                (textType === TextType.CIPHERTEXT && text.ciphertext.length === CIPHERTEXT_LENGTH)
-              ? 'input-success'
-              : ''
-            : ''
-        }`}
+        className={`input input-bordered w-full ${inputStateClasses}`}
         type="text"
         name=""
         id=""
         placeholder="Type here"
-        // defaultValue={textType === TextType.PLAINTEXT ? text.plaintext : text.ciphertext}
         value={textType === TextType.PLAINTEXT ? text.plaintextRaw : text.ciphertext}
         onChange={handleTextInputOnChange}
-        onBlur={() => setIsTextInputFocused(false)}
-        onFocus={() => setIsTextInputFocused(true)}
       />
       <label className="label">
-        <span className="label-text-alt">
-          {(textType === TextType.PLAINTEXT && !text.isValidPlaintext) ||
-          (textType === TextType.CIPHERTEXT && !text.isValidCiphertext)
-            ? 'Invalid text'
-            : textType === TextType.PLAINTEXT && text.plaintext.length <= PLAINTEXT_LENGTH
-            ? `${PLAINTEXT_LENGTH - text.plaintext.length} characters left`
-            : textType === TextType.PLAINTEXT
-            ? `${text.plaintext.length - PLAINTEXT_LENGTH} characters over`
-            : text.ciphertext.length <= CIPHERTEXT_LENGTH
-            ? `${CIPHERTEXT_LENGTH - text.ciphertext.length} characters left`
-            : `${text.ciphertext.length - CIPHERTEXT_LENGTH} characters over`}
-        </span>
+        <span className="label-text-alt">{hintText}</span>
       </label>
     </>
   );

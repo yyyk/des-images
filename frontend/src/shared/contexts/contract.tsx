@@ -1,7 +1,7 @@
 import { ethers, Contract, BigNumber } from 'ethers';
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { useWalletContext } from 'src/shared/contexts/wallet';
-import { CONTRACT_ADDRESS } from 'src/shared/constants';
+import { CONTRACT_ADDRESS, DEFAULT_CONTRACT_STATE } from 'src/shared/constants';
 import {
   mint as _mint,
   burn as _burn,
@@ -9,17 +9,15 @@ import {
   getTotalSupply,
   getCurrentPrice,
   currentBurnReward,
+  isPaused,
 } from 'src/shared/services/contract';
 import DesImages from 'src/abi/DesImages.json';
-import { calcBurnReward, calcMintPrice, getIsPaused, queryTokenIds } from 'src/shared/utils/contractHelpers';
+import { calcBurnReward, calcMintPrice, queryTokenIds } from 'src/shared/utils/contractHelpers';
+import { ContractState } from 'src/shared/interfaces';
 
 interface ContextState {
   contract: Contract | null;
-  isPaused: boolean;
-  totalEverMinted: string;
-  totalSupply: string;
-  mintPrice: string;
-  burnPrice: string;
+  contractState: ContractState;
   ownedTokenIds: string[];
   mint: (dateHex: string, ciphertext: string) => Promise<boolean>;
   burn: (tokenId: string) => Promise<boolean>;
@@ -30,24 +28,18 @@ const ContractContext = createContext({} as ContextState);
 const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   const { isWalletInstalled, signer, walletAddress } = useWalletContext();
   const [contract, setContract] = useState<Contract | null>(null);
-  const [isPaused, setIsPaused] = useState(true);
-  const [totalEverMinted, setTotalEverMinted] = useState('');
-  const [totalSupply, setTotalSupply] = useState('');
-  const [mintPrice, setMintPrice] = useState('');
-  const [burnPrice, setBurnPrice] = useState('');
+  const [contractState, setContractState] = useState<ContractState>(DEFAULT_CONTRACT_STATE);
   const ownedTokenIds = useRef<string[]>([]);
 
   const _updateOwnedTokenIds = (from: string, to: string, tokenId: BigNumber) => {
     const _tokenId = tokenId.toHexString();
     const index = ownedTokenIds.current.findIndex((id) => id === _tokenId);
     if (from.toLowerCase() === walletAddress.toLowerCase()) {
-      // remove
+      // console.log('remove', _tokenId, index);
       if (index > -1) {
         ownedTokenIds.current = [...ownedTokenIds.current.slice(0, index), ...ownedTokenIds.current.slice(index + 1)];
       }
-      // console.log('remove', _tokenId, index);
     } else if (to.toLowerCase() === walletAddress.toLowerCase()) {
-      // add
       // console.log('add', _tokenId, index);
       if (index === -1) {
         ownedTokenIds.current = ownedTokenIds.current.concat(_tokenId);
@@ -63,7 +55,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
             return;
           }
           _updateOwnedTokenIds(from, to, tokenId);
-          setIsPaused(await getIsPaused(contract));
+          setContractState({ ...contractState, isPaused: !contract ? true : await isPaused(contract) });
         };
       case 'Minted':
         return async (
@@ -77,10 +69,13 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           if (event?.blockNumber <= startBlockNumber) {
             return;
           }
-          setTotalSupply(totalSupply.toString());
-          setTotalEverMinted(totalEverMinted.toString());
-          setMintPrice(calcMintPrice(totalSupply));
-          setBurnPrice(calcBurnReward(totalSupply));
+          setContractState({
+            ...contractState,
+            totalSupply: totalSupply.toString(),
+            totalEverMinted: totalEverMinted.toString(),
+            mintPrice: calcMintPrice(totalSupply),
+            burnPrice: calcBurnReward(totalSupply),
+          });
         };
       case 'Burned':
         return async (
@@ -93,9 +88,12 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           if (event?.blockNumber <= startBlockNumber) {
             return;
           }
-          setTotalSupply(totalSupply.toString());
-          setMintPrice(calcMintPrice(totalSupply));
-          setBurnPrice(calcBurnReward(totalSupply));
+          setContractState({
+            ...contractState,
+            totalSupply: totalSupply.toString(),
+            mintPrice: calcMintPrice(totalSupply),
+            burnPrice: calcBurnReward(totalSupply),
+          });
         };
       default:
         return () => {};
@@ -116,11 +114,17 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const _setup = async (contract: Contract | null) => {
-    setIsPaused(await getIsPaused(contract));
-    setTotalEverMinted(!contract ? '' : (await getTotalEverMinted(contract)) ?? '');
-    setTotalSupply(!contract ? '' : (await getTotalSupply(contract)) ?? '');
-    setMintPrice(!contract ? '' : (await getCurrentPrice(contract)) ?? '');
-    setBurnPrice(!contract ? '' : (await currentBurnReward(contract)) ?? '');
+    setContractState(
+      !!contract
+        ? {
+            isPaused: await isPaused(contract),
+            totalSupply: await getTotalSupply(contract),
+            totalEverMinted: await getTotalEverMinted(contract),
+            mintPrice: await getCurrentPrice(contract),
+            burnPrice: await currentBurnReward(contract),
+          }
+        : DEFAULT_CONTRACT_STATE,
+    );
   };
 
   useEffect(() => {
@@ -149,7 +153,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       return Promise.resolve(false);
     }
     const cost = await getCurrentPrice(contract);
-    setMintPrice(cost);
+    setContractState({ ...contractState, mintPrice: cost });
     // TODO: add 0.01 eth buffer
     // ethers.utils.formatEther(ethers.utils.parseEther(cost).add(ethers.utils.parseEther('0.01'))).toString()
     return await _mint(contract, dateHex, ciphertext, cost);
@@ -166,11 +170,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     <ContractContext.Provider
       value={{
         contract,
-        isPaused,
-        totalEverMinted,
-        totalSupply,
-        mintPrice,
-        burnPrice,
+        contractState,
         ownedTokenIds: ownedTokenIds.current,
         mint,
         burn,
