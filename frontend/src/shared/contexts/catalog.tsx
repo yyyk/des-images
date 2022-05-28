@@ -69,7 +69,8 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       return false;
     }
     const status = !contract ? undefined : await getTokenStatus(contract, data);
-    const isOwner = !contract ? false : (await getOwnerOf(contract, data)) === walletAddress;
+    const ownerAddress = await getOwnerOf(contract, data);
+    const isOwner = ownerAddress.length === 0 ? false : ownerAddress.toLowerCase() === walletAddress.toLowerCase();
     const tokenId = isOwner ? getTokenId(data.dateHex, data.ciphertext) : '';
     _updateTokenData([{ ...data, isOwner, status, tokenId }, ...tokenData]);
     return true;
