@@ -1,9 +1,16 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { BASE_MINT_PRICE, MINT_PRICE_COEF, RESERVE_CUT_OVER_10000 } from 'src/shared/constants';
+import { ChainName } from '../interfaces';
 
 // TODO: replace with subgraph?
 export async function queryTokenIds(contract: Contract, walletAddress: string): Promise<string[]> {
-  const startBlock = parseInt(process.env.REACT_START_BLOCK ?? '0');
+  const startBlock = parseInt(
+    process.env.REACT_APP_ETH_NETWORK === ChainName.RINKEBY
+      ? '10753971' // TODO: update needed once contract deployed
+      : process.env.REACT_APP_ETH_NETWORK === ChainName.MAIN_NET
+      ? '14859331' // TODO: update needed once contract deployed
+      : '0',
+  );
   const endBlock = await contract.provider.getBlockNumber();
   let result: string[] = [];
   for (let i = startBlock; i <= endBlock; i += 5000) {

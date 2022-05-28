@@ -9,7 +9,15 @@ export interface WalletProvider {
   provider: Provider;
 }
 
-export type ChainName = 'mainnet' | 'rinkeby' | 'ropsten' | 'localhost' | 'hardhat';
+// export type ChainName = 'mainnet' | 'rinkeby' | 'ropsten' | 'localhost' | 'hardhat';
+
+export enum ChainName {
+  MAIN_NET = 'mainnet',
+  ROPSTEN = 'ropsten',
+  RINKEBY = 'rinkeby',
+  LOCALHOST = 'localhost',
+  HARD_HAT = 'hardhat',
+}
 
 export enum ChainId {
   MAIN_NET = '0x1',
@@ -31,9 +39,9 @@ export enum TOKEN_STATUS {
 }
 
 export interface TokenData {
-  day: string;
-  month: string;
   year: string;
+  month: string;
+  day: string;
   dateHex: string;
   ciphertext: string;
   plaintext?: string;

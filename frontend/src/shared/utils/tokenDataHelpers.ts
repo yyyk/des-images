@@ -24,9 +24,9 @@ export function getTokenData({
   const _ciphertext = ciphertext || encrypt(`${year}${month}${day}`, plaintext || undefined);
   const _plaintext = plaintext || (ciphertext ? decrypt(`${year}${month}${day}`, ciphertext as string) : undefined);
   return {
-    day: day.padStart(2, '0'),
-    month: month.padStart(2, '0'),
     year: year.padStart(4, '0'),
+    month: month.padStart(2, '0'),
+    day: day.padStart(2, '0'),
     dateHex: `0x${toHexString(year)}${toHexString(month)}${toHexString(day).padStart(2, '0')}`,
     ciphertext: _ciphertext,
     plaintext: _plaintext,
@@ -136,19 +136,21 @@ export async function updateTokenDataStatus(
 }
 
 export function writeTokenDataToLocalStorage(data: TokenData[]): void {
-  window.localStorage.setItem(
-    LOCAL_STORAGE_TOKEN_DATA_KEY,
-    JSON.stringify(
-      data.map(({ day, month, year, dateHex, ciphertext, plaintext }) => ({
-        day,
-        month,
-        year,
-        dateHex,
-        ciphertext,
-        plaintext,
-      })),
-    ),
-  );
+  try {
+    window.localStorage.setItem(
+      LOCAL_STORAGE_TOKEN_DATA_KEY,
+      JSON.stringify(
+        data.map(({ day, month, year, dateHex, ciphertext, plaintext }) => ({
+          year,
+          month,
+          day,
+          dateHex,
+          ciphertext,
+          plaintext,
+        })),
+      ),
+    );
+  } catch (err) {}
 }
 
 export function getTokenDataFromLocalStorage(): TokenData[] {

@@ -24,7 +24,7 @@ const Collection = () => {
           ))}
         </ul>
       ) : (
-        <p className="pt-3 sm:mt-4">You don't own any tokens.</p>
+        <p className="pt-3 sm:mt-4">Currently you don't own any tokens.</p>
       )}
     </>
   );

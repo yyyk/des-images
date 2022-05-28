@@ -34,9 +34,9 @@ const Main = () => {
       <div className="w-2/3 mt-0 mx-auto">
         <DesImageCard
           tokenData={{
-            day: '1',
-            month: '1',
             year: '2020',
+            month: '1',
+            day: '1',
             dateHex: '0x7e4101',
             ciphertext: '0x79030f7920aaa3cfbbd92afbb93e70ba',
           }}

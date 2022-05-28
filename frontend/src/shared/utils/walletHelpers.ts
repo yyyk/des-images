@@ -1,7 +1,7 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
 // import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
-import { ETH_MAINNET_JSONRPC_URL, HARDHAT_CHAIN_ID, HARDHAT_JSONRPC_URL, MAINNET_CHAIN_ID } from 'src/shared/constants';
-import { Provider, WalletProvider } from 'src/shared/interfaces';
+import { ETH_MAINNET_JSONRPC_URL, ETH_RINKEBY_JSONRPC_URL, HARDHAT_JSONRPC_URL } from 'src/shared/constants';
+import { ChainId, Provider, WalletProvider } from 'src/shared/interfaces';
 
 export function getWindowEthereum(key: string): Provider[] {
   if (!key) {
@@ -12,6 +12,20 @@ export function getWindowEthereum(key: string): Provider[] {
     : window?.ethereum?.[key]
     ? [window?.ethereum]
     : [];
+}
+
+export function getDefaultWalletConnectProvider(): WalletProvider {
+  return {
+    type: 'wallet-connect',
+    name: 'WalletConnect',
+    provider: new WalletConnectProvider({
+      rpc: {
+        [parseInt(ChainId.MAIN_NET)]: ETH_MAINNET_JSONRPC_URL,
+        [parseInt(ChainId.RINKEBY)]: ETH_RINKEBY_JSONRPC_URL,
+        [parseInt(ChainId.HARD_HAT)]: HARDHAT_JSONRPC_URL,
+      },
+    }),
+  };
 }
 
 export function getProviders(): WalletProvider[] {
@@ -48,16 +62,7 @@ export function getProviders(): WalletProvider[] {
     });
   }
   // WalletConnect
-  providers.push({
-    type: 'wallet-connect',
-    name: 'WalletConnect',
-    provider: new WalletConnectProvider({
-      rpc: {
-        [MAINNET_CHAIN_ID]: ETH_MAINNET_JSONRPC_URL,
-        [HARDHAT_CHAIN_ID]: HARDHAT_JSONRPC_URL,
-      },
-    }),
-  });
+  providers.push(getDefaultWalletConnectProvider());
 
   return providers;
 }

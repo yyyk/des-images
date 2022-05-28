@@ -30,7 +30,7 @@ const CatalogLink = () => (
 const GoBackButton = () => {
   const navigate = useNavigate();
   return (
-    <button className="btn btn-md ml-auto" onClick={() => navigate(-1)}>
+    <button className="btn btn-md btn-outline ml-auto" onClick={() => navigate(-1)}>
       go back
     </button>
   );

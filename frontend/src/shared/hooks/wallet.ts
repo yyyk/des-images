@@ -1,16 +1,10 @@
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import {
-  ETH_MAINNET_JSONRPC_URL,
-  HARDHAT_CHAIN_ID,
-  HARDHAT_JSONRPC_URL,
-  LOCAL_STORAGE_WALLET_KEY,
-  MAINNET_CHAIN_ID,
-} from 'src/shared/constants';
-import { ChainId, Provider, WalletProvider } from 'src/shared/interfaces';
+import { LOCAL_STORAGE_WALLET_KEY } from 'src/shared/constants';
+import { ChainId, ChainName, Provider, WalletProvider } from 'src/shared/interfaces';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
-import { getProviders } from 'src/shared/utils/walletHelpers';
+import { getDefaultWalletConnectProvider, getProviders } from 'src/shared/utils/walletHelpers';
 
 export const useWallet = () => {
   const [isWalletInstalled, setIsWalletInstalled] = useState(false);
@@ -79,7 +73,6 @@ export const useWallet = () => {
     setIsInvalidChainId(false);
   };
 
-  // TODO: needs refactor
   const connectWallet = async (
     provider: WalletProvider,
     needRequest = true,
@@ -95,20 +88,10 @@ export const useWallet = () => {
         if (index >= 0) {
           setProviders([
             ...providers.slice(0, index),
-            {
-              type: 'wallet-connect',
-              name: 'WalletConnect',
-              provider: new WalletConnectProvider({
-                rpc: {
-                  [MAINNET_CHAIN_ID]: ETH_MAINNET_JSONRPC_URL,
-                  [HARDHAT_CHAIN_ID]: HARDHAT_JSONRPC_URL,
-                },
-              }),
-            },
+            getDefaultWalletConnectProvider(),
             ...providers.slice(index + 1),
           ]);
         }
-        // throw new Error(err?.message ?? err);
         return {
           success: false,
           error: err,
@@ -122,15 +105,13 @@ export const useWallet = () => {
       const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
       const chainId = await web3Provider.send('eth_chainId', []);
       if (
-        (process.env.NODE_ENV === 'production' && chainId !== ChainId.MAIN_NET) ||
-        // TODO:
-        // (process.env.NODE_ENV === 'test' && chainId !== ChainId.RINKEBY) ||
-        (process.env.NODE_ENV === 'development' && chainId !== ChainId.LOCALHOST)
+        (process.env.REACT_APP_ETH_NETWORK === ChainName.LOCALHOST && chainId !== ChainId.LOCALHOST) ||
+        (process.env.REACT_APP_ETH_NETWORK === ChainName.RINKEBY && chainId !== ChainId.RINKEBY) ||
+        (process.env.REACT_APP_ETH_NETWORK === ChainName.MAIN_NET && chainId !== ChainId.MAIN_NET)
       ) {
         _handleDisconnect();
         setIsInvalidChainId(true);
         setProvider(provider.provider);
-        // throw new Error('Invalid Chain ID!');
         return {
           success: false,
           error: {
@@ -150,7 +131,6 @@ export const useWallet = () => {
       error = { type: 'NoAddressFound', message: 'No address found.' };
     } catch (err: any) {
       error = err;
-      // throw new Error(err?.message ?? err);
     }
     _handleDisconnect();
     return {

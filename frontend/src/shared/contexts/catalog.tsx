@@ -61,7 +61,6 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     _fetchOwnedTokenData(contract, ownedTokenIds);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract, ownedTokenIds]);
 
   const add = async (data: TokenData) => {

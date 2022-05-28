@@ -57,6 +57,19 @@ export async function getTokenStatus(contract: Contract, dateHex: string, cipher
   }
 }
 
+export async function getOwnerOf(contract: Contract, dateHex: string, ciphertext: string): Promise<string> {
+  try {
+    const status = await getTokenStatus(contract, dateHex, ciphertext);
+    if (status === 0 || status === 2) {
+      return '';
+    }
+    return await contract.ownerOf(BigNumber.from(getTokenId(dateHex, ciphertext)));
+  } catch (err: any) {
+    console.error(err);
+    throw new Error(err?.message ?? '');
+  }
+}
+
 export async function mint(contract: Contract, dateHex: string, ciphertext: string, cost: string): Promise<boolean> {
   try {
     const tx = await contract.mint(parseInt(dateHex), BigNumber.from(ciphertext), {
@@ -84,19 +97,6 @@ export async function burn(contract: Contract, tokenId: string): Promise<boolean
   } catch (err) {
     console.error(err);
     return false;
-  }
-}
-
-export async function getOwnerOf(contract: Contract, dateHex: string, ciphertext: string): Promise<string> {
-  try {
-    const status = await getTokenStatus(contract, dateHex, ciphertext);
-    if (status === 0 || status === 2) {
-      return '';
-    }
-    return await contract.ownerOf(BigNumber.from(getTokenId(dateHex, ciphertext)));
-  } catch (err: any) {
-    console.error(err);
-    throw new Error(err?.message ?? '');
   }
 }
 

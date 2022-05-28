@@ -129,7 +129,6 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     _setup(contract);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
 
   useEffect(() => {
