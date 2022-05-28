@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import { LOCAL_STORAGE_WALLET_KEY } from 'src/shared/constants';
+import { ETH_NETWORK, LOCAL_STORAGE_WALLET_KEY } from 'src/shared/constants';
 import { ChainId, ChainName, Provider, WalletProvider } from 'src/shared/interfaces';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import { getDefaultWalletConnectProvider, getProviders } from 'src/shared/utils/walletHelpers';
@@ -105,9 +105,9 @@ export const useWallet = () => {
       const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
       const chainId = await web3Provider.send('eth_chainId', []);
       if (
-        (process.env.REACT_APP_ETH_NETWORK === ChainName.LOCALHOST && chainId !== ChainId.LOCALHOST) ||
-        (process.env.REACT_APP_ETH_NETWORK === ChainName.RINKEBY && chainId !== ChainId.RINKEBY) ||
-        (process.env.REACT_APP_ETH_NETWORK === ChainName.MAIN_NET && chainId !== ChainId.MAIN_NET)
+        (ETH_NETWORK === ChainName.LOCALHOST && chainId !== ChainId.LOCALHOST) ||
+        (ETH_NETWORK === ChainName.RINKEBY && chainId !== ChainId.RINKEBY) ||
+        (ETH_NETWORK === ChainName.MAIN_NET && chainId !== ChainId.MAIN_NET)
       ) {
         _handleDisconnect();
         setIsInvalidChainId(true);

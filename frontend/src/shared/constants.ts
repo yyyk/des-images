@@ -25,6 +25,7 @@ export const MINT_PRICE_COEF = '0.001';
 export const RESERVE_CUT_OVER_10000 = 9950;
 
 export const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS ?? '';
+export const ETH_NETWORK = process.env.REACT_APP_ETH_NETWORK ?? '';
 
 // const APP_LOGO_URL = 'https://example.com/logo.png';
 export const ETH_MAINNET_JSONRPC_URL = process.env.REACT_APP_ETH_MAINNET_JSONRPC_URL ?? '';
