@@ -93,7 +93,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     if (index >= 0) {
       _updateTokenData([...tokenData.slice(0, index), { ...newData }, ...tokenData.slice(index + 1)]);
     }
-    setOwnedTokenData([{ ...newData }, ...ownedTokenData]);
+    setOwnedTokenData([{ ...newData }, ...ownedTokenData.filter((_data) => !isSameTokenData(_data, newData))]);
   };
 
   const burned = (data: TokenData) => {
@@ -103,10 +103,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       status: TOKEN_STATUS.BURNED,
       tokenId: data.tokenId || getTokenId(data.dateHex, data.ciphertext),
     };
-    const index = tokenData.findIndex((_data) => isSameTokenData(_data, newData));
-    if (index > -1) {
-      _updateTokenData([...tokenData.slice(0, index), { ...newData }, ...tokenData.slice(index + 1)]);
-    }
+    _updateTokenData(tokenData.filter((_data) => !isSameTokenData(_data, newData)));
     setOwnedTokenData(ownedTokenData.filter((_data) => !isSameTokenData(_data, newData)));
   };
 

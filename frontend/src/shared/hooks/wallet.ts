@@ -123,9 +123,9 @@ export const useWallet = () => {
       // console.log(_address);
       if (_address && _address.length > 0) {
         localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, provider.type);
+        setWalletAddress(_address[0]);
         setProvider(provider.provider);
         setSigner(_signer);
-        setWalletAddress(_address[0]);
         return { success: true };
       }
       error = { type: 'NoAddressFound', message: 'No address found.' };

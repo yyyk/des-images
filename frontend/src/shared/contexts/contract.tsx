@@ -58,7 +58,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           setContractState({ ...contractState, isPaused: !contract ? true : await isPaused(contract) });
         };
       case 'Minted':
-        return async (
+        return (
           _to: string,
           _tokenId: BigNumber,
           _mintPrice: BigNumber,
@@ -78,13 +78,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           });
         };
       case 'Burned':
-        return async (
-          _from: string,
-          _tokenId: BigNumber,
-          _burnReward: BigNumber,
-          totalSupply: BigNumber,
-          event: any,
-        ) => {
+        return (_from: string, _tokenId: BigNumber, _burnReward: BigNumber, totalSupply: BigNumber, event: any) => {
           if (event?.blockNumber <= startBlockNumber) {
             return;
           }
@@ -152,7 +146,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       return Promise.resolve(false);
     }
     const cost = await getCurrentPrice(contract);
-    setContractState({ ...contractState, mintPrice: cost });
+    // setContractState({ ...contractState, mintPrice: cost });
     // TODO: add 0.01 eth buffer
     // ethers.utils.formatEther(ethers.utils.parseEther(cost).add(ethers.utils.parseEther('0.01'))).toString()
     return await _mint(contract, dateHex, ciphertext, cost);
