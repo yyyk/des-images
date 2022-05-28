@@ -10,10 +10,10 @@ async function main() {
 
   const DesImages = await ethers.getContractFactory("DesImages");
   const desImages = await DesImages.attach(process.env.CONTRACT_ADDRESS);
-  await desImages.unpause();
+  const tx = await desImages.unpause();
   console.log("desImages unpause.");
 
-  const receipt = await desImages.deployTransaction.wait();
+  const receipt = await tx.wait();
   console.log("gasUsed:", receipt.gasUsed._hex);
 }
 
