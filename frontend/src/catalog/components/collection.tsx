@@ -13,7 +13,10 @@ const Collection = () => {
           } sm:grid-rows-${Math.ceil(tokenData.length / 2)} mt-0 mx-auto px-0 pb-0 pt-3 sm:pt-4`}
         >
           {ownedTokenData.map((data) => (
-            <li key={data.dateHex + (data.plaintext ?? '') + data.ciphertext} className="w-full m-0 p-0">
+            <li
+              key={`collection-${data.plaintext?.replace(/\s/g, '-') ?? ''}-${data.dateHex}-${data.ciphertext}`}
+              className="w-full m-0 p-0"
+            >
               <DesImageCard
                 tokenData={data}
                 showPlaintext={true}
