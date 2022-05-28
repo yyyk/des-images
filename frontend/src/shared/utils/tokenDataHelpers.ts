@@ -127,7 +127,7 @@ export async function updateTokenDataStatus(
       const status = await getTokenStatus(contract, _data);
       _data = { ..._data, status };
       const ownerAddress = await getOwnerOf(contract, _data);
-      const isOwner = ownerAddress.length === 0 ? false : ownerAddress === walletAddress;
+      const isOwner = ownerAddress.length === 0 ? false : ownerAddress.toLowerCase() === walletAddress.toLowerCase();
       const tokenId = isOwner ? getTokenId(_data.dateHex, _data.ciphertext) : '';
       _data = { ..._data, isOwner, tokenId };
       result.push(_data);

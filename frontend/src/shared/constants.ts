@@ -20,14 +20,6 @@ export const DEFAULT_DATE = `${year}-${month}-${day}`;
 export const LOCAL_STORAGE_WALLET_KEY = 'wallet';
 export const LOCAL_STORAGE_TOKEN_DATA_KEY = 'tokenData';
 
-export const DEFAULT_CONTRACT_STATE = {
-  isPaused: true,
-  totalEverMinted: '',
-  totalSupply: '',
-  mintPrice: '',
-  burnPrice: '',
-};
-
 export const BASE_MINT_PRICE = '0.01';
 export const MINT_PRICE_COEF = '0.001';
 export const RESERVE_CUT_OVER_10000 = 9950;

@@ -6,7 +6,7 @@ import { ChainName } from '../interfaces';
 export async function queryTokenIds(contract: Contract, walletAddress: string): Promise<string[]> {
   const startBlock = parseInt(
     process.env.REACT_APP_ETH_NETWORK === ChainName.RINKEBY
-      ? '10753971' // TODO: update needed once contract deployed
+      ? '10755524' // TODO: update needed once contract deployed
       : process.env.REACT_APP_ETH_NETWORK === ChainName.MAIN_NET
       ? '14859331' // TODO: update needed once contract deployed
       : '0',
