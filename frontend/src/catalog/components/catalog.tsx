@@ -43,7 +43,7 @@ const Catalog = () => {
         {tokenData.map((data, index) => (
           <li
             ref={index === 0 ? scrollRef : undefined}
-            key={data.dateHex + (data.plaintext ?? '') + data.ciphertext}
+            key={`${data.plaintext ?? ''}-${data.dateHex}-${data.ciphertext}-${Date.now()}`}
             className="w-full m-0 p-0"
           >
             <DesImageCard
