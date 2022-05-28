@@ -14,6 +14,7 @@ import {
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import { Contract } from 'ethers';
 import { useWalletContext } from 'src/shared/contexts/wallet';
+import { isSameAddress } from 'src/shared/utils/contractHelpers';
 
 interface ContextState {
   tokenData: TokenData[];
@@ -70,7 +71,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     }
     const status = !contract ? undefined : await getTokenStatus(contract, data);
     const ownerAddress = await getOwnerOf(contract, data);
-    const isOwner = ownerAddress.length === 0 ? false : ownerAddress.toLowerCase() === walletAddress.toLowerCase();
+    const isOwner = ownerAddress.length === 0 ? false : isSameAddress(ownerAddress, walletAddress);
     const tokenId = isOwner ? getTokenId(data.dateHex, data.ciphertext) : '';
     _updateTokenData([{ ...data, isOwner, status, tokenId }, ...tokenData]);
     return true;

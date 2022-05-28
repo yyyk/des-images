@@ -32,9 +32,9 @@ export async function queryTokenIds(contract: Contract, walletAddress: string): 
         if (!tokenId?.toHexString()) {
           continue;
         }
-        if (to?.toLowerCase() === walletAddress.toLowerCase()) {
+        if (isSameAddress(to ?? '', walletAddress)) {
           owned.add(tokenId.toHexString());
-        } else if (from?.toLowerCase() === walletAddress.toLowerCase()) {
+        } else if (isSameAddress(from ?? '', walletAddress)) {
           owned.delete(tokenId.toHexString());
         }
       }
@@ -62,4 +62,8 @@ export function calcBurnReward(totalSupply: BigNumber): string {
         .div(10000),
     )
     .toString();
+}
+
+export function isSameAddress(a: string, b: string): boolean {
+  return a.toLowerCase() === b.toLowerCase();
 }

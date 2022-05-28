@@ -3,6 +3,7 @@ import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { decrypt, encrypt } from 'src/shared/utils/des';
 import { getTokenStatus as _getTokenStatus, getOwnerOf as _getOwnerOf, tokenURI } from 'src/shared/services/contract';
 import { LOCAL_STORAGE_TOKEN_DATA_KEY } from 'src/shared/constants';
+import { isSameAddress } from 'src/shared/utils/contractHelpers';
 
 function toHexString(value: string): string {
   return parseInt(value).toString(16);
@@ -37,6 +38,16 @@ export function isSameTokenData(d1: TokenData, d2: TokenData): boolean {
   return d1.dateHex === d2.dateHex && d1.ciphertext === d2.ciphertext;
 }
 
+export function decryptSvg(svg: string): string {
+  return `0x${svg
+    .match(/fill="#([0-9a-fA-F]{6})"/gi)
+    ?.map((str) => {
+      const res = /fill="#([0-9a-fA-F]{2})[0-9a-fA-F]{4}"/.exec(str);
+      return (res && res[1]) ?? '';
+    })
+    .join('')}`;
+}
+
 export function convertTokenURIToTokenData(
   uri: string,
   tokenId: string,
@@ -52,13 +63,7 @@ export function convertTokenURIToTokenData(
         year: date.slice(0, 4),
         month: date.slice(4, 6),
         day: date.slice(6),
-        ciphertext: `0x${svg
-          .match(/fill="#([0-9a-fA-F]{6})"/gi)
-          ?.map((str) => {
-            const res = /fill="#([0-9a-fA-F]{2})[0-9a-fA-F]{4}"/.exec(str);
-            return (res && res[1]) ?? '';
-          })
-          .join('')}`,
+        ciphertext: decryptSvg(svg),
       }),
       isOwner,
       status,
@@ -127,7 +132,7 @@ export async function updateTokenDataStatus(
       const status = await getTokenStatus(contract, _data);
       _data = { ..._data, status };
       const ownerAddress = await getOwnerOf(contract, _data);
-      const isOwner = ownerAddress.length === 0 ? false : ownerAddress.toLowerCase() === walletAddress.toLowerCase();
+      const isOwner = ownerAddress.length === 0 ? false : isSameAddress(ownerAddress, walletAddress);
       const tokenId = isOwner ? getTokenId(_data.dateHex, _data.ciphertext) : '';
       _data = { ..._data, isOwner, tokenId };
       result.push(_data);

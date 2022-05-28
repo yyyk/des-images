@@ -12,7 +12,7 @@ import {
   isPaused as _isPaused,
 } from 'src/shared/services/contract';
 import DesImages from 'src/abi/DesImages.json';
-import { calcBurnReward, calcMintPrice, queryTokenIds } from 'src/shared/utils/contractHelpers';
+import { calcBurnReward, calcMintPrice, isSameAddress, queryTokenIds } from 'src/shared/utils/contractHelpers';
 
 interface ContextState {
   contract: Contract | null;
@@ -36,20 +36,26 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   const [totalSupply, setTotalSupply] = useState('');
   const [mintPrice, setMintPrice] = useState('');
   const [burnPrice, setBurnPrice] = useState('');
-  const ownedTokenIds = useRef<string[]>([]);
+  const ownedTokenIdsRef = useRef<string[]>([]);
+  const [ownedTokenIds, setOwnedTokenIds] = useState<string[]>([]);
 
   const _updateOwnedTokenIds = (from: string, to: string, tokenId: BigNumber) => {
     const _tokenId = tokenId.toHexString();
-    const index = ownedTokenIds.current.findIndex((id) => id === _tokenId);
-    if (from.toLowerCase() === walletAddress.toLowerCase()) {
+    const index = ownedTokenIdsRef.current.findIndex((id) => id === _tokenId);
+    if (isSameAddress(from, walletAddress)) {
       // console.log('remove', _tokenId, index);
       if (index > -1) {
-        ownedTokenIds.current = [...ownedTokenIds.current.slice(0, index), ...ownedTokenIds.current.slice(index + 1)];
+        ownedTokenIdsRef.current = [
+          ...ownedTokenIdsRef.current.slice(0, index),
+          ...ownedTokenIdsRef.current.slice(index + 1),
+        ];
+        setOwnedTokenIds([...ownedTokenIdsRef.current]);
       }
-    } else if (to.toLowerCase() === walletAddress.toLowerCase()) {
+    } else if (isSameAddress(to, walletAddress)) {
       // console.log('add', _tokenId, index);
       if (index === -1) {
-        ownedTokenIds.current = ownedTokenIds.current.concat(_tokenId);
+        ownedTokenIdsRef.current = ownedTokenIdsRef.current.concat(_tokenId);
+        setOwnedTokenIds([...ownedTokenIdsRef.current]);
       }
     }
   };
@@ -104,7 +110,8 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
 
   const _queryTokenIds = async (contract: Contract, walletAddress: string) => {
     // TODO: set loading
-    ownedTokenIds.current = await queryTokenIds(contract, walletAddress);
+    ownedTokenIdsRef.current = await queryTokenIds(contract, walletAddress);
+    setOwnedTokenIds([...ownedTokenIdsRef.current]);
     // TODO: unset loading
   };
 
@@ -163,7 +170,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
         totalEverMinted,
         mintPrice,
         burnPrice,
-        ownedTokenIds: ownedTokenIds.current,
+        ownedTokenIds,
         mint,
         burn,
       }}
