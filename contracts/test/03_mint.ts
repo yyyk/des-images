@@ -76,7 +76,7 @@ describe("DesImages--mint", function () {
       });
 
       it("emits 'Minted' event", async function () {
-        const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
+        const { date, ciphertext } = getDateAndCiphertext(2020, 4, 1);
         await expect(
           desImages.connect(user).mint(date, ciphertext, {
             value: mintPrice,
