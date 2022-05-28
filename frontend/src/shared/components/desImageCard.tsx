@@ -109,10 +109,14 @@ const DesImageCard = ({
         {onBurn && isOwner && status === TOKEN_STATUS.MINTED && (
           <div className="card-actions justify-end">
             <div
-              className={`tooltip tooltip-left ${isLoading ? 'loading' : ''}`}
+              className="tooltip tooltip-left"
               data-tip={`${!walletAddress ? 'Please connect wallet' : `Reward: ${burnPrice} ETH`}`}
             >
-              <button className="btn px-8" onClick={handleOnBurn} disabled={!walletAddress || isLoading}>
+              <button
+                className={`btn px-8 ${isLoading ? 'loading' : ''}`}
+                onClick={handleOnBurn}
+                disabled={!walletAddress || isLoading}
+              >
                 Burn
               </button>
             </div>
