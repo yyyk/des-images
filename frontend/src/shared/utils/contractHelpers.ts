@@ -45,23 +45,19 @@ export async function queryTokenIds(contract: Contract, walletAddress: string): 
   return result;
 }
 
+const BASE_PRICE = ethers.utils.parseEther(BASE_MINT_PRICE);
+const COEF = ethers.utils.parseEther(MINT_PRICE_COEF);
+
 export function calcMintPrice(totalSupply: BigNumber): string {
-  const basePrice = ethers.utils.parseEther(BASE_MINT_PRICE);
-  const coef = ethers.utils.parseEther(MINT_PRICE_COEF);
-  return ethers.utils.formatEther(basePrice.add(coef.mul(totalSupply))).toString();
+  return ethers.utils.formatEther(BASE_PRICE.add(COEF.mul(totalSupply)));
 }
 
 export function calcBurnReward(totalSupply: BigNumber): string {
-  const basePrice = ethers.utils.parseEther(BASE_MINT_PRICE);
-  const coef = ethers.utils.parseEther(MINT_PRICE_COEF);
-  return ethers.utils
-    .formatEther(
-      basePrice
-        .add(coef.mul(totalSupply.sub(1)))
-        .mul(RESERVE_CUT_OVER_10000)
-        .div(10000),
-    )
-    .toString();
+  return ethers.utils.formatEther(
+    BASE_PRICE.add(COEF.mul(totalSupply.sub(1)))
+      .mul(RESERVE_CUT_OVER_10000)
+      .div(10000),
+  );
 }
 
 export function isSameAddress(a: string, b: string): boolean {

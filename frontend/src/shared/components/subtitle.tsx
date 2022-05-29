@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import Modal from 'src/shared/components/modal';
+import { BASE_MINT_PRICE, MINT_PRICE_COEF } from 'src/shared/constants';
 
 const BCOModal = ({ open, onClose }: { open: boolean; onClose: () => void }) => (
   <Modal open={open} onClose={onClose}>
     <h5 className="mt-0 mb-3">The total supply amount governs the mint price.</h5>
     <ul>
       <li>
-        The very first token costs 0.01 ETH. Each increase in supply raises the token's price by 0.001 ETH. Likewise,
-        each decrease in supply lowers the token's price by 0.001 ETH.
+        The very first token costs {BASE_MINT_PRICE} ETH. Each increase in supply raises the token's price by{' '}
+        {MINT_PRICE_COEF} ETH. Likewise, each decrease in supply lowers the token's price by {MINT_PRICE_COEF} ETH.
       </li>
       <li>99.5% of the mint price is stored in the contract, while 0.5% goes to the creator.</li>
       <li className="mb-0">
