@@ -31,7 +31,7 @@ const Stats = () => {
           <LightningIcon />
         </div>
         <div className="stat-title">Current Mint Price</div>
-        <div className="stat-value">{mintPrice} ETH</div>
+        <div className="stat-value">Ξ {mintPrice}</div>
       </div>
     </div>
   );

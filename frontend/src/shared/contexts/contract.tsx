@@ -1,14 +1,14 @@
 import { ethers, Contract, BigNumber } from 'ethers';
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { useWalletContext } from 'src/shared/contexts/wallet';
-import { CONTRACT_ADDRESS } from 'src/shared/constants';
+import { CONTRACT_ADDRESS, MINT_PRICE_COEF } from 'src/shared/constants';
 import {
   mint as _mint,
   burn as _burn,
   getTotalEverMinted,
   getTotalSupply,
   getCurrentPrice,
-  currentBurnReward,
+  getCurrentBurnReward,
   isPaused as _isPaused,
 } from 'src/shared/services/contract';
 import DesImages from 'src/abi/DesImages.json';
@@ -120,7 +120,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     setTotalSupply(!!contract ? await getTotalSupply(contract) : '');
     setTotalEverMinted(!!contract ? await getTotalEverMinted(contract) : '');
     setMintPrice(!!contract ? await getCurrentPrice(contract) : '');
-    setBurnPrice(!!contract ? await currentBurnReward(contract) : '');
+    setBurnPrice(!!contract ? await getCurrentBurnReward(contract) : '');
   };
 
   useEffect(() => {
@@ -148,17 +148,27 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       return Promise.resolve(false);
     }
     const cost = await getCurrentPrice(contract);
-    setMintPrice(cost);
+    setMintPrice(ethers.utils.formatEther(ethers.utils.parseEther(cost).add(ethers.utils.parseEther(MINT_PRICE_COEF))));
     // TODO: add 0.01 eth buffer
-    // ethers.utils.formatEther(ethers.utils.parseEther(cost).add(ethers.utils.parseEther('0.01'))).toString()
-    return await _mint(contract, dateHex, ciphertext, cost);
+    // ethers.utils.formatEther(ethers.utils.parseEther(cost).add(ethers.utils.parseEther(MINT_PRICE_COEF).mul(10)))
+    const res = await _mint(contract, dateHex, ciphertext, cost);
+    if (!res) {
+      setMintPrice(cost);
+    }
+    return res;
   };
 
   const burn = async (tokenId: string): Promise<boolean> => {
     if (!contract) {
       return Promise.resolve(false);
     }
-    return await _burn(contract, tokenId);
+    const reward = burnPrice;
+    setBurnPrice(calcBurnReward(BigNumber.from(totalSupply).sub(1)));
+    const res = await _burn(contract, tokenId);
+    if (!res) {
+      setBurnPrice(reward);
+    }
+    return res;
   };
 
   return (

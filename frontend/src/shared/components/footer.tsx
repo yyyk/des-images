@@ -3,7 +3,7 @@ import { ChainName } from 'src/shared/interfaces';
 
 const Footer = () => {
   const etherscanUrl =
-    ETH_NETWORK === ChainName.LOCALHOST
+    !ETH_NETWORK || ETH_NETWORK === ChainName.LOCALHOST
       ? '#'
       : `https://${
           ETH_NETWORK === ChainName.RINKEBY ? `${ChainName.RINKEBY}.` : ''

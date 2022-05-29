@@ -38,7 +38,7 @@ export async function getCurrentPrice(contract: Contract): Promise<string> {
   }
 }
 
-export async function currentBurnReward(contract: Contract): Promise<string> {
+export async function getCurrentBurnReward(contract: Contract): Promise<string> {
   try {
     return ethers.utils.formatEther(await contract.currentBurnReward());
   } catch (err: any) {
