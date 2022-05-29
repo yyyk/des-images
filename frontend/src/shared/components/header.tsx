@@ -15,8 +15,8 @@ const OfficialBadgeLink = ({ pathname }: { pathname: string }) => (
   </Link>
 );
 
-const ModBadgeLink = () => (
-  <Link className="block badge badge-outline font-normal no-underline" to="/">
+const ModBadgeLink = ({ toCatalog }: { toCatalog: boolean }) => (
+  <Link className="block badge badge-outline font-normal no-underline" to={toCatalog ? '/catalog' : '/'}>
     mod
   </Link>
 );
@@ -63,6 +63,8 @@ const Header = () => {
   const { pathname, state } = useLocation();
   const { walletAddress } = useWalletContext();
 
+  const isPrevPathCatalog = (state as any)?.previousPath === '/catalog';
+
   return (
     <header
       style={{ minHeight: '48px' }}
@@ -72,13 +74,17 @@ const Header = () => {
         <h1 className="m-0">{pathname === '/' ? 'desImages' : <HomeLink />}</h1>
         <div
           className="tooltip tooltip-bottom ml-1 mb-0.5"
-          data-tip={pathname !== '/mod' ? 'mod?' : 'back to official'}
+          data-tip={pathname !== '/mod' ? 'mod?' : `back to ${isPrevPathCatalog ? 'catalog' : 'official'}?`}
         >
-          {pathname !== '/mod' ? <OfficialBadgeLink pathname={pathname} /> : <ModBadgeLink />}
+          {pathname !== '/mod' ? (
+            <OfficialBadgeLink pathname={pathname} />
+          ) : (
+            <ModBadgeLink toCatalog={isPrevPathCatalog} />
+          )}
         </div>
       </div>
       {pathname === '/' && <CatalogLink />}
-      {pathname === '/mod' && (state as any)?.previousPath === '/catalog' && <GoBackButton />}
+      {pathname === '/mod' && isPrevPathCatalog && <GoBackButton />}
       {pathname === '/catalog' && (walletAddress.length > 0 ? <WalletAddress /> : <ConnectWalletButton />)}
     </header>
   );
