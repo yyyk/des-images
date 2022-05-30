@@ -88,7 +88,7 @@ export const useWallet = () => {
         if (index >= 0) {
           setProviders([
             ...providers.slice(0, index),
-            getDefaultWalletConnectProvider(),
+            // getDefaultWalletConnectProvider(),
             ...providers.slice(index + 1),
           ]);
         }
