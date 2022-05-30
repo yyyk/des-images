@@ -1,6 +1,6 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { BASE_MINT_PRICE, ETH_NETWORK, MINT_PRICE_COEF, RESERVE_CUT_OVER_10000 } from 'src/shared/constants';
-import { ChainName } from '../interfaces';
+import { ChainName } from 'src/shared/interfaces';
 
 // TODO: replace with subgraph in the future?
 export async function queryTokenIds(contract: Contract, walletAddress: string): Promise<string[]> {

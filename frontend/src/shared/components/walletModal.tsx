@@ -13,6 +13,7 @@ interface WalletModalProps {
 
 const WalletModal = ({ open, onClose }: WalletModalProps) => {
   const { providers, connectWallet } = useWalletContext();
+  const isMetaMaskNotInstalled = !providers.some((provider) => provider?.type === 'metamask');
   // console.log(providers);
 
   const listClasses = 'p-0 mx-0 mt-0 mb-4 last:mb-0 w-full';
@@ -33,13 +34,13 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
   return (
     <Modal open={open} onClose={onClose}>
       <ul className="list-none p-0 m-0">
-        {!providers.some((provider) => provider?.type === 'metamask') && (
+        {isMetaMaskNotInstalled && (
           <li className={listClasses}>
             <a className={linkClasses} href="https://metamask.io/download.html" target="_blank" rel="noreferrer">
               <span className={logoContainerClasses}>
                 <MetaMaskLogo />
               </span>
-              <span>Metamask</span>
+              <span>Install Metamask</span>
             </a>
           </li>
         )}
@@ -56,6 +57,9 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
           </li>
         ))}
       </ul>
+      {isMetaMaskNotInstalled && (
+        <p className="text-center m-0 mt-4 -mb-2">Note: Please reload the page after installing MetaMask.</p>
+      )}
     </Modal>
   );
 };

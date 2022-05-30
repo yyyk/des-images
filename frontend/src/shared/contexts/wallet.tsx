@@ -10,12 +10,21 @@ interface ContextState {
   isInvalidChainId: boolean;
   walletAddress: string;
   connectWallet: (provider: WalletProvider) => Promise<{ success: boolean; error?: { type: string; message: string } }>;
+  checkIfWalletInstalled: () => void;
 }
 
 const WalletContext = createContext({} as ContextState);
 
 const WalletContextProvider = ({ children }: { children: ReactNode }) => {
-  const { providers, signer, isWalletInstalled, isInvalidChainId, walletAddress, connectWallet } = useWallet();
+  const {
+    providers,
+    signer,
+    isWalletInstalled,
+    isInvalidChainId,
+    walletAddress,
+    connectWallet,
+    checkIfWalletInstalled,
+  } = useWallet();
 
   return (
     <WalletContext.Provider
@@ -26,6 +35,7 @@ const WalletContextProvider = ({ children }: { children: ReactNode }) => {
         isInvalidChainId,
         walletAddress,
         connectWallet,
+        checkIfWalletInstalled,
       }}
     >
       {children}

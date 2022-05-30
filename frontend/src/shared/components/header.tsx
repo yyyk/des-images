@@ -46,11 +46,16 @@ const WalletAddress = () => {
 };
 
 const ConnectWalletButton = () => {
+  const { checkIfWalletInstalled } = useWalletContext();
   const [walletModalOpen, setWalletModalOpen] = useState(false);
+  const handleClick = () => {
+    checkIfWalletInstalled();
+    setWalletModalOpen(true);
+  };
   return (
     <>
       <>
-        <button className="btn btn-md ml-auto" onClick={() => setWalletModalOpen(true)}>
+        <button className="btn btn-md ml-auto" onClick={handleClick}>
           Connect Wallet
         </button>
         <WalletModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
