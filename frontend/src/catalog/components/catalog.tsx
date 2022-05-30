@@ -12,12 +12,9 @@ const Catalog = () => {
   const timeoutRef = useRef<any>(null);
   const scrollRef = useRef<HTMLLIElement>(null);
   
-  console.log('tokenData', tokenData);
-
   const handleOnPreview = async ({ year, month, day, plaintext, ciphertext }: PreviewFormData) => {
     const tokenData = getTokenData({ year, month, day, plaintext, ciphertext });
     const result = await add(tokenData);
-    console.log('result', result);
     if (!result) {
       setShowAlert(true);
       if (timeoutRef.current) {
