@@ -62,7 +62,7 @@ export function getProviders(): WalletProvider[] {
     });
   }
   // WalletConnect
-  providers.push(getDefaultWalletConnectProvider());
+  // providers.push(getDefaultWalletConnectProvider());
 
   return providers;
 }
