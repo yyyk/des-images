@@ -66,10 +66,11 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
 
   const add = async (data: TokenData) => {
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, data));
-    console.log('index', index);
+    // console.log('index', index);
     if (index >= 0) {
       return false;
     }
+    console.log('index', index);
     const status = !contract ? undefined : await getTokenStatus(contract, data);
     console.log('status', status);
     const ownerAddress = await getOwnerOf(contract, data);
