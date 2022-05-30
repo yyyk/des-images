@@ -70,7 +70,8 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     if (index >= 0) {
       return false;
     }
-    console.log('index', index);
+    console.log('index', index, contract, data);
+    console.log(await getTokenStatus(contract, data));
     const status = !contract ? undefined : await getTokenStatus(contract, data);
     console.log('status', status);
     const ownerAddress = await getOwnerOf(contract, data);
