@@ -66,7 +66,6 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
 
   const add = async (data: TokenData) => {
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, data));
-    console.log('add', index);
     if (index >= 0) {
       return false;
     }
