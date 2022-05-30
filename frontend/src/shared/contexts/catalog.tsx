@@ -73,6 +73,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     const ownerAddress = await getOwnerOf(contract, data);
     const isOwner = ownerAddress.length === 0 ? false : isSameAddress(ownerAddress, walletAddress);
     const tokenId = isOwner ? getTokenId(data.dateHex, data.ciphertext) : '';
+    console.log('add', { ...data, isOwner, status, tokenId });
     _updateTokenData([{ ...data, isOwner, status, tokenId }, ...tokenData]);
     return true;
   };
