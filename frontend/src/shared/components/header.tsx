@@ -78,7 +78,7 @@ const Header = () => {
       <div className="flex justify-start items-end">
         <h1 className="m-0">{pathname === '/' ? 'desImages' : <HomeLink />}</h1>
         <div
-          className="tooltip tooltip-bottom ml-1 mb-0.5"
+          className="tooltip tooltip-bottom ml-1 mb-[5px]"
           data-tip={pathname !== '/mod' ? 'mod?' : `back to ${isPrevPathCatalog ? 'catalog' : 'official'}?`}
         >
           {pathname !== '/mod' ? (
