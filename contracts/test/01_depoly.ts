@@ -52,4 +52,30 @@ describe("DesImages--deploy", function () {
       expect(await desImages.owner()).to.equal(owner.address);
     });
   });
+
+  describe("supportsInterface()", function () {
+    it("returns true for ERC721", async function () {
+      expect(
+        await desImages.supportsInterface(parseInt("0x80ac58cd"))
+      ).to.equal(true);
+    });
+
+    it("returns true for ERC721Metadata", async function () {
+      expect(
+        await desImages.supportsInterface(parseInt("0x5b5e139f"))
+      ).to.equal(true);
+    });
+
+    it("returns true for ERC165", async function () {
+      expect(
+        await desImages.supportsInterface(parseInt("0x01ffc9a7"))
+      ).to.equal(true);
+    });
+
+    it("returns true for ERC2981", async function () {
+      expect(
+        await desImages.supportsInterface(parseInt("0x2a55205a"))
+      ).to.equal(true);
+    });
+  });
 });

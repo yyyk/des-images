@@ -21,7 +21,7 @@ error DesImages__OwnerTransferFail();
 /// @title DesImages
 /// @author
 /// @notice
-contract DesImages is ERC721, ERC2981, Ownable, ReentrancyGuard {
+contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
     enum Status {
         FOR_SALE,
         MINTED,

@@ -270,10 +270,12 @@ describe("DesImages--mint", function () {
 
       it("prevents from minting future date's token", async function () {
         const today = new Date(new Date().setUTCHours(0, 0, 0, 0));
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
         const { date, ciphertext } = getDateAndCiphertext(
-          today.getUTCFullYear(),
-          today.getUTCMonth() + 1,
-          today.getUTCDate() + 1
+          tomorrow.getUTCFullYear(),
+          tomorrow.getUTCMonth() + 1,
+          tomorrow.getUTCDate()
         );
         await expect(
           desImages.connect(user).mint(date, ciphertext, {
