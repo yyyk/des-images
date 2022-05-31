@@ -24,7 +24,7 @@ const DesImageCard = ({
 }: DesImageCardProps) => {
   const { theme } = useThemeContext();
   const { walletAddress } = useWalletContext();
-  const { isPaused, mintPrice, burnPrice, mint, burn } = useContractContext();
+  const { isPaused, mint, burn } = useContractContext();
   const [isLoading, setIsLoading] = useState(false);
   const date = `#${tokenData.year}${String(tokenData.month).padStart(2, '0')}${String(tokenData.day).padStart(2, '0')}`;
   const { status, isOwner } = tokenData;
@@ -87,14 +87,8 @@ const DesImageCard = ({
         {onMint && status === TOKEN_STATUS.FOR_SALE && (
           <div className="card-actions justify-end">
             <div
-              className={'tooltip tooltip-left'}
-              data-tip={`${
-                !walletAddress
-                  ? 'Please connect wallet'
-                  : isPaused
-                  ? 'Currently minting paused'
-                  : `Cost: ${mintPrice} ETH`
-              }`}
+              className={!walletAddress || isPaused ? 'tooltip tooltip-left' : ''}
+              data-tip={!walletAddress ? 'Please connect wallet' : isPaused ? 'Currently minting paused' : ''}
             >
               <button
                 className={`btn px-8 ${isLoading ? 'loading' : ''}`}
@@ -109,8 +103,8 @@ const DesImageCard = ({
         {onBurn && isOwner && status === TOKEN_STATUS.MINTED && (
           <div className="card-actions justify-end">
             <div
-              className="tooltip tooltip-left"
-              data-tip={`${!walletAddress ? 'Please connect wallet' : `Reward: ${burnPrice} ETH`}`}
+              className={!walletAddress ? 'tooltip tooltip-left' : ''}
+              data-tip={!walletAddress ? 'Please connect wallet' : ''}
             >
               <button
                 className={`btn px-8 ${isLoading ? 'loading' : ''}`}

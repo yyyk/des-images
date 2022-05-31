@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 import { useThemeContext } from 'src/shared/contexts/theme';
-import { useWalletContext } from 'src/shared/contexts/wallet';
 import { DEFAULT_DATE } from 'src/shared/constants';
 import { DEFAULT_PLAINTEXT } from 'src/mod/constants';
 import { PreviewFormData, TokenData } from 'src/shared/interfaces';
@@ -8,14 +7,12 @@ import { getTokenData } from 'src/shared/utils/tokenDataHelpers';
 import { destructDateInputValue } from 'src/shared/utils/formHelpers';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import DesImageCard from 'src/shared/components/desImageCard';
-import Stats from 'src/shared/components/stats';
 import Subtitle from 'src/shared/components/subtitle';
 import Description from 'src/mod/components/description';
 import ModPreviewForm from 'src/shared/components/modPreviewForm';
 
 const Mod = () => {
   const { setTheme } = useThemeContext();
-  const { walletAddress } = useWalletContext();
   const [tokenData, setTokenData] = useState<TokenData | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -47,11 +44,6 @@ const Mod = () => {
       <div className="mt-6 sm:mt-10 mb-0 mx-0 px-3 sm:px-0 text-center">
         <Subtitle />
       </div>
-      {walletAddress && (
-        <div className="mt-6 grow flex flex-col flex-nowrap justify-end px-3 sm:px-0">
-          <Stats />
-        </div>
-      )}
       <div className="mt-6 sm:mt-10">
         <Description />
       </div>

@@ -105,7 +105,10 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       status: TOKEN_STATUS.BURNED,
       tokenId: data.tokenId || getTokenId(data.dateHex, data.ciphertext),
     };
-    _updateTokenData(tokenData.filter((_data) => !isSameTokenData(_data, newData)));
+    const index = tokenData.findIndex((_data) => isSameTokenData(_data, newData));
+    if (index >= 0) {
+      _updateTokenData([...tokenData.slice(0, index), { ...newData }, ...tokenData.slice(index + 1)]);
+    }
     setOwnedTokenData(ownedTokenData.filter((_data) => !isSameTokenData(_data, newData)));
   };
 

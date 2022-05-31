@@ -1,7 +1,7 @@
 import { ethers, Contract, BigNumber } from 'ethers';
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { useWalletContext } from 'src/shared/contexts/wallet';
-import { CONTRACT_ADDRESS, MINT_PRICE_COEF } from 'src/shared/constants';
+import { CONTRACT_ADDRESS } from 'src/shared/constants';
 import {
   mint as _mint,
   burn as _burn,
@@ -36,8 +36,8 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   const [totalSupply, setTotalSupply] = useState('');
   const [mintPrice, setMintPrice] = useState('');
   const [burnPrice, setBurnPrice] = useState('');
-  const ownedTokenIdsRef = useRef<string[]>([]);
   const [ownedTokenIds, setOwnedTokenIds] = useState<string[]>([]);
+  const ownedTokenIdsRef = useRef<string[]>([]);
 
   const _updateOwnedTokenIds = (from: string, to: string, tokenId: BigNumber) => {
     const _tokenId = tokenId.toHexString();
@@ -60,15 +60,15 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const _eventHandler = (type: string, contract: Contract, startBlockNumber: number) => {
+  const _eventHandler = (type: string, startBlockNumber: number) => {
     switch (type) {
       case 'Transfer':
         return async (from: string, to: string, tokenId: BigNumber, event: any) => {
           if (event?.blockNumber <= startBlockNumber) {
             return;
           }
+          console.log('Transferred');
           _updateOwnedTokenIds(from, to, tokenId);
-          setIsPaused(!contract ? true : await _isPaused(contract));
         };
       case 'Minted':
         return (
@@ -82,6 +82,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           if (event?.blockNumber <= startBlockNumber) {
             return;
           }
+          console.log('Minted');
           setTotalSupply(totalSupply.toString());
           setTotalEverMinted(totalEverMinted.toString());
           setMintPrice(calcMintPrice(totalSupply));
@@ -92,9 +93,26 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           if (event?.blockNumber <= startBlockNumber) {
             return;
           }
+          console.log('Burned');
           setTotalSupply(totalSupply.toString());
           setMintPrice(calcMintPrice(totalSupply));
           setBurnPrice(calcBurnReward(totalSupply));
+        };
+      case 'Paused':
+        return (event: any) => {
+          if (event?.blockNumber <= startBlockNumber) {
+            return;
+          }
+          console.log('Paused');
+          setIsPaused(true);
+        };
+      case 'UnPaused':
+        return (event: any) => {
+          if (event?.blockNumber <= startBlockNumber) {
+            return;
+          }
+          console.log('UnPaused');
+          setIsPaused(false);
         };
       default:
         return () => {};
@@ -103,9 +121,11 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
 
   const _setupContractListeners = async (contract: Contract) => {
     const startBlockNumber = await contract.provider.getBlockNumber();
-    contract.on(contract.filters.Transfer(), _eventHandler('Transfer', contract, startBlockNumber));
-    contract.on(contract.filters.Minted(), _eventHandler('Minted', contract, startBlockNumber));
-    contract.on(contract.filters.Burned(), _eventHandler('Burned', contract, startBlockNumber));
+    contract.on(contract.filters.Transfer(), _eventHandler('Transfer', startBlockNumber));
+    contract.on(contract.filters.Minted(), _eventHandler('Minted', startBlockNumber));
+    contract.on(contract.filters.Burned(), _eventHandler('Burned', startBlockNumber));
+    contract.on(contract.filters.Paused(), _eventHandler('Paused', startBlockNumber));
+    contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', startBlockNumber));
   };
 
   const _queryTokenIds = async (contract: Contract, walletAddress: string) => {
@@ -147,13 +167,24 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     if (!contract) {
       return Promise.resolve(false);
     }
+    // const prevTotalSupply = totalSupply;
+    // const newTotalSupply = BigNumber.from(prevTotalSupply).add(1);
+    // const prevTotalEverMinted = totalEverMinted;
+    // const prevBurnPrice = burnPrice;
+    // const prevMintPrice = mintPrice;
     const cost = await getCurrentPrice(contract);
-    setMintPrice(ethers.utils.formatEther(ethers.utils.parseEther(cost).add(ethers.utils.parseEther(MINT_PRICE_COEF))));
+    // setTotalSupply(newTotalSupply.toString());
+    // setTotalEverMinted(BigNumber.from(prevTotalEverMinted).add(1).toString());
+    // setMintPrice(ethers.utils.formatEther(ethers.utils.parseEther(cost).add(ethers.utils.parseEther(MINT_PRICE_COEF))));
+    // setBurnPrice(calcBurnReward(newTotalSupply));
     // TODO: add 0.01 eth buffer
     // ethers.utils.formatEther(ethers.utils.parseEther(cost).add(ethers.utils.parseEther(MINT_PRICE_COEF).mul(10)))
     const res = await _mint(contract, dateHex, ciphertext, cost);
     if (!res) {
-      setMintPrice(cost);
+      // setTotalSupply(prevTotalSupply);
+      // setTotalEverMinted(prevTotalEverMinted);
+      // setMintPrice(prevMintPrice);
+      // setBurnPrice(prevBurnPrice);
     }
     return res;
   };
@@ -162,11 +193,18 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     if (!contract) {
       return Promise.resolve(false);
     }
-    const reward = burnPrice;
-    setBurnPrice(calcBurnReward(BigNumber.from(totalSupply).sub(1)));
+    // const prevBurnPrice = burnPrice;
+    // const prevMintPrice = mintPrice;
+    // const prevTotalSupply = totalSupply;
+    // const newTotalSupply = BigNumber.from(prevTotalSupply).sub(1);
+    // setTotalSupply(newTotalSupply.toString());
+    // setMintPrice(calcMintPrice(newTotalSupply));
+    // setBurnPrice(calcBurnReward(newTotalSupply));
     const res = await _burn(contract, tokenId);
     if (!res) {
-      setBurnPrice(reward);
+      // setTotalSupply(prevTotalSupply);
+      // setMintPrice(prevMintPrice);
+      // setBurnPrice(prevBurnPrice);
     }
     return res;
   };

@@ -31,3 +31,12 @@ select.text-type {
 /* select.text-type:focus {
     outline:0;
 } */
+
+@keyframes marquee {
+    from {
+        transform: translateX(var(--from-position));
+    }
+    to {
+        transform: translateX(var(--to-position));
+    }
+}
