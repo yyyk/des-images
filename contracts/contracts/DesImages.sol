@@ -45,6 +45,9 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
     uint256 public totalEverMinted;
     bool public paused;
 
+    event Paused();
+    event UnPaused();
+
     event Minted(
         address indexed to,
         uint256 indexed tokenId,
@@ -105,10 +108,12 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
 
     function pause() external onlyOwner whenNotPaused {
         paused = true;
+        emit Paused();
     }
 
     function unpause() external onlyOwner whenPaused {
         paused = false;
+        emit UnPaused();
     }
 
     /// @notice Multiplies 2 numbers together

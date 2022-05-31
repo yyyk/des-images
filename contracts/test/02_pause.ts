@@ -25,6 +25,18 @@ describe("DesImages--pause", function () {
       expect(await desImages.paused()).to.equal(true);
     });
 
+    it("emits 'Paused' event", async function () {
+      const [owner] = signers;
+      const paused = await desImages.paused();
+      if (paused) {
+        await desImages.connect(owner).unpause();
+      }
+      await expect(desImages.connect(owner).pause()).to.emit(
+        desImages,
+        "Paused"
+      );
+    });
+
     it("fails to pause if the contract is already paused", async function () {
       const [owner] = signers;
       const paused = await desImages.paused();
@@ -53,6 +65,18 @@ describe("DesImages--pause", function () {
       }
       await desImages.connect(owner).unpause();
       expect(await desImages.paused()).to.equal(false);
+    });
+
+    it("emits 'UnPaused' event", async function () {
+      const [owner] = signers;
+      const paused = await desImages.paused();
+      if (!paused) {
+        await desImages.connect(owner).pause();
+      }
+      await expect(desImages.connect(owner).unpause()).to.emit(
+        desImages,
+        "UnPaused"
+      );
     });
 
     it("fails to unpause if the contract is already unpaused", async function () {
