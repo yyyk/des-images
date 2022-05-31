@@ -96,6 +96,24 @@ describe("DesImages--burn", function () {
           .withArgs(user.address, tokenId, burnReward, BigNumber.from(0));
       });
 
+      it("emits 'Transfer' event", async function () {
+        const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
+        const tokenId = BigNumber.from(getTokenId(date, ciphertext));
+
+        const tx = await desImages.connect(user).mint(date, ciphertext, {
+          value: mintPrice,
+        });
+        await tx.wait();
+
+        await expect(desImages.connect(user).burn(tokenId))
+          .to.emit(desImages, "Transfer")
+          .withArgs(
+            user.address,
+            "0x0000000000000000000000000000000000000000",
+            tokenId
+          );
+      });
+
       it("sends the reward ether to the token owner", async function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
         const tokenId = BigNumber.from(getTokenId(date, ciphertext));

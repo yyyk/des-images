@@ -157,7 +157,10 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
         override
         returns (string memory)
     {
-        require(_exists(tokenId_), "ERC721: URI query for nonexistent token");
+        require(
+            ERC721._exists(tokenId_),
+            "ERC721: URI query for nonexistent token"
+        );
 
         TokenValue storage tokenValue = _tokenValues[tokenId_];
         return
@@ -188,7 +191,7 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
         if (_tokenValues[tokenId].status != Status.FOR_SALE) {
             revert DesImages__TokenNotForSale();
         }
-        _safeMint(msg.sender, tokenId);
+        ERC721._safeMint(msg.sender, tokenId);
         _tokenValues[tokenId] = TokenValue(Status.MINTED, ciphertext_, date_);
         totalEverMinted += 1;
         totalSupply += 1;
@@ -232,7 +235,7 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
         //     revert DesImages__TokenNotForBurn();
         // }
         uint256 burnReward = currentBurnReward();
-        super._burn(tokenId_);
+        ERC721._burn(tokenId_);
         _tokenValues[tokenId_].status = Status.BURNED;
         totalSupply -= 1;
 

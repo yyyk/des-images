@@ -8,7 +8,7 @@ library TokenURI {
     using Strings for uint16;
     using Strings for uint8;
 
-    bytes private constant HEX_TABLE = "0123456789abcdef";
+    bytes16 private constant HEX_TABLE = "0123456789abcdef";
 
     function generateTitle(uint32 date_) internal pure returns (bytes memory) {
         uint8 day = uint8(date_ & 0xff);

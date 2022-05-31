@@ -92,6 +92,21 @@ describe("DesImages--mint", function () {
           );
       });
 
+      it("emits 'Transfer' event", async function () {
+        const { date, ciphertext } = getDateAndCiphertext(2020, 4, 1);
+        await expect(
+          desImages.connect(user).mint(date, ciphertext, {
+            value: mintPrice,
+          })
+        )
+          .to.emit(desImages, "Transfer")
+          .withArgs(
+            "0x0000000000000000000000000000000000000000",
+            user.address,
+            BigNumber.from(getTokenId(date, ciphertext))
+          );
+      });
+
       it("sends back ether if more than mintPrice is sent", async function () {
         const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
         const balanceBeforeMint = await user.getBalance();
