@@ -10,27 +10,32 @@ const Footer = () => {
         }etherscan.io/address/${CONTRACT_ADDRESS}`;
 
   return (
-    <footer className="prose w-full mx-auto pb-0">
+    <footer className="prose w-full mx-auto mt-0 mb-4 pb-0">
       <ul className="list-none p-0 m-0 flex justify-center">
-        <li className="my-0 p-0 tooltip tooltip-top" data-tip="coming soon!">
+        <li className="my-0 mx-3 p-0 tooltip tooltip-top" data-tip="coming soon!">
           discord
         </li>
-        <li className="my-0 mx-6 p-0">
-          <a href="https://twitter.com/_y_y_y_k_" target="_blank" rel="noopener noreferrer">
-            twitter
+        <li className="my-0 mx-3 p-0">
+          <a href={etherscanUrl} target="_blank" rel="noopener noreferrer">
+            etherscan
           </a>
         </li>
-        <li className="my-0 p-0">
+        <li className="my-0 mx-3 p-0">
           <a href="https://github.com/yyyk/des-images" target="_blank" rel="noopener noreferrer">
             github
           </a>
         </li>
+        <li className="my-0 mx-3 p-0">
+          <a href="https://twitter.com/_y_y_y_k_" target="_blank" rel="noopener noreferrer">
+            twitter
+          </a>
+        </li>
       </ul>
-      <p className="mx-auto my-2 text-center">
+      {/* <p className="mx-auto my-2 text-center">
         <a href={etherscanUrl} target="_blank" rel="noopener noreferrer">
           @{CONTRACT_ADDRESS}
         </a>
-      </p>
+      </p> */}
     </footer>
   );
 };
