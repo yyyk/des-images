@@ -35,17 +35,12 @@ const StatsBanner = () => {
   const [duration, setDuration] = useState('1');
   const el = useRef<HTMLSpanElement>(null);
   const marqueeContainerClasses = 'flex flex-nowrap whitespace-nowrap';
-  const marqueeStyle = {
-    '--from-position': '0px',
-    '--to-position': `-${width}px`,
-    animation: `marquee ${duration}s linear infinite`,
-  } as CSSProperties;
 
   const setup = () => {
     const elWidth = el?.current?.getBoundingClientRect()?.width ?? 1;
     const n = window.innerWidth / elWidth;
     const nCeiled = Math.ceil(n);
-    setDuration((15 * n).toFixed(2));
+    setDuration((60 * n).toFixed(2));
     setWidth(elWidth * nCeiled);
     setAmount(nCeiled);
   };
@@ -70,7 +65,16 @@ const StatsBanner = () => {
 
   return (
     <div className="sticky top-0 z-50 w-full flex flex-nowrap overflow-hidden bg-primary text-primary-content py-0.5 px-0 rounded-bl-[56px]">
-      <div className={marqueeContainerClasses} style={marqueeStyle}>
+      <div
+        className={marqueeContainerClasses}
+        style={
+          {
+            '--from-position': '0px',
+            '--to-position': `-${width}px`,
+            animation: `marquee ${duration}s linear infinite`,
+          } as CSSProperties
+        }
+      >
         {Array.from({ length: amount }, (_, i) => i).map((i) => (
           <span ref={i === 0 ? el : undefined} key={i + '-0'}>
             <Stats
@@ -82,7 +86,16 @@ const StatsBanner = () => {
           </span>
         ))}
       </div>
-      <div className={marqueeContainerClasses} style={marqueeStyle}>
+      <div
+        className={marqueeContainerClasses}
+        style={
+          {
+            '--from-position': '0px',
+            '--to-position': `-${width}px`,
+            animation: `marquee ${duration}s linear infinite`,
+          } as CSSProperties
+        }
+      >
         {Array.from({ length: amount }, (_, i) => i).map((i) => (
           <span key={i + '-1'}>
             <Stats
