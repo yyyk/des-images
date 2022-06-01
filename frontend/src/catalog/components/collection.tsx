@@ -1,8 +1,14 @@
 import DesImageCard from 'src/shared/components/desImageCard';
 import { useCatalogContext } from 'src/shared/contexts/catalog';
+import { useContractContext } from 'src/shared/contexts/contract';
 
 const Collection = () => {
   const { ownedTokenData, minted, burned } = useCatalogContext();
+  const { isUserTokensLoading } = useContractContext();
+
+  if (isUserTokensLoading) {
+    return <p className="pt-3 sm:mt-4">Loading...</p>;
+  }
 
   return (
     <>
