@@ -60,9 +60,9 @@ const DesImageCard = ({
         theme === 'lofi' ? 'bg-base-100 shadow-xl' : theme === 'black' ? 'bg-neutral text-neutral-content' : ''
       }`}
     >
-      <figure className="m-0 p-0 block">
+      <div>
         <DesImageSvg date={date} ciphertext={tokenData.ciphertext} />
-      </figure>
+      </div>
       <div className={`relative card-body !gap-0 ${onMint && status === TOKEN_STATUS.FOR_SALE ? '!pb-5' : ''}`}>
         {onRemove && (
           <button
