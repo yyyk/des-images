@@ -43,7 +43,7 @@ const Catalog = () => {
             </button>
           )}
         </div>
-        <div className="flex nowrap overflow-x-clip -mx-6 px-6">
+        <div className="flex nowrap overflow-x-hidden pb-16 -mb-16 -mx-6 px-6">
           <div
             className={`grow shrink-0 basis-full w-full transition-transform duration-300 ${
               tabIndex === 0 ? '' : '-translate-x-full -ml-12'
