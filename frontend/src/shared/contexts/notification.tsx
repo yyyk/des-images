@@ -23,7 +23,7 @@ const NotificationContextProvider = ({ children }: { children: ReactNode }) => {
         ),
       ];
       setNotifications([...notificationsRef.current]);
-    }, 3500);
+    }, 3300);
   };
   return <NotificationContext.Provider value={{ notifications, add }}>{children}</NotificationContext.Provider>;
 };

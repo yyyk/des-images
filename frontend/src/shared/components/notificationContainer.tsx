@@ -48,8 +48,8 @@ const NotificationsContainer = () => {
           key={n.type + n.text.replace(/\s/g, '-') + '-' + n.id}
           className={`relative mb-4 shadow-lg alert ${n.type === 'success' ? 'alert-success' : 'alert-warning'}`}
           style={{
-            // animation: 'slideInFromBottom 0.3s ease-out 0s 1',
-            animation: 'alertInFromBottom 0.3s ease-out 0s 1 forwards, alertOutToBottom 0.3s linear 3s 1 forwards',
+            animation: 'alertInFromBottom 0.3s ease-out 0s 1',
+            // animation: 'alertInFromBottom 0.3s ease-out 0s 1 forwards, alertOutToBottom 0.3s linear 3s 1 forwards',
           }}
         >
           {n.type === 'success' ? <SuccessAlert text={n.text} /> : <FailedAlert text={n.text} />}

@@ -13,8 +13,13 @@ const Stats = ({
   mintPrice: string;
   burnPrice: string;
 }) => {
+  const today = new Date();
   return (
     <span className="flex flex-nowrap">
+      <span className="px-4">{`${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today
+        .getDate()
+        .toString()
+        .padStart(2, '0')}`}</span>
       <span className="px-4">Current Minted: {totalEverMinted}</span>
       <span className="px-4">Current Supply: {totalSupply}</span>
       <span className="px-4">Current Mint Price: Ξ {mintPrice}</span>
