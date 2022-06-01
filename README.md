@@ -13,3 +13,32 @@ contains solidity files
 ### `/frontend`
 
 contains react frontend app
+
+### DES
+
+#### Node.js
+
+```js
+const crypto = require('crypto');
+
+const algorithm = 'des-ecb';
+const key = Buffer.from('20200101', 'latin1');
+const ciphertext = '79030f7920aaa3cfbbd92afbb93e70ba';
+const decipher = crypto.createDecipheriv(algorithm, key, null);
+decipher.setAutoPadding(false);
+let plaintext = decipher.update(ciphertext, 'hex', 'latin1');
+plaintext += decipher.final('latin1');
+console.log(plaintext) // 'i am still alive'
+```
+
+#### Python
+
+```python
+from Crypto.Cipher import DES
+
+key = b"20200101"
+ciphertext = bytes.fromhex("79030f7920aaa3cfbbd92afbb93e70ba")
+des = DES.new(key, DES.MODE_ECB)
+plaintext = des.decrypt(ciphertext)
+print(plaintext) # b'i am still alive'
+```
