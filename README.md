@@ -14,7 +14,7 @@ contains solidity files
 
 contains react frontend app
 
-### DES
+### DES decryption examples
 
 #### Node.js
 
