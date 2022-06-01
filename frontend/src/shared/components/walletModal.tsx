@@ -58,7 +58,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
         ))}
       </ul>
       {isMetaMaskNotInstalled && (
-        <p className="text-center m-0 mt-4 -mb-2">Note: Please reload the page after installing MetaMask.</p>
+        <p className="text-center m-0 mt-4">Note: Please reload the page after installing MetaMask.</p>
       )}
     </Modal>
   );
