@@ -11,7 +11,7 @@ export interface WalletProvider {
 
 // export type ChainName = 'mainnet' | 'rinkeby' | 'ropsten' | 'localhost' | 'hardhat';
 
-export enum ChainName {
+export enum CHAIN_NAME {
   MAIN_NET = 'mainnet',
   ROPSTEN = 'ropsten',
   RINKEBY = 'rinkeby',
@@ -19,7 +19,7 @@ export enum ChainName {
   HARD_HAT = 'hardhat',
 }
 
-export enum ChainId {
+export enum CHAIN_ID {
   MAIN_NET = '0x1',
   ROPSTEN = '0x3',
   RINKEBY = '0x4',
@@ -28,8 +28,8 @@ export enum ChainId {
 }
 
 export interface Chain {
-  id: ChainId;
-  name: ChainName;
+  id: CHAIN_ID;
+  name: CHAIN_NAME;
 }
 
 export enum TOKEN_STATUS {
@@ -56,4 +56,15 @@ export interface PreviewFormData {
   day: string;
   plaintext?: string;
   ciphertext?: string;
+}
+
+export enum NOTIFICATION_TYPE {
+  SUCCESS = 'success',
+  WARNING = 'warning',
+}
+
+export interface Notification {
+  id: string;
+  type: NOTIFICATION_TYPE;
+  text: string;
 }

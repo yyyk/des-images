@@ -1,28 +1,21 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useCatalogContext } from 'src/shared/contexts/catalog';
-import { PreviewFormData } from 'src/shared/interfaces';
+import { NOTIFICATION_TYPE, PreviewFormData, TokenData } from 'src/shared/interfaces';
 import { getTokenData } from 'src/shared/utils/tokenDataHelpers';
 import DesImageCard from 'src/shared/components/desImageCard';
 import ModPreviewForm from 'src/shared/components/modPreviewForm';
-import PreviewAlert from 'src/catalog/components/previewAlert';
+import { useNotificationContext } from 'src/shared/contexts/notification';
 
 const Catalog = () => {
   const { tokenData, add, remove, minted, burned } = useCatalogContext();
-  const [showAlert, setShowAlert] = useState(false);
-  const timeoutRef = useRef<any>(null);
   const scrollRef = useRef<HTMLLIElement>(null);
+  const { add: addNotification } = useNotificationContext();
 
   const handleOnPreview = async ({ year, month, day, plaintext, ciphertext }: PreviewFormData) => {
     const tokenData = getTokenData({ year, month, day, plaintext, ciphertext });
     const result = await add(tokenData);
     if (!result) {
-      setShowAlert(true);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      timeoutRef.current = setTimeout(() => {
-        setShowAlert(false);
-      }, 3000);
+      addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Preview already exists.' });
       return;
     }
     setTimeout(() => {
@@ -30,9 +23,27 @@ const Catalog = () => {
     });
   };
 
+  const handleMinted = (data: TokenData) => (res: boolean) => {
+    if (!res) {
+      addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Mint failed.' });
+      return;
+    }
+    addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Minted.' });
+    minted(data);
+  };
+
+  const handleBurned = (data: TokenData) => (res: boolean) => {
+    if (!res) {
+      addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Burn failed.' });
+      return;
+    }
+    addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Burned.' });
+    burned(data);
+  };
+
   return (
     <>
-      <div className="pt-0 sm:pt-4 pb-11 px-3 sm:px-0">
+      <div className="pt-0 sm:pt-3 pb-10 px-3 sm:px-0">
         <ModPreviewForm onSubmit={handleOnPreview} defaultPlaintext="i am still alive" showHint={true} />
       </div>
       <ul
@@ -50,14 +61,13 @@ const Catalog = () => {
               tokenData={data}
               showPlaintext={true}
               showCiphertext={true}
-              onMint={(res) => res && minted(data)}
-              onBurn={(res) => res && burned(data)}
+              onMint={handleMinted(data)}
+              onBurn={handleBurned(data)}
               onRemove={() => remove(data)}
             />
           </li>
         ))}
       </ul>
-      <PreviewAlert showAlert={showAlert} />
     </>
   );
 };

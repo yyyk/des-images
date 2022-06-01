@@ -1,12 +1,12 @@
 import { CONTRACT_ADDRESS, ETH_NETWORK } from 'src/shared/constants';
-import { ChainName } from 'src/shared/interfaces';
+import { CHAIN_NAME } from 'src/shared/interfaces';
 
 const Footer = () => {
   const etherscanUrl =
-    !ETH_NETWORK || ETH_NETWORK === ChainName.LOCALHOST
+    !ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST
       ? '#'
       : `https://${
-          ETH_NETWORK === ChainName.RINKEBY ? `${ChainName.RINKEBY}.` : ''
+          ETH_NETWORK === CHAIN_NAME.RINKEBY ? `${CHAIN_NAME.RINKEBY}.` : ''
         }etherscan.io/address/${CONTRACT_ADDRESS}`;
 
   return (

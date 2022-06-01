@@ -5,6 +5,7 @@ import AlertBanner from 'src/shared/components/alertBanner';
 import Header from 'src/shared/components/header';
 import Footer from 'src/shared/components/footer';
 import StatsBanner from 'src/shared/components/statsBanner';
+import NotificationsContainer from 'src/shared/components/notificationContainer';
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const { theme } = useThemeContext();
@@ -16,9 +17,10 @@ const Layout = ({ children }: { children: ReactNode }) => {
       {walletAddress && <StatsBanner />}
       <div className="flex flex-col flex-nowrap grow px-3 py-0">
         <Header />
-        <main className="prose w-full mt-0 mx-auto pt-0 pb-14 flex flex-col flex-nowrap grow">{children}</main>
+        <main className="prose w-full mt-0 mx-auto pt-0 pb-16 flex flex-col flex-nowrap grow">{children}</main>
         <Footer />
       </div>
+      <NotificationsContainer />
     </div>
   );
 };

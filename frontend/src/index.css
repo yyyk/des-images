@@ -40,3 +40,24 @@ select.text-type {
         transform: translateX(var(--to-position));
     }
 }
+
+@keyframes alertInFromBottom {
+    0% {
+        transform: translateY(100%);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes alertOutToBottom {
+    0% {
+        visibility: visible;
+    }
+    1% {
+        visibility: hidden;
+    }
+    100% {
+        visibility: hidden;
+    }
+}

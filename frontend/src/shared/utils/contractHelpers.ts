@@ -1,13 +1,13 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { BASE_MINT_PRICE, ETH_NETWORK, MINT_PRICE_COEF, RESERVE_CUT_OVER_10000 } from 'src/shared/constants';
-import { ChainName } from 'src/shared/interfaces';
+import { CHAIN_NAME } from 'src/shared/interfaces';
 
 // TODO: replace with subgraph in the future?
 export async function queryTokenIds(contract: Contract, walletAddress: string): Promise<string[]> {
   const startBlock = parseInt(
-    ETH_NETWORK === ChainName.RINKEBY
+    ETH_NETWORK === CHAIN_NAME.RINKEBY
       ? '10755524'
-      : ETH_NETWORK === ChainName.MAIN_NET
+      : ETH_NETWORK === CHAIN_NAME.MAIN_NET
       ? '14859331' // TODO: update needed once contract deployed
       : '0',
   );

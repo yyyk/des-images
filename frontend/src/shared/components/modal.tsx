@@ -107,8 +107,11 @@ const Modal = ({ children, open, disableClose = false, onClose }: ModalProps) =>
         className={`modal ${!disableClose ? 'cursor-pointer' : ''}`}
         onClick={handleOverlayClick}
       >
-        <div className="modal-box prose relative cursor-default px-10 py-12" aria-modal="true">
-          <div>{children}</div>
+        <div
+          className="modal-box prose relative flex flex-col flex-nowrap overflow-hidden cursor-default px-0 py-12"
+          aria-modal="true"
+        >
+          <div className="h-full overflow-auto px-10">{children}</div>
           <button
             className="btn btn-sm btn-circle btn-outline absolute right-2 top-2"
             onClick={handleClose}
