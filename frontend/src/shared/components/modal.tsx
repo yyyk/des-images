@@ -108,10 +108,10 @@ const Modal = ({ children, open, disableClose = false, onClose }: ModalProps) =>
         onClick={handleOverlayClick}
       >
         <div
-          className="modal-box prose relative flex flex-col flex-nowrap overflow-hidden cursor-default px-0 py-12"
+          className="modal-box prose relative flex flex-col flex-nowrap overflow-hidden cursor-default px-0 py-10"
           aria-modal="true"
         >
-          <div className="h-full overflow-auto px-10">{children}</div>
+          <div className="h-full overflow-auto px-10 py-2">{children}</div>
           <button
             className="btn btn-sm btn-circle btn-outline absolute right-2 top-2"
             onClick={handleClose}
