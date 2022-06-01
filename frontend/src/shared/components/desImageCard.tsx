@@ -60,31 +60,32 @@ const DesImageCard = ({
         theme === 'lofi' ? 'bg-base-100 shadow-xl' : theme === 'black' ? 'bg-neutral text-neutral-content' : ''
       }`}
     >
-      <figure className="m-0 p-0">
+      <figure className="m-0 p-0 block">
         <DesImageSvg date={date} ciphertext={tokenData.ciphertext} />
       </figure>
-      <div className={`card-body !gap-0 ${onMint && status === TOKEN_STATUS.FOR_SALE ? '!pb-5' : ''}`}>
+      <div className={`relative card-body !gap-0 ${onMint && status === TOKEN_STATUS.FOR_SALE ? '!pb-5' : ''}`}>
+        {onRemove && (
+          <button
+            className="absolute btn btn-square btn-sm !w-[28px] !h-[28px] !min-h-[28px] right-3 sm:right-4 top-3 sm:top-4"
+            onClick={handleRemove}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
         {onMint && isNil(status) && (
           <div className="badge badge-md badge-outline mb-1">
             {status === TOKEN_STATUS.MINTED ? 'Minted' : status === TOKEN_STATUS.BURNED ? 'Burned' : 'Available'}
           </div>
         )}
-        <h2 className="card-title !mt-0 !mb-1 sm:!mb-0 !gap-0 justify-between">
-          <span>{date}</span>
-          {onRemove && (
-            <button className="btn btn-square btn-sm !w-[28px] !h-[28px] !min-h-[28px]" onClick={handleRemove}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
-        </h2>
+        <h2 className="card-title !mt-0 !mb-1 sm:!mb-0 !gap-0">{date}</h2>
         {showCiphertext && (
           <code
             className={`w-full overflow-hidden text-ellipsis font-normal opacity-60 p-0 m-0 mt-0 ${
@@ -94,7 +95,7 @@ const DesImageCard = ({
             {tokenData.ciphertext}
           </code>
         )}
-        {showPlaintext && <p className={`w-full overflow-hidden text-ellipsis m-0 mb-2`}>{tokenData.plaintext}</p>}
+        {showPlaintext && <p className="w-full overflow-hidden text-ellipsis m-0 mb-2">{tokenData.plaintext}</p>}
         {onMint && status === TOKEN_STATUS.FOR_SALE && (
           <div className="card-actions justify-end">
             <div
