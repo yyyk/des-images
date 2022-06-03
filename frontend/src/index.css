@@ -21,16 +21,16 @@ code {
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-    background: transparent;
+    position: absolute;
+    top: 0;
+    right: 0;
     bottom: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    background: transparent;
     color: transparent;
     cursor: pointer;
-    height: auto;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: auto;
 }
 
 select {

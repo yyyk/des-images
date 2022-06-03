@@ -42,7 +42,7 @@ const NotificationsContainer = () => {
   const { notifications } = useNotificationContext();
 
   return (
-    <div className="fixed bottom-0 right-1/2 translate-x-1/2 w-1/2 z-10">
+    <div className="fixed bottom-0 right-1/2 translate-x-1/2 w-[calc(100%-3rem)] sm:w-1/2 z-10">
       {notifications.map((n, i) => (
         <div
           key={n.type + n.text.replace(/\s/g, '-') + '-' + n.id}
