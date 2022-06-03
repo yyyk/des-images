@@ -20,6 +20,19 @@ code {
     filter: invert(1);
 }
 
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background: transparent;
+    bottom: 0;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+}
+
 select {
     appearance: none;
     -moz-appearance: none; 
@@ -33,6 +46,14 @@ select.text-type {
     --tw-text-opacity: 1;
     color: hsl(var(--bc) / var(--tw-text-opacity));
 }
+
+/* p:hover {
+    background-color: #ff3030;
+}
+
+p {
+    transition: background-color 0.3s;
+} */
 
 /* select.text-type:focus {
     outline:0;

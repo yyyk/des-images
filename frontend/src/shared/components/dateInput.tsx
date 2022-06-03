@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 import { defaultTokenData } from 'src/shared/constants';
 
 interface DateInputProps {
@@ -17,6 +17,7 @@ const DateInput = ({ showLabel = true, defaultValue, onChange }: DateInputProps)
   const maxDate = `${dateObj.getUTCFullYear()}-${String(dateObj.getUTCMonth() + 1).padStart(2, '0')}-${String(
     dateObj.getUTCDate(),
   ).padStart(2, '0')}`;
+  const dateInputRef = useRef<HTMLInputElement>(null);
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -32,16 +33,28 @@ const DateInput = ({ showLabel = true, defaultValue, onChange }: DateInputProps)
           <span className="label-text">choose a date</span>
         </label>
       )}
-      <input
-        className="input input-bordered w-full"
-        type="date"
-        name=""
-        id=""
-        value={date}
-        min={DEFAULT_MIN_DATE}
-        max={maxDate}
-        onChange={handleOnChange}
-      />
+      <div className="relative">
+        <input
+          className="input input-bordered w-full"
+          type="text"
+          name=""
+          id=""
+          readOnly
+          value={date}
+          onClick={() => dateInputRef?.current?.focus()}
+        />
+        <input
+          ref={dateInputRef}
+          className="absolute top-0 right-0 bottom-0 left-0 opacity-0"
+          type="date"
+          name=""
+          id=""
+          value={date}
+          min={DEFAULT_MIN_DATE}
+          max={maxDate}
+          onChange={handleOnChange}
+        />
+      </div>
     </>
   );
 };
