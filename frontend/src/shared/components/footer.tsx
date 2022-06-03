@@ -1,5 +1,6 @@
 import { CONTRACT_ADDRESS, ETH_NETWORK } from 'src/shared/constants';
 import { CHAIN_NAME } from 'src/shared/interfaces';
+import ExternalLink from 'src/shared/components/externalLink';
 
 const Footer = () => {
   const etherscanUrl =
@@ -16,25 +17,19 @@ const Footer = () => {
           discord
         </li>
         <li className="my-0 mx-3 p-0">
-          <a href={etherscanUrl} target="_blank" rel="noopener noreferrer">
-            etherscan
-          </a>
+          <ExternalLink href={etherscanUrl}>etherscan</ExternalLink>
         </li>
         <li className="my-0 mx-3 p-0">
-          <a href="https://github.com/yyyk/des-images" target="_blank" rel="noopener noreferrer">
-            github
-          </a>
+          <ExternalLink href="https://github.com/yyyk/des-images">github</ExternalLink>
         </li>
         <li className="my-0 mx-3 p-0">
-          <a href="https://twitter.com/_y_y_y_k_" target="_blank" rel="noopener noreferrer">
-            twitter
-          </a>
+          <ExternalLink href="https://twitter.com/_y_y_y_k_">twitter</ExternalLink>
         </li>
       </ul>
       {/* <p className="mx-auto my-2 text-center">
-        <a href={etherscanUrl} target="_blank" rel="noopener noreferrer">
+        <ExternalLink href={etherscanUrl}>
           @{CONTRACT_ADDRESS}
-        </a>
+        </ExternalLink>
       </p> */}
     </footer>
   );
