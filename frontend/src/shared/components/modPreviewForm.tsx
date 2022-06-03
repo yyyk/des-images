@@ -88,7 +88,7 @@ const ModPreviewForm = ({
         <div className="w-3/12">
           <KeyLabel />
         </div>
-        <div className="grow mx-4 flex flex-row justify-start items-start">
+        <div className="grow flex flex-row justify-start items-start">
           <TypeSelect showHint={showHint} onChange={(value) => setTextType(value)} />
         </div>
         <div className="w-2/12"></div>
@@ -98,20 +98,26 @@ const ModPreviewForm = ({
           <div className="w-full block sm:hidden px-2">
             <KeyLabel />
           </div>
-          <DateInput defaultValue={defaultDate} showLabel={false} onChange={(value) => setDate(value)} />
+          <DateInput
+            classNames="rounded-r-none"
+            defaultValue={defaultDate}
+            showLabel={false}
+            onChange={(value) => setDate(value)}
+          />
         </div>
-        <div className="w-full sm:w-auto grow mx-0 sm:mx-4 mt-4 sm:mt-0">
+        <div className="w-full sm:w-auto grow mx-0 mt-4 sm:mt-0">
           <div className="flex sm:hidden flex-row justify-start items-start mb-1">
             <TypeSelect showHint={showHint} onChange={(value) => setTextType(value)} />
           </div>
           <TextInput
+            classNames="sm:rounded-l-none sm:rounded-r-none sm:border-x-0"
             defaultValue={{ plaintext: defaultPlaintext, ciphertext: defaultCiphertext }}
             textType={textType}
             onChange={handleTextInputOnChange}
           />
         </div>
         <button
-          className={`btn w-full sm:w-2/12 mt-2 sm:mt-0 ${isLoading ? 'loading' : ''}`}
+          className={`btn w-full sm:w-2/12 mt-2 sm:mt-0 sm:rounded-l-none ${isLoading ? 'loading' : ''}`}
           type="submit"
           disabled={
             isLoading ||

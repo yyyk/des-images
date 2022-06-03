@@ -10,12 +10,14 @@ interface TextInputProps {
     ciphertext: string;
   };
   textType: TextType;
+  classNames?: string;
   onChange?: (value: { plaintext: string; ciphertext: string; isValid: boolean }) => void;
 }
 
 const TextInput = ({
   defaultValue = { plaintext: DEFAULT_PLAINTEXT, ciphertext: DEFAULT_CIPHERTEXT },
   textType,
+  classNames = '',
   onChange,
 }: TextInputProps) => {
   const [text, setText] = useState({
@@ -86,7 +88,7 @@ const TextInput = ({
   return (
     <>
       <input
-        className={`input input-bordered w-full ${inputStateClasses}`}
+        className={`input input-bordered w-full ${inputStateClasses}${classNames && ` ${classNames}`}`}
         type="text"
         name=""
         id=""

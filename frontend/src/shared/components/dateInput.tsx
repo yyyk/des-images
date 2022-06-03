@@ -4,12 +4,13 @@ import { defaultTokenData } from 'src/shared/constants';
 interface DateInputProps {
   showLabel?: boolean;
   defaultValue?: string;
+  classNames?: string;
   onChange?: (value: string) => void;
 }
 
 const DEFAULT_MIN_DATE = '2020-01-01';
 
-const DateInput = ({ showLabel = true, defaultValue, onChange }: DateInputProps) => {
+const DateInput = ({ showLabel = true, defaultValue, classNames = '', onChange }: DateInputProps) => {
   const [date, setDate] = useState(
     defaultValue ?? `${defaultTokenData.year}-${defaultTokenData.month}-${defaultTokenData.day}`,
   );
@@ -35,7 +36,7 @@ const DateInput = ({ showLabel = true, defaultValue, onChange }: DateInputProps)
       )}
       <div className="relative">
         <input
-          className="input input-bordered w-full"
+          className={`input input-bordered w-full${classNames && ` ${classNames}`}`}
           type="text"
           name=""
           id=""
