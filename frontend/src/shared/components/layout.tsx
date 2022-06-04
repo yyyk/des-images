@@ -13,7 +13,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div data-theme={theme} className="min-h-screen w-full flex flex-col flex-nowrap overflow-x-hidden">
-      <div className="alert alert-info justify-center rounded-none w-screen ">
+      <div className="alert alert-info justify-center rounded-none w-screen bg-primary text-primary-content">
         <div>
           <svg
             xmlns="http://www.w3.org/2000/svg"

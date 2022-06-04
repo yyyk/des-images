@@ -1,5 +1,5 @@
 const AlertBanner = () => (
-  <div className="alert alert-warning justify-center rounded-none w-screen ">
+  <div className="alert alert-warning justify-center rounded-none w-screen">
     <div>
       <svg
         xmlns="http://www.w3.org/2000/svg"
