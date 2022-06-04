@@ -12,7 +12,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const { isInvalidChainId, walletAddress } = useWalletContext();
 
   return (
-    <div data-theme={theme} className="min-h-screen flex flex-col flex-nowrap">
+    <div data-theme={theme} className="min-h-screen flex flex-col flex-nowrap overflow-x-hidden">
       <div className="alert alert-info justify-center rounded-none w-screen ">
         <div>
           <svg
