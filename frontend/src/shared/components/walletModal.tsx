@@ -1,4 +1,4 @@
-import { MouseEvent } from 'react';
+import { MouseEvent, useEffect, useRef } from 'react';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { NOTIFICATION_TYPE, WalletProvider } from 'src/shared/interfaces';
 import Modal from 'src/shared/components/modal';
@@ -6,6 +6,7 @@ import MetaMaskLogo from 'src/shared/components/logos/metamask';
 import CoinbaseWalletLogo from 'src/shared/components/logos/coinbaseWallet';
 import WalletConnectLogo from 'src/shared/components/logos/walletConnect';
 import { useNotificationContext } from 'src/shared/contexts/notification';
+import { isMobile } from '../utils/walletHelpers';
 
 interface WalletModalProps {
   open: boolean;
@@ -15,14 +16,22 @@ interface WalletModalProps {
 const WalletModal = ({ open, onClose }: WalletModalProps) => {
   const { providers, connectWallet } = useWalletContext();
   const { add: addNotification } = useNotificationContext();
-  // const isMetaMaskNotInstalled = !providers.some((provider) => provider?.type === 'metamask');
+  const walletConnectRef = useRef<HTMLButtonElement>(null);
+  const isNotMobile = !isMobile();
+  const isMetaMaskNotInstalled = !providers.some((provider) => provider?.type === 'metamask');
   // console.log(providers);
 
   const listClasses = 'p-0 mx-0 mt-0 mb-4 last:mb-0 w-full';
   const buttonClasses =
     'font-normal w-full px-4 py-3 flex row nowrap justify-center items-center border border-solid border-neutral-300 rounded';
-  // const linkClasses = `no-underline ${buttonClasses}`;
+  const linkClasses = `no-underline ${buttonClasses}`;
   const logoContainerClasses = 'w-9 mr-2';
+
+  useEffect(() => {
+    try {
+      !isNotMobile && open && walletConnectRef?.current?.click();
+    } catch (err) {}
+  }, [isNotMobile, open]);
 
   const handleConnectWallet = (provider: WalletProvider) => async (e: MouseEvent) => {
     e.preventDefault();
@@ -42,7 +51,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
   return (
     <Modal open={open} onClose={onClose}>
       <ul className="list-none p-0 m-0">
-        {/* {isMetaMaskNotInstalled && (
+        {isNotMobile && isMetaMaskNotInstalled && (
           <li className={listClasses}>
             <a className={linkClasses} href="https://metamask.io/download.html" target="_blank" rel="noreferrer">
               <span className={logoContainerClasses}>
@@ -51,10 +60,14 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
               <span>Install Metamask</span>
             </a>
           </li>
-        )} */}
+        )}
         {providers.map((provider) => (
           <li key={provider?.type} className={listClasses}>
-            <button className={buttonClasses} onClick={handleConnectWallet(provider)}>
+            <button
+              ref={provider?.type === 'wallet-connect' ? walletConnectRef : undefined}
+              className={buttonClasses}
+              onClick={handleConnectWallet(provider)}
+            >
               <span className={logoContainerClasses}>
                 {provider?.type === 'metamask' && <MetaMaskLogo />}
                 {provider?.type === 'coinbase' && <CoinbaseWalletLogo />}
@@ -65,9 +78,9 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
           </li>
         ))}
       </ul>
-      {/* {isMetaMaskNotInstalled && (
+      {isNotMobile && isMetaMaskNotInstalled && (
         <p className="text-center m-0 mt-4">Note: Please reload the page after installing MetaMask.</p>
-      )} */}
+      )}
     </Modal>
   );
 };
