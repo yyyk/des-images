@@ -6,7 +6,7 @@ import { CHAIN_NAME } from 'src/shared/interfaces';
 export async function queryTokenIds(contract: Contract, walletAddress: string): Promise<string[]> {
   const startBlock = parseInt(
     ETH_NETWORK === CHAIN_NAME.RINKEBY
-      ? '10755524'
+      ? '10793462'
       : ETH_NETWORK === CHAIN_NAME.MAIN_NET
       ? '14859331' // TODO: update needed once contract deployed
       : '0',
