@@ -13,6 +13,24 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div data-theme={theme} className="min-h-screen flex flex-col flex-nowrap">
+      <div className="alert alert-info justify-center rounded-none w-screen ">
+        <div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="stroke-current flex-shrink-0 w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <span>Currently in beta with rinkeby network</span>
+        </div>
+      </div>
       {isInvalidChainId && <AlertBanner />}
       {walletAddress && <StatsBanner />}
       <div className="flex flex-col flex-nowrap grow px-3 py-0">
