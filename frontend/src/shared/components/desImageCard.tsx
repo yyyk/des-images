@@ -5,47 +5,46 @@ import { useThemeContext } from 'src/shared/contexts/theme';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import DesImageSvg from 'src/shared/components/desImageSvg';
 import { isNil } from 'src/shared/utils/isNil';
-import Modal from './modal';
+import Modal from 'src/shared/components/modal';
 
-const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () => void; onSubmit: () => void }) => (
-  <Modal open={open} onClose={onClose}>
-    <p className="mt-0 mb-0">Notes:</p>
-    <ul>
-      <li>
-        {' '}
-        The smart contract is <strong>unaudited</strong>, though it's written with extra cares.{' '}
-        <strong>Please mint at your own risk.</strong>
-      </li>
-      <li>
-        {' '}
-        Since only one token per price point can be minted, the buffer of <strong>Ξ 0.01</strong> is added to the cost
-        to ensure that the transaction succeeds.
-      </li>
-      <li>
-        If there is more than one mint transaction per block, a part of the buffer will be used to pay the mint cost at
-        the time of confirmation.
-      </li>
-      <li>
-        <strong>All the remaining of the buffer will be refunded.</strong>
-      </li>
-      <li>
-        If more than 10 mints occur in one block, your minting transaction might fail. In that case, you will be
-        refunded, though <strong>it would still cost you the gas price</strong>.
-      </li>
-    </ul>
-    <div className="flex justify-end mt-6">
-      <button
-        className="btn btn-primary"
-        onClick={() => {
-          onClose();
-          onSubmit();
-        }}
-      >
-        Confirm Mint
-      </button>
-    </div>
-  </Modal>
-);
+const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () => void; onSubmit: () => void }) => {
+  const handleOnClick = () => {
+    onClose();
+    onSubmit();
+  };
+  return (
+    <Modal open={open} onClose={onClose}>
+      <p className="mt-0 mb-0">Notes:</p>
+      <ul>
+        <li>
+          The smart contract is <strong>unaudited</strong>, though it's written with extra care.{' '}
+          <strong>Please mint at your own risk.</strong>
+        </li>
+        <li>
+          Since only one token per price point can be minted, the buffer of <strong>Ξ 0.01</strong> is added to the cost
+          to ensure that the transaction succeeds.
+        </li>
+        <li>
+          If there is more than one mint transaction per block, a part of the buffer is used to pay the mint cost at the
+          time of confirmation.
+        </li>
+        <li>
+          <strong>The unused part of the buffer will be refunded.</strong>
+        </li>
+        <li>
+          If more than 10 mints occur in one block, your mint transaction might fail. In such case,{' '}
+          <strong>you would be charged for the transaction fee</strong>, though the ether sent to the contract would be
+          returned.
+        </li>
+      </ul>
+      <div className="flex justify-end mt-6">
+        <button className="btn btn-primary" onClick={handleOnClick}>
+          Confirm Mint
+        </button>
+      </div>
+    </Modal>
+  );
+};
 
 interface DesImageCardProps {
   tokenData: TokenData;
