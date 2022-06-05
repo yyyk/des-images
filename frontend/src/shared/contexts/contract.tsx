@@ -1,7 +1,7 @@
 import { ethers, Contract, BigNumber } from 'ethers';
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { useWalletContext } from 'src/shared/contexts/wallet';
-import { CONTRACT_ADDRESS } from 'src/shared/constants';
+import { CONTRACT_ADDRESS, MINT_PRICE_COEF } from 'src/shared/constants';
 import {
   mint as _mint,
   burn as _burn,
@@ -169,46 +169,18 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     if (!contract) {
       return Promise.resolve(false);
     }
-    // const prevTotalSupply = totalSupply;
-    // const newTotalSupply = BigNumber.from(prevTotalSupply).add(1);
-    // const prevTotalEverMinted = totalEverMinted;
-    // const prevBurnPrice = burnPrice;
-    // const prevMintPrice = mintPrice;
-    const cost = await getCurrentPrice(contract);
-    // setTotalSupply(newTotalSupply.toString());
-    // setTotalEverMinted(BigNumber.from(prevTotalEverMinted).add(1).toString());
-    // setMintPrice(ethers.utils.formatEther(ethers.utils.parseEther(cost).add(ethers.utils.parseEther(MINT_PRICE_COEF))));
-    // setBurnPrice(calcBurnReward(newTotalSupply));
-    // TODO: add 0.01 eth buffer
-    // ethers.utils.formatEther(ethers.utils.parseEther(cost).add(ethers.utils.parseEther(MINT_PRICE_COEF).mul(10)))
-    const res = await _mint(contract, dateHex, ciphertext, cost);
-    if (!res) {
-      // setTotalSupply(prevTotalSupply);
-      // setTotalEverMinted(prevTotalEverMinted);
-      // setMintPrice(prevMintPrice);
-      // setBurnPrice(prevBurnPrice);
-    }
-    return res;
+    let cost = await getCurrentPrice(contract);
+    cost = ethers.utils.formatEther(
+      ethers.utils.parseEther(cost).add(ethers.utils.parseEther(MINT_PRICE_COEF).mul(10)),
+    );
+    return await _mint(contract, dateHex, ciphertext, cost);
   };
 
   const burn = async (tokenId: string): Promise<boolean> => {
     if (!contract) {
       return Promise.resolve(false);
     }
-    // const prevBurnPrice = burnPrice;
-    // const prevMintPrice = mintPrice;
-    // const prevTotalSupply = totalSupply;
-    // const newTotalSupply = BigNumber.from(prevTotalSupply).sub(1);
-    // setTotalSupply(newTotalSupply.toString());
-    // setMintPrice(calcMintPrice(newTotalSupply));
-    // setBurnPrice(calcBurnReward(newTotalSupply));
-    const res = await _burn(contract, tokenId);
-    if (!res) {
-      // setTotalSupply(prevTotalSupply);
-      // setMintPrice(prevMintPrice);
-      // setBurnPrice(prevBurnPrice);
-    }
-    return res;
+    return await _burn(contract, tokenId);
   };
 
   return (
