@@ -33,9 +33,9 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
 
   useEffect(() => {
     try {
-      !isNotMobile && open && walletConnectRef?.current?.click();
+      !isNotMobile && open && providers.length === 1 && walletConnectRef?.current?.click();
     } catch (err) {}
-  }, [isNotMobile, open]);
+  }, [isNotMobile, open, providers]);
 
   const handleConnectWallet = (provider: WalletProvider) => async (e: MouseEvent) => {
     e.preventDefault();

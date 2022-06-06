@@ -111,7 +111,13 @@ export const useWallet = () => {
       const _signer = web3Provider.getSigner();
       const network = await web3Provider.ready;
       console.log(`connected to ${network?.name}`);
-      const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
+      let _address = [];
+      // const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
+      try {
+        _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
+      } catch (err) {
+        console.log(err);
+      }
       const chainId = await web3Provider.send('eth_chainId', []);
       if (
         (ETH_NETWORK === CHAIN_NAME.LOCALHOST && chainId !== CHAIN_ID.LOCALHOST) ||
