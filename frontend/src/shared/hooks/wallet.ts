@@ -107,17 +107,17 @@ export const useWallet = () => {
     }
     let error: any = undefined;
     try {
+      try {
+        await (provider.provider as any).request({ method: needRequest ? 'eth_requestAccounts' : 'eth_accounts' });
+      } catch (error) {
+        throw new Error('User Rejected');
+      }
       const web3Provider = new ethers.providers.Web3Provider(provider.provider as ethers.providers.ExternalProvider);
       const _signer = web3Provider.getSigner();
       const network = await web3Provider.ready;
       console.log(`connected to ${network?.name}`);
-      let _address = [];
+      const userAddress = await web3Provider.getSigner().getAddress();
       // const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
-      try {
-        _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
-      } catch (err) {
-        console.log(err);
-      }
       const chainId = await web3Provider.send('eth_chainId', []);
       if (
         (ETH_NETWORK === CHAIN_NAME.LOCALHOST && chainId !== CHAIN_ID.LOCALHOST) ||
@@ -135,10 +135,10 @@ export const useWallet = () => {
           },
         };
       }
-      console.log('address', _address);
-      if (_address && _address.length > 0) {
+      // console.log('address', userAddress);
+      if (userAddress && userAddress.length > 0) {
         localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, provider.type);
-        setWalletAddress(_address[0]);
+        setWalletAddress(userAddress);
         setProvider(provider.provider);
         setSigner(_signer);
         return { success: true };
@@ -146,15 +146,9 @@ export const useWallet = () => {
       error = { type: 'NoAddressFound', message: 'No address found.' };
     } catch (err: any) {
       error = {
-        type: 'UnknownConnectionError',
+        type: err?.message === 'User Rejected' ? 'UserConnectionRejected' : 'UnknownConnectionError',
         message: err?.message ?? err,
       };
-    }
-    if (provider?.type === 'opera') {
-      const index = providers.findIndex((provider) => provider.type === 'opera');
-      if (index >= 0) {
-        setProviders([...providers.slice(0, index), getDefaultOperaProvider(), ...providers.slice(index + 1)]);
-      }
     }
     console.log('error', error);
     _handleDisconnect();
