@@ -6,13 +6,17 @@ const BCOModal = ({ open, onClose }: { open: boolean; onClose: () => void }) => 
   <Modal open={open} onClose={onClose}>
     <h5 className="mt-0 mb-3">The total supply amount governs the mint price.</h5>
     <ul>
-      <li>
-        The very first token costs {BASE_MINT_PRICE} ETH. Each increase in supply raises the token's price by{' '}
-        {MINT_PRICE_COEF} ETH. Likewise, each decrease in supply lowers the token's price by {MINT_PRICE_COEF} ETH.
+      <li className="mt-0">
+        The very first token costs <strong>{BASE_MINT_PRICE} ETH</strong>. Each increase in supply raises the token's
+        price by <strong>{MINT_PRICE_COEF} ETH</strong>. Likewise, each decrease in supply lowers the token's price by{' '}
+        <strong>{MINT_PRICE_COEF} ETH</strong>.
       </li>
-      <li>99.5% of the mint price is stored in the contract, while 0.5% goes to the creator.</li>
+      <li>
+        <strong>99.5%</strong> of the mint price is stored in the contract, while <strong>0.5%</strong> goes to the
+        creator.
+      </li>
       <li className="mb-0">
-        Burning a token rewards the owner of the token the amount equals to 99.5% of last mint price.
+        Burning a token rewards the owner of the token the amount equals to <strong>99.5% of last mint price</strong>.
       </li>
     </ul>
   </Modal>

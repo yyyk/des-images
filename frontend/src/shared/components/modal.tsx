@@ -10,19 +10,15 @@ interface ModalProps {
   children: ReactNode;
   open: boolean;
   disableClose?: boolean;
+  actions?: ReactNode;
   onClose: () => void;
 }
 
-const Modal = ({ children, open, disableClose = false, onClose }: ModalProps) => {
+const Modal = ({ children, open, disableClose = false, actions, onClose }: ModalProps) => {
   const { theme } = useThemeContext();
   const [wrapperElement, setWrapperElement] = useState<HTMLElement | null>(null);
   const overlayRef = useRef(null as null | HTMLDivElement);
   const lastActiveElementRef = useRef(null as null | Element);
-
-  // useLayoutEffect(() => {
-  //   let element = document.getElementById('modal');
-  //   setWrapperElement(element ?? null);
-  // }, []);
 
   useEffectOnce(() => {
     let element = document.getElementById('modal');
@@ -108,10 +104,13 @@ const Modal = ({ children, open, disableClose = false, onClose }: ModalProps) =>
         onClick={handleOverlayClick}
       >
         <div
-          className="modal-box prose relative flex flex-col flex-nowrap overflow-hidden cursor-default px-0 py-10"
+          className={`modal-box prose relative flex flex-col flex-nowrap overflow-hidden cursor-default px-0 pt-10 ${
+            actions ? 'pb-7' : 'pb-10'
+          }`}
           aria-modal="true"
         >
           <div className="h-full overflow-auto px-10 py-2">{children}</div>
+          {actions && <div className="flex justify-end px-10 pt-4">{actions}</div>}
           <button
             className="btn btn-sm btn-circle btn-outline absolute right-2 top-2"
             onClick={handleClose}

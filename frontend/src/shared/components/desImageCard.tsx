@@ -3,8 +3,8 @@ import { useContractContext } from 'src/shared/contexts/contract';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { useThemeContext } from 'src/shared/contexts/theme';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
-import DesImageSvg from 'src/shared/components/desImageSvg';
 import { isNil } from 'src/shared/utils/isNil';
+import DesImageSvg from 'src/shared/components/desImageSvg';
 import Modal from 'src/shared/components/modal';
 
 const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () => void; onSubmit: () => void }) => {
@@ -13,7 +13,15 @@ const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () 
     onSubmit();
   };
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      actions={
+        <button className="btn btn-primary" onClick={handleOnClick}>
+          Confirm Mint
+        </button>
+      }
+    >
       <p className="mt-0 mb-0">Notes:</p>
       <ul>
         <li>
@@ -21,8 +29,8 @@ const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () 
           <strong>Please mint at your own risk.</strong>
         </li>
         <li>
-          Since only one token per price point can be minted, the buffer of <strong>Ξ 0.01</strong> is added to the cost
-          to ensure that the transaction succeeds.
+          Since <strong>only one token per price point</strong> can be minted, the buffer of <strong>0.01 ETH</strong>{' '}
+          is added to the cost to ensure that the transaction succeeds.
         </li>
         <li>
           If there is more than one mint transaction per block, a part of the buffer is used to pay the mint cost at the
@@ -31,17 +39,12 @@ const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () 
         <li>
           <strong>The unused part of the buffer will be refunded.</strong>
         </li>
-        <li>
+        <li className="mb-0">
           If more than 10 mints occur in one block, your mint transaction might fail. In such case,{' '}
-          <strong>you would be charged for the transaction fee</strong>, though the ether sent to the contract would be
-          returned.
+          <strong>you would still be charged for the transaction fee</strong>, though the Ether sent to the contract
+          would be returned.
         </li>
       </ul>
-      <div className="flex justify-end mt-6">
-        <button className="btn btn-primary" onClick={handleOnClick}>
-          Confirm Mint
-        </button>
-      </div>
     </Modal>
   );
 };
