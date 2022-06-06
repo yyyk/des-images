@@ -5,8 +5,10 @@ import Modal from 'src/shared/components/modal';
 import MetaMaskLogo from 'src/shared/components/logos/metamask';
 import CoinbaseWalletLogo from 'src/shared/components/logos/coinbaseWallet';
 import WalletConnectLogo from 'src/shared/components/logos/walletConnect';
+import BraveLogo from 'src/shared/components/logos/brave';
+import OperaLogo from 'src/shared/components/logos/opera';
 import { useNotificationContext } from 'src/shared/contexts/notification';
-import { isMobile } from '../utils/walletHelpers';
+import { isMobile } from 'src/shared/utils/walletHelpers';
 
 interface WalletModalProps {
   open: boolean;
@@ -18,7 +20,9 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
   const { add: addNotification } = useNotificationContext();
   const walletConnectRef = useRef<HTMLButtonElement>(null);
   const isNotMobile = !isMobile();
-  const isMetaMaskNotInstalled = !providers.some((provider) => provider?.type === 'metamask');
+  const showMetaMaskInstallLink = !providers.some(
+    (provider) => provider?.type === 'metamask' || provider?.type === 'brave' || provider?.type === 'opera',
+  );
   // console.log(providers);
 
   const listClasses = 'p-0 mx-0 mt-0 mb-4 last:mb-0 w-full';
@@ -51,7 +55,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
   return (
     <Modal open={open} onClose={onClose}>
       <ul className="list-none p-0 m-0">
-        {isNotMobile && isMetaMaskNotInstalled && (
+        {isNotMobile && showMetaMaskInstallLink && (
           <li className={listClasses}>
             <a className={linkClasses} href="https://metamask.io/download.html" target="_blank" rel="noreferrer">
               <span className={logoContainerClasses}>
@@ -70,6 +74,8 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
             >
               <span className={logoContainerClasses}>
                 {provider?.type === 'metamask' && <MetaMaskLogo />}
+                {provider?.type === 'brave' && <BraveLogo />}
+                {provider?.type === 'opera' && <OperaLogo />}
                 {provider?.type === 'coinbase' && <CoinbaseWalletLogo />}
                 {provider?.type === 'wallet-connect' && <WalletConnectLogo />}
               </span>
@@ -78,7 +84,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
           </li>
         ))}
       </ul>
-      {isNotMobile && isMetaMaskNotInstalled && (
+      {isNotMobile && showMetaMaskInstallLink && (
         <p className="text-center m-0 mt-4">Note: Please reload the page after installing MetaMask.</p>
       )}
     </Modal>

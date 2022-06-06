@@ -33,10 +33,30 @@ export function getProviders(): WalletProvider[] {
   // MetaMask
   const metaMaskProvider = getWindowEthereum('isMetaMask');
   if (metaMaskProvider.length > 0) {
+    metaMaskProvider.forEach((provider) => {
+      if (!(provider as any)?.isBraveWallet) {
+        // MetaMask
+        providers.push({
+          type: 'metamask',
+          name: 'MetaMask',
+          provider: provider,
+        });
+      } else {
+        // Brave
+        providers.push({
+          type: 'brave',
+          name: 'Brave Wallet',
+          provider: provider,
+        });
+      }
+    });
+  }
+  // Opera
+  if (window?.ethereum?.isOpera) {
     providers.push({
-      type: 'metamask',
-      name: 'MetaMask',
-      provider: metaMaskProvider[0],
+      type: 'opera',
+      name: 'Opera Wallet',
+      provider: window.ethereum,
     });
   }
   // Coinbase Wallet
