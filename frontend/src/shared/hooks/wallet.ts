@@ -4,7 +4,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ETH_NETWORK, LOCAL_STORAGE_WALLET_KEY } from 'src/shared/constants';
 import { CHAIN_ID, CHAIN_NAME, Provider, WalletProvider } from 'src/shared/interfaces';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
-import { getDefaultWalletConnectProvider, getProviders } from 'src/shared/utils/walletHelpers';
+import { getDefaultOperaProvider, getDefaultWalletConnectProvider, getProviders } from 'src/shared/utils/walletHelpers';
 
 export const useWallet = () => {
   const [isWalletInstalled, setIsWalletInstalled] = useState(false);
@@ -98,7 +98,10 @@ export const useWallet = () => {
         }
         return {
           success: false,
-          error: err,
+          error: {
+            type: 'WalletConnectFailed',
+            message: err?.message ?? err,
+          },
         };
       }
     }
@@ -126,7 +129,7 @@ export const useWallet = () => {
           },
         };
       }
-      // console.log(_address);
+      console.log('address', _address);
       if (_address && _address.length > 0) {
         localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, provider.type);
         setWalletAddress(_address[0]);
@@ -136,8 +139,18 @@ export const useWallet = () => {
       }
       error = { type: 'NoAddressFound', message: 'No address found.' };
     } catch (err: any) {
-      error = err;
+      error = {
+        type: 'UnknownConnectionError',
+        message: err?.message ?? err,
+      };
     }
+    if (provider?.type === 'opera') {
+      const index = providers.findIndex((provider) => provider.type === 'opera');
+      if (index >= 0) {
+        setProviders([...providers.slice(0, index), getDefaultOperaProvider(), ...providers.slice(index + 1)]);
+      }
+    }
+    console.log('error', error);
     _handleDisconnect();
     return {
       success: false,

@@ -45,11 +45,8 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
       onClose();
       return;
     }
-    if (res.error && res.error?.type !== 'InvalidChainIdError') {
-      onClose();
-      addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Connection canceled.' });
-      return;
-    }
+    onClose();
+    addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Connection canceled.' });
   };
 
   return (

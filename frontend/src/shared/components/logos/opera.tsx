@@ -1,7 +1,6 @@
 const OperaLogo = () => (
   <svg
-    width="81"
-    height="80"
+    viewBox="0 0 81 80"
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
     className="block w-full h-auto"

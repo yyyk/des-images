@@ -1,7 +1,5 @@
 const BraveLogo = () => (
   <svg
-    width="218px"
-    height="256px"
     viewBox="0 0 218 256"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
