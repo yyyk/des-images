@@ -47,8 +47,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       setOwnedTokenData([]);
       return;
     }
-    const ids = ownedTokenIds?.reverse();
-    setOwnedTokenData(await getTokenDataFromTokenIds(contract, ids));
+    setOwnedTokenData(await getTokenDataFromTokenIds(contract, ownedTokenIds));
   };
 
   useEffectOnce(() => {

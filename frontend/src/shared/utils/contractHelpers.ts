@@ -41,8 +41,7 @@ export async function queryTokenIds(contract: Contract, walletAddress: string): 
     }
     result = result.concat(Array.from(owned));
   }
-  // console.log('result', result.reverse());
-  return result;
+  return result.reverse();
 }
 
 const BASE_PRICE = ethers.utils.parseEther(BASE_MINT_PRICE);

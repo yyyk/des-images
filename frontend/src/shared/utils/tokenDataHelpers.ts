@@ -84,7 +84,7 @@ export async function getTokenDataFromTokenIds(contract: Contract, ids: string[]
       try {
         const uri = await tokenURI(contract, id);
         const data = convertTokenURIToTokenData(uri, id);
-        res.unshift(data);
+        res.push(data);
       } catch (err) {
         console.error(err);
       }
