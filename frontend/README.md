@@ -71,6 +71,5 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 ### TODOs
 
-- add 0.01 ETH buffer
-- cloudflare tracking
 - tests
+- test wallet connect, metamask in brave and opera

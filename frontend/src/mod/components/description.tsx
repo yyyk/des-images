@@ -2,7 +2,7 @@ import Code from 'src/mod/components/code';
 import ExternalLink from 'src/shared/components/externalLink';
 
 const Description = () => (
-  <div>
+  <div className="sm:text-lg sm:leading-8">
     <blockquote className="mt-0">
       With the case of <i>#20200101</i>, decrypting the ciphertext{' '}
       <i style={{ wordBreak: 'break-all' }}>0x79030f7920aaa3cfbbd92afbb93e70ba</i> with the key <i>20200101</i>, using

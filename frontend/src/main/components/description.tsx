@@ -1,7 +1,7 @@
 import ExternalLink from 'src/shared/components/externalLink';
 
 const Description = () => (
-  <div>
+  <div className="sm:text-lg sm:leading-8">
     <p className="mt-0">
       Referring to <ExternalLink href="https://en.wikipedia.org/wiki/On_Kawara">On Kawara</ExternalLink>
       's telegram series, the plaintext{' '}

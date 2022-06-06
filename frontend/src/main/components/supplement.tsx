@@ -1,6 +1,6 @@
 const Supplement = () => {
   return (
-    <div>
+    <div className="sm:text-lg sm:leading-8">
       <p className="mt-0">
         If you have tried different dates a few times, you might have encountered the same looking image generated for
         different dates. In other words, <strong>two or more different keys have produced the same ciphertext.</strong>

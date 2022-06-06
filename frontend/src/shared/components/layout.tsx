@@ -33,9 +33,9 @@ const Layout = ({ children }: { children: ReactNode }) => {
       </div>
       {isInvalidChainId && <AlertBanner />}
       {walletAddress && <StatsBanner />}
-      <div className="w-full flex flex-col flex-nowrap grow px-3 py-0 overflow-x-hidden">
+      <div className="prose w-full mx-auto flex flex-col flex-nowrap grow px-3 py-0 overflow-x-hidden">
         <Header />
-        <main className="prose w-full mt-0 mx-auto pt-0 pb-16 flex flex-col flex-nowrap grow">{children}</main>
+        <main className="w-full my-0 mx-auto pt-0 pb-16 flex flex-col flex-nowrap grow">{children}</main>
         <Footer />
       </div>
       <NotificationsContainer />

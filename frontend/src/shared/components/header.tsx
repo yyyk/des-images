@@ -124,7 +124,7 @@ const Header = () => {
   return (
     <header
       style={{ minHeight: '48px' }}
-      className="prose w-full flex justify-between items-center flex-wrap mt-3 sm:mt-6 mb-8 sm:mb-10 mx-auto"
+      className="w-full flex justify-between items-center flex-wrap mt-3 sm:mt-6 mb-8 sm:mb-10 mx-auto"
     >
       <div className="flex justify-start items-end">
         <h1 className="m-0">{pathname === '/' ? 'desImages' : <HomeLink />}</h1>
