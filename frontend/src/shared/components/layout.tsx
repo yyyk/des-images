@@ -12,7 +12,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const { isInvalidChainId, walletAddress } = useWalletContext();
 
   return (
-    <div data-theme={theme} className="min-h-screen w-full flex flex-col flex-nowrap overflow-x-hidden">
+    <div data-theme={theme} className="min-h-screen w-full flex flex-col flex-nowrap">
       <div className="alert alert-info justify-center rounded-none w-screen bg-primary text-primary-content">
         <div>
           <svg
@@ -33,7 +33,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       </div>
       {isInvalidChainId && <AlertBanner />}
       {walletAddress && <StatsBanner />}
-      <div className="flex flex-col flex-nowrap grow px-3 py-0">
+      <div className="w-full flex flex-col flex-nowrap grow px-3 py-0 overflow-x-hidden">
         <Header />
         <main className="prose w-full mt-0 mx-auto pt-0 pb-16 flex flex-col flex-nowrap grow">{children}</main>
         <Footer />
