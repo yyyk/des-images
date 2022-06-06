@@ -2,9 +2,9 @@ import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ETH_NETWORK, LOCAL_STORAGE_WALLET_KEY } from 'src/shared/constants';
-import { CHAIN_ID, CHAIN_NAME, Provider, WalletProvider } from 'src/shared/interfaces';
+import { CHAIN_ID, CHAIN_NAME, ERROR_TYPE, Provider, WalletProvider } from 'src/shared/interfaces';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
-import { getDefaultOperaProvider, getDefaultWalletConnectProvider, getProviders } from 'src/shared/utils/walletHelpers';
+import { getDefaultWalletConnectProvider, getProviders } from 'src/shared/utils/walletHelpers';
 
 export const useWallet = () => {
   const [isWalletInstalled, setIsWalletInstalled] = useState(false);
@@ -99,7 +99,7 @@ export const useWallet = () => {
         return {
           success: false,
           error: {
-            type: 'WalletConnectFailed',
+            type: ERROR_TYPE.WALLET_CONNECT_FAILED,
             message: err?.message ?? err,
           },
         };
@@ -130,7 +130,7 @@ export const useWallet = () => {
         return {
           success: false,
           error: {
-            type: 'InvalidChainIdError',
+            type: ERROR_TYPE.INVALID_CHAIN_ID,
             message: 'Invalid Chain ID',
           },
         };
@@ -143,14 +143,15 @@ export const useWallet = () => {
         setSigner(_signer);
         return { success: true };
       }
-      error = { type: 'NoAddressFound', message: 'No address found.' };
+      error = { type: ERROR_TYPE.NO_ADDRESS_FOUND, message: 'No address found.' };
     } catch (err: any) {
       error = {
-        type: err?.message === 'User Rejected' ? 'UserConnectionRejected' : 'UnknownConnectionError',
+        type:
+          err?.message === 'User Rejected' ? ERROR_TYPE.USER_CONNECTION_REJECTED : ERROR_TYPE.UNKNOWN_CONNECTION_ERROR,
         message: err?.message ?? err,
       };
     }
-    console.log('error', error);
+    // console.log('error', error);
     _handleDisconnect();
     return {
       success: false,

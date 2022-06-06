@@ -68,3 +68,11 @@ export interface Notification {
   type: NOTIFICATION_TYPE;
   text: string;
 }
+
+export enum ERROR_TYPE {
+  WALLET_CONNECT_FAILED = 'WalletConnectFailed',
+  INVALID_CHAIN_ID = 'InvalidChainIdError',
+  NO_ADDRESS_FOUND = 'NoAddressFound',
+  USER_CONNECTION_REJECTED = 'UserConnectionRejected',
+  UNKNOWN_CONNECTION_ERROR = 'UnknownConnectionError',
+}

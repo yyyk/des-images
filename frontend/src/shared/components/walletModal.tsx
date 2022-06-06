@@ -1,6 +1,6 @@
 import { MouseEvent, useEffect, useRef } from 'react';
 import { useWalletContext } from 'src/shared/contexts/wallet';
-import { NOTIFICATION_TYPE, WalletProvider } from 'src/shared/interfaces';
+import { ERROR_TYPE, NOTIFICATION_TYPE, WalletProvider } from 'src/shared/interfaces';
 import Modal from 'src/shared/components/modal';
 import MetaMaskLogo from 'src/shared/components/logos/metamask';
 import CoinbaseWalletLogo from 'src/shared/components/logos/coinbaseWallet';
@@ -41,7 +41,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
     e.preventDefault();
     e.stopPropagation();
     const res = await connectWallet(provider);
-    if (res.success || (!res.success && res.error?.type === 'InvalidChainIdError')) {
+    if (res.success || (!res.success && res.error?.type === ERROR_TYPE.INVALID_CHAIN_ID)) {
       onClose();
       return;
     }

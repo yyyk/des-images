@@ -28,14 +28,6 @@ export function getDefaultWalletConnectProvider(): WalletProvider {
   };
 }
 
-export function getDefaultOperaProvider(): WalletProvider {
-  return {
-    type: 'opera',
-    name: 'Opera Wallet',
-    provider: window.ethereum,
-  };
-}
-
 export function getProviders(): WalletProvider[] {
   const providers = [];
   // MetaMask
@@ -60,8 +52,13 @@ export function getProviders(): WalletProvider[] {
     });
   }
   // Opera
-  if (window?.ethereum?.isOpera) {
-    providers.push(getDefaultOperaProvider());
+  const operaProvider = getWindowEthereum('isOpera');
+  if (operaProvider.length > 0) {
+    providers.push({
+      type: 'opera',
+      name: 'Opera Wallet',
+      provider: operaProvider[0],
+    });
   }
   // Coinbase Wallet
   const coinbaseProvider = getWindowEthereum('isWalletLink');
