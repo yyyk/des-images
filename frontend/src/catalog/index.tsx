@@ -23,7 +23,7 @@ const Catalog = () => {
   return (
     <>
       <div>
-        <div className="tabs mb-4 sm:mb-6">
+        <div className="tabs m-0">
           <button className={`tab tab-bordered ${tabIndex === 0 ? 'tab-active' : ''}`} onClick={() => setTabIndex(0)}>
             Catalog
           </button>
@@ -43,7 +43,7 @@ const Catalog = () => {
             </button>
           )}
         </div>
-        <div className="flex nowrap overflow-x-hidden pb-16 -mb-16 -mx-6 px-6">
+        <div className="flex nowrap overflow-x-hidden -mb-16 -mx-6 pt-4 sm:pt-6 pb-16 px-6">
           <div
             className={`grow shrink-0 basis-full w-full transition-transform duration-300 ${
               tabIndex === 0 ? '' : '-translate-x-full -ml-12'
