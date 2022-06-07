@@ -23,7 +23,7 @@ const TypeSelect = ({ showHint, onChange }: { showHint: boolean; onChange: (valu
   <>
     <TextTypeSelect defaultValue={TextType.PLAINTEXT} onChange={onChange} />
     {showHint && (
-      <div className="tooltip tooltip-top ml-0.5" data-tip="have you clicked 'official'?">
+      <div className="tooltip tooltip-right ml-0.5" data-tip="have you clicked 'official'?">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path
             fillRule="evenodd"

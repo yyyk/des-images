@@ -14,7 +14,7 @@ export function getWindowEthereum(key: string): Provider[] {
     : [];
 }
 
-export function getDefaultWalletConnectProvider(): WalletProvider {
+export function createWalletConnectProvider(): WalletProvider {
   return {
     type: 'wallet-connect',
     name: 'WalletConnect',
@@ -28,62 +28,78 @@ export function getDefaultWalletConnectProvider(): WalletProvider {
   };
 }
 
+export function createMetaMaskProvider(provider: Provider): WalletProvider {
+  return {
+    type: 'metamask',
+    name: 'MetaMask',
+    provider,
+  };
+}
+
+export function createBraveWalletProvider(provider: Provider): WalletProvider {
+  return {
+    type: 'brave',
+    name: 'Brave Wallet',
+    provider,
+  };
+}
+
+export function createOperaWalletProvider(provider: Provider): WalletProvider {
+  return {
+    type: 'opera',
+    name: 'Opera Wallet',
+    provider,
+  };
+}
+
+export function createCoinbaseWalletProvider(provider: Provider): WalletProvider {
+  // const coinbaseWallet = new CoinbaseWalletSDK({
+  //   appName: 'desImages',
+  //   appLogoUrl: '',
+  //   darkMode: false,
+  // });
+  // providers.push({
+  //   type: 'coinbase',
+  //   name: 'Coinbase Wallet',
+  //   provider: coinbaseWallet.makeWeb3Provider(
+  //     process.env.NODE_ENV === 'development' ? HARDHAT_JSONRPC_URL : ETH_MAINNET_JSONRPC_URL,
+  //     process.env.NODE_ENV === 'development' ? HARDHAT_CHAIN_ID : MAINNET_CHAIN_ID,
+  //   ),
+  // });
+  return {
+    type: 'coinbase',
+    name: 'Coinbase Wallet',
+    provider,
+  };
+}
+
 export function getProviders(): WalletProvider[] {
   const providers = [];
   // MetaMask
   const metaMaskProvider = getWindowEthereum('isMetaMask');
   if (metaMaskProvider.length > 0) {
     metaMaskProvider.forEach((provider) => {
-      if (!(provider as any)?.isBraveWallet) {
+      if (!(provider as any)?.isBraveWallet && !(provider as any)?.isWalletLink) {
         // MetaMask
-        providers.push({
-          type: 'metamask',
-          name: 'MetaMask',
-          provider: provider,
-        });
-      } else {
+        providers.push(createMetaMaskProvider(provider));
+      } else if ((provider as any)?.isBraveWallet && !(provider as any)?.isWalletLink) {
         // Brave
-        providers.push({
-          type: 'brave',
-          name: 'Brave Wallet',
-          provider: provider,
-        });
+        providers.push(createBraveWalletProvider(provider));
       }
     });
   }
   // Opera
   const operaProvider = getWindowEthereum('isOpera');
   if (operaProvider.length > 0) {
-    providers.push({
-      type: 'opera',
-      name: 'Opera Wallet',
-      provider: operaProvider[0],
-    });
+    providers.push(createOperaWalletProvider(operaProvider[0]));
   }
   // Coinbase Wallet
   const coinbaseProvider = getWindowEthereum('isWalletLink');
   if (coinbaseProvider.length > 0) {
-    // const coinbaseWallet = new CoinbaseWalletSDK({
-    //   appName: 'desImages',
-    //   appLogoUrl: '',
-    //   darkMode: false,
-    // });
-    // providers.push({
-    //   type: 'coinbase',
-    //   name: 'Coinbase Wallet',
-    //   provider: coinbaseWallet.makeWeb3Provider(
-    //     process.env.NODE_ENV === 'development' ? HARDHAT_JSONRPC_URL : ETH_MAINNET_JSONRPC_URL,
-    //     process.env.NODE_ENV === 'development' ? HARDHAT_CHAIN_ID : MAINNET_CHAIN_ID,
-    //   ),
-    // });
-    providers.push({
-      type: 'coinbase',
-      name: 'Coinbase Wallet',
-      provider: coinbaseProvider[0],
-    });
+    providers.push(createCoinbaseWalletProvider(coinbaseProvider[0]));
   }
   // WalletConnect
-  providers.push(getDefaultWalletConnectProvider());
+  providers.push(createWalletConnectProvider());
 
   return providers;
 }

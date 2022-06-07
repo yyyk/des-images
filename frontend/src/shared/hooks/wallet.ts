@@ -4,7 +4,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ETH_NETWORK, LOCAL_STORAGE_WALLET_KEY } from 'src/shared/constants';
 import { CHAIN_ID, CHAIN_NAME, ERROR_TYPE, Provider, WalletProvider } from 'src/shared/interfaces';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
-import { getDefaultWalletConnectProvider, getProviders } from 'src/shared/utils/walletHelpers';
+import { createWalletConnectProvider, getProviders } from 'src/shared/utils/walletHelpers';
 
 export const useWallet = () => {
   const [isWalletInstalled, setIsWalletInstalled] = useState(false);
@@ -90,11 +90,7 @@ export const useWallet = () => {
       } catch (err: any) {
         const index = providers.findIndex((provider) => provider.type === 'wallet-connect');
         if (index >= 0) {
-          setProviders([
-            ...providers.slice(0, index),
-            getDefaultWalletConnectProvider(),
-            ...providers.slice(index + 1),
-          ]);
+          setProviders([...providers.slice(0, index), createWalletConnectProvider(), ...providers.slice(index + 1)]);
         }
         return {
           success: false,
