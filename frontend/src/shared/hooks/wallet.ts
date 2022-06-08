@@ -116,17 +116,21 @@ export const useWallet = () => {
       const userAddress = await web3Provider.getSigner().getAddress();
       // const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
       const chainId = await web3Provider.send('eth_chainId', []);
-      console.log(`connected to ${network?.name}`, userAddress, chainId);
+      console.log(`connected to ${network?.name}`);
       if (
-        (ETH_NETWORK === CHAIN_NAME.LOCALHOST && chainId !== CHAIN_ID.LOCALHOST) ||
-        (ETH_NETWORK === CHAIN_NAME.RINKEBY && chainId !== CHAIN_ID.RINKEBY) ||
-        (ETH_NETWORK === CHAIN_NAME.MAIN_NET && chainId !== CHAIN_ID.MAIN_NET)
+        (ETH_NETWORK === CHAIN_NAME.LOCALHOST &&
+          chainId !== CHAIN_ID.LOCALHOST &&
+          chainId !== parseInt(CHAIN_ID.LOCALHOST)) ||
+        (ETH_NETWORK === CHAIN_NAME.RINKEBY &&
+          chainId !== CHAIN_ID.RINKEBY &&
+          chainId !== parseInt(CHAIN_ID.RINKEBY)) ||
+        (ETH_NETWORK === CHAIN_NAME.MAIN_NET &&
+          chainId !== CHAIN_ID.MAIN_NET &&
+          chainId !== parseInt(CHAIN_ID.MAIN_NET))
       ) {
         _handleDisconnect();
         setIsInvalidChainId(true);
-        if (provider?.type !== 'wallet-connect') {
-          setProvider(provider.provider);
-        }
+        setProvider(provider.provider);
         return {
           success: false,
           error: {
