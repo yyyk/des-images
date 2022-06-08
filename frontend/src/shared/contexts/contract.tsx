@@ -123,10 +123,9 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
 
   const _setupContractListeners = async (contract: Contract, walletAddress: string) => {
     const startBlockNumber = await contract.provider.getBlockNumber();
-    console.log('startBlockNumber', startBlockNumber);
-    // contract.on(contract.filters.Transfer(walletAddress, walletAddress), _eventHandler('Transfer', startBlockNumber));
-    // contract.on(contract.filters.Minted(), _eventHandler('Minted', startBlockNumber));
-    // contract.on(contract.filters.Burned(), _eventHandler('Burned', startBlockNumber));
+    contract.on(contract.filters.Transfer(walletAddress, walletAddress), _eventHandler('Transfer', startBlockNumber));
+    contract.on(contract.filters.Minted(), _eventHandler('Minted', startBlockNumber));
+    contract.on(contract.filters.Burned(), _eventHandler('Burned', startBlockNumber));
     // contract.on(contract.filters.Paused(), _eventHandler('Paused', startBlockNumber));
     // contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', startBlockNumber));
   };
