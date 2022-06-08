@@ -103,18 +103,20 @@ export const useWallet = () => {
     }
     let error: any = undefined;
     try {
-      try {
-        await (provider.provider as any).request({ method: needRequest ? 'eth_requestAccounts' : 'eth_accounts' });
-      } catch (error) {
-        throw new Error('User Rejected');
+      if (provider?.type !== 'wallet-connect') {
+        try {
+          await (provider.provider as any).request({ method: needRequest ? 'eth_requestAccounts' : 'eth_accounts' });
+        } catch (error) {
+          throw new Error('User Rejected');
+        }
       }
       const web3Provider = new ethers.providers.Web3Provider(provider.provider as ethers.providers.ExternalProvider);
       const _signer = web3Provider.getSigner();
       const network = await web3Provider.ready;
-      console.log(`connected to ${network?.name}`);
       const userAddress = await web3Provider.getSigner().getAddress();
       // const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
       const chainId = await web3Provider.send('eth_chainId', []);
+      console.log(`connected to ${network?.name}`, userAddress, chainId);
       if (
         (ETH_NETWORK === CHAIN_NAME.LOCALHOST && chainId !== CHAIN_ID.LOCALHOST) ||
         (ETH_NETWORK === CHAIN_NAME.RINKEBY && chainId !== CHAIN_ID.RINKEBY) ||
@@ -122,7 +124,9 @@ export const useWallet = () => {
       ) {
         _handleDisconnect();
         setIsInvalidChainId(true);
-        setProvider(provider.provider);
+        if (provider?.type !== 'wallet-connect') {
+          setProvider(provider.provider);
+        }
         return {
           success: false,
           error: {
