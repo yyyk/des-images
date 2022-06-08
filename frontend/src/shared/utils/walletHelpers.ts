@@ -20,7 +20,7 @@ export function createWalletConnectProvider(): WalletProvider {
     name: 'WalletConnect',
     provider: new WalletConnectProvider({
       rpc: {
-        // [parseInt(CHAIN_ID.MAIN_NET)]: ETH_MAINNET_JSONRPC_URL,
+        [parseInt(CHAIN_ID.MAIN_NET)]: ETH_MAINNET_JSONRPC_URL,
         [parseInt(CHAIN_ID.RINKEBY)]: ETH_RINKEBY_JSONRPC_URL,
         // [parseInt(CHAIN_ID.HARD_HAT)]: HARDHAT_JSONRPC_URL,
       },

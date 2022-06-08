@@ -121,13 +121,13 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const _setupContractListeners = async (contract: Contract) => {
+  const _setupContractListeners = async (contract: Contract, walletAddress: string) => {
     const startBlockNumber = await contract.provider.getBlockNumber();
-    contract.on(contract.filters.Transfer(), _eventHandler('Transfer', startBlockNumber));
+    contract.on(contract.filters.Transfer(walletAddress, walletAddress), _eventHandler('Transfer', startBlockNumber));
     contract.on(contract.filters.Minted(), _eventHandler('Minted', startBlockNumber));
     contract.on(contract.filters.Burned(), _eventHandler('Burned', startBlockNumber));
-    contract.on(contract.filters.Paused(), _eventHandler('Paused', startBlockNumber));
-    contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', startBlockNumber));
+    // contract.on(contract.filters.Paused(), _eventHandler('Paused', startBlockNumber));
+    // contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', startBlockNumber));
   };
 
   const _queryTokenIds = async (contract: Contract, walletAddress: string) => {
@@ -157,7 +157,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     }
     const newContract = new ethers.Contract(CONTRACT_ADDRESS, DesImages.abi, signer);
     _queryTokenIds(newContract, walletAddress);
-    _setupContractListeners(newContract);
+    _setupContractListeners(newContract, walletAddress);
     setContract(newContract);
     return () => {
       newContract.removeAllListeners();
