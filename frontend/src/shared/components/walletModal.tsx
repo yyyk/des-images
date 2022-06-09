@@ -8,7 +8,7 @@ import WalletConnectLogo from 'src/shared/components/logos/walletConnect';
 import BraveLogo from 'src/shared/components/logos/brave';
 import OperaLogo from 'src/shared/components/logos/opera';
 import { useNotificationContext } from 'src/shared/contexts/notification';
-import { isMobile } from 'src/shared/utils/walletHelpers';
+// import { isMobile } from 'src/shared/utils/walletHelpers';
 
 interface WalletModalProps {
   open: boolean;
@@ -19,23 +19,23 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
   const { providers, connectWallet } = useWalletContext();
   const { add: addNotification } = useNotificationContext();
   const walletConnectRef = useRef<HTMLButtonElement>(null);
-  const isNotMobile = !isMobile();
-  const showMetaMaskInstallLink = !providers.some(
-    (provider) => provider?.type === 'metamask' || provider?.type === 'brave' || provider?.type === 'opera',
-  );
+  // const isNotMobile = !isMobile();
+  // const showMetaMaskInstallLink = !providers.some(
+  //   (provider) => provider?.type === 'metamask' || provider?.type === 'brave' || provider?.type === 'opera',
+  // );
   // console.log(providers);
 
   const listClasses = 'p-0 mx-0 mt-0 mb-4 last:mb-0 w-full';
   const buttonClasses =
     'font-normal w-full px-4 py-3 flex row nowrap justify-center items-center border border-solid border-neutral-300 rounded';
-  const linkClasses = `no-underline ${buttonClasses}`;
+  // const linkClasses = `no-underline ${buttonClasses}`;
   const logoContainerClasses = 'w-9 mr-2';
 
-  useEffect(() => {
-    try {
-      !isNotMobile && open && providers.length === 1 && walletConnectRef?.current?.click();
-    } catch (err) {}
-  }, [isNotMobile, open, providers]);
+  // useEffect(() => {
+  //   try {
+  //     !isNotMobile && open && providers.length === 1 && walletConnectRef?.current?.click();
+  //   } catch (err) {}
+  // }, [isNotMobile, open, providers]);
 
   const handleConnectWallet = (provider: WalletProvider) => async (e: MouseEvent) => {
     e.preventDefault();
@@ -52,7 +52,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
   return (
     <Modal open={open} onClose={onClose}>
       <ul className="list-none p-0 m-0">
-        {isNotMobile && showMetaMaskInstallLink && (
+        {/* {isNotMobile && showMetaMaskInstallLink && (
           <li className={listClasses}>
             <a className={linkClasses} href="https://metamask.io/download.html" target="_blank" rel="noreferrer">
               <span className={logoContainerClasses}>
@@ -61,7 +61,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
               <span>Install Metamask</span>
             </a>
           </li>
-        )}
+        )} */}
         {providers.map((provider) => (
           <li key={provider?.type} className={listClasses}>
             <button
@@ -81,9 +81,9 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
           </li>
         ))}
       </ul>
-      {isNotMobile && showMetaMaskInstallLink && (
+      {/* {isNotMobile && showMetaMaskInstallLink && (
         <p className="text-center m-0 mt-4">Note: Please reload the page after installing MetaMask.</p>
-      )}
+      )} */}
     </Modal>
   );
 };

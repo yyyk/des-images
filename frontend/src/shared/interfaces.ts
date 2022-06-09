@@ -1,7 +1,7 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ethers } from 'ethers';
 
-export type Provider = ethers.providers.BaseProvider | WalletConnectProvider;
+export type Provider = ethers.providers.Provider | WalletConnectProvider;
 
 export interface WalletProvider {
   type: string;
@@ -71,8 +71,14 @@ export interface Notification {
 
 export enum ERROR_TYPE {
   WALLET_CONNECT_FAILED = 'WalletConnectFailed',
+  INVALID_PROVIDER = 'INVALID_PROVIDER',
   INVALID_CHAIN_ID = 'InvalidChainIdError',
   NO_ADDRESS_FOUND = 'NoAddressFound',
   USER_CONNECTION_REJECTED = 'UserConnectionRejected',
   UNKNOWN_CONNECTION_ERROR = 'UnknownConnectionError',
+}
+
+export interface ConnectWalletResponse {
+  success: boolean;
+  error?: { type: string; message: string };
 }

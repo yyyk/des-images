@@ -1,33 +1,34 @@
-import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ETH_NETWORK, LOCAL_STORAGE_WALLET_KEY } from 'src/shared/constants';
-import { CHAIN_ID, CHAIN_NAME, ERROR_TYPE, Provider, WalletProvider } from 'src/shared/interfaces';
+import {
+  CHAIN_ID,
+  CHAIN_NAME,
+  ConnectWalletResponse,
+  ERROR_TYPE,
+  Provider,
+  WalletProvider,
+} from 'src/shared/interfaces';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
-import { createWalletConnectProvider, getProviders } from 'src/shared/utils/walletHelpers';
+import {
+  createErrorResponse,
+  createWalletConnectProvider,
+  getProviders,
+  isWalletConnect,
+} from 'src/shared/utils/walletHelpers';
 
 export const useWallet = () => {
-  const [isWalletInstalled, setIsWalletInstalled] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
   const [providers, setProviders] = useState<WalletProvider[]>([]);
+  const [walletProvider, setWalletProvider] = useState<WalletProvider | null>(null);
   const [provider, setProvider] = useState<Provider | null>(null);
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner | null>(null);
   const [isInvalidChainId, setIsInvalidChainId] = useState(false);
 
-  const checkIfWalletInstalled = () => {
-    const isInstalled = !!window.ethereum;
-    setIsWalletInstalled(isInstalled);
-    setProviders(getProviders());
-  };
-
   useEffectOnce(() => {
-    checkIfWalletInstalled();
-  });
-
-  useEffect(() => {
-    if (!isWalletInstalled) {
-      return;
-    }
+    const providers = getProviders();
+    setProviders(providers);
     const wallet = localStorage.getItem(LOCAL_STORAGE_WALLET_KEY);
     if (wallet) {
       const index = providers.findIndex((provider) => wallet === provider.type);
@@ -35,8 +36,18 @@ export const useWallet = () => {
         connectWallet(providers[index], false);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isWalletInstalled]);
+  });
+
+  // useEffect(() => {
+  //   const wallet = localStorage.getItem(LOCAL_STORAGE_WALLET_KEY);
+  //   if (wallet) {
+  //     const index = providers.findIndex((provider) => wallet === provider.type);
+  //     if (index > -1) {
+  //       connectWallet(providers[index], false);
+  //     }
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [providers]);
 
   useEffect(() => {
     if (provider?.on) {
@@ -55,67 +66,62 @@ export const useWallet = () => {
   }, [provider]);
 
   const _handleAccountChange = (accounts: string[]) => {
-    if (accounts && accounts.length > 0) {
+    console.log('wallet account changed:', (accounts?.length && accounts[0]) || []);
+    if (accounts && accounts?.length) {
       setWalletAddress(accounts[0]);
+      console.log(walletProvider);
+      walletProvider && connectWallet(walletProvider);
     } else {
       _handleDisconnect();
     }
   };
 
   const _handleChainChanged = (_chainId: string) => {
-    console.log('chainChanged:', parseInt(_chainId));
+    console.log('wallet chain changed:', parseInt(_chainId));
     window.location.reload();
   };
 
   const _handleDisconnect = () => {
-    // console.log('wallet disconnected');
+    console.log('wallet disconnected');
     localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
     setWalletAddress('');
     setSigner(null);
     setProvider(null);
+    setWalletProvider(null);
     setProviders(getProviders());
     setIsInvalidChainId(false);
   };
 
-  const connectWallet = async (
-    provider: WalletProvider,
-    needRequest = true,
-  ): Promise<{ success: boolean; error?: { type: string; message: string } }> => {
+  const connectWallet = async (provider: WalletProvider, needRequest = true): Promise<ConnectWalletResponse> => {
     if (!provider?.provider) {
-      return { success: false };
+      return createErrorResponse(ERROR_TYPE.INVALID_PROVIDER, 'Invalid Provider');
     }
-    if (provider?.type === 'wallet-connect') {
+    if (isWalletConnect(provider)) {
       try {
         await (provider?.provider as WalletConnectProvider)?.enable();
       } catch (err: any) {
-        const index = providers.findIndex((provider) => provider.type === 'wallet-connect');
+        const index = providers.findIndex(isWalletConnect);
         if (index >= 0) {
           setProviders([...providers.slice(0, index), createWalletConnectProvider(), ...providers.slice(index + 1)]);
         }
-        return {
-          success: false,
-          error: {
-            type: ERROR_TYPE.WALLET_CONNECT_FAILED,
-            message: err?.message ?? err,
-          },
-        };
+        return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
       }
     }
-    let error: any = undefined;
+    let error: ConnectWalletResponse | undefined = undefined;
     try {
-      if (provider?.type !== 'wallet-connect') {
+      if (!isWalletConnect(provider)) {
         try {
           await (provider.provider as any).request({ method: needRequest ? 'eth_requestAccounts' : 'eth_accounts' });
         } catch (error) {
           throw new Error('User Rejected');
         }
       }
-      const web3Provider = new ethers.providers.Web3Provider(provider.provider as ethers.providers.ExternalProvider);
-      const _signer = web3Provider.getSigner();
+      const web3Provider = new ethers.providers.Web3Provider(provider.provider as any);
+      const signer = web3Provider.getSigner();
       const network = await web3Provider.ready;
       const userAddress = await web3Provider.getSigner().getAddress();
       // const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
-      const chainId = await web3Provider.send('eth_chainId', []);
+      const chainId: number | string = await web3Provider.send('eth_chainId', []);
       console.log(`connected to ${network?.name}`);
       if (
         (ETH_NETWORK === CHAIN_NAME.LOCALHOST &&
@@ -131,45 +137,35 @@ export const useWallet = () => {
         _handleDisconnect();
         setIsInvalidChainId(true);
         setProvider(provider.provider);
-        return {
-          success: false,
-          error: {
-            type: ERROR_TYPE.INVALID_CHAIN_ID,
-            message: 'Invalid Chain ID',
-          },
-        };
+        setWalletProvider(provider);
+        return createErrorResponse(ERROR_TYPE.INVALID_CHAIN_ID, 'Invalid Chain ID');
       }
       // console.log('address', userAddress);
-      if (userAddress && userAddress.length > 0) {
+      if (userAddress && userAddress?.length) {
         localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, provider.type);
         setWalletAddress(userAddress);
         setProvider(provider.provider);
-        setSigner(_signer);
+        setWalletProvider(provider);
+        setSigner(signer);
         return { success: true };
       }
-      error = { type: ERROR_TYPE.NO_ADDRESS_FOUND, message: 'No address found.' };
+      error = createErrorResponse(ERROR_TYPE.NO_ADDRESS_FOUND, 'No address found.');
     } catch (err: any) {
-      error = {
-        type:
-          err?.message === 'User Rejected' ? ERROR_TYPE.USER_CONNECTION_REJECTED : ERROR_TYPE.UNKNOWN_CONNECTION_ERROR,
-        message: err?.message ?? err,
-      };
+      error = createErrorResponse(
+        err?.message === 'User Rejected' ? ERROR_TYPE.USER_CONNECTION_REJECTED : ERROR_TYPE.UNKNOWN_CONNECTION_ERROR,
+        err?.message ?? err,
+      );
     }
     // console.log('error', error);
     _handleDisconnect();
-    return {
-      success: false,
-      error,
-    };
+    return error;
   };
 
   return {
-    isWalletInstalled,
     isInvalidChainId,
     walletAddress,
     providers,
     signer,
     connectWallet,
-    checkIfWalletInstalled,
   };
 };

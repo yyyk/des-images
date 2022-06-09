@@ -1,5 +1,5 @@
-import { ethers, Contract, BigNumber } from 'ethers';
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
+import { ethers, Contract, BigNumber } from 'ethers';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { CONTRACT_ADDRESS, MINT_PRICE_COEF } from 'src/shared/constants';
 import {
@@ -30,7 +30,7 @@ interface ContextState {
 const ContractContext = createContext({} as ContextState);
 
 const ContractContextProvider = ({ children }: { children: ReactNode }) => {
-  const { isWalletInstalled, signer, walletAddress } = useWalletContext();
+  const { signer, walletAddress } = useWalletContext();
   const [contract, setContract] = useState<Contract | null>(null);
   const [isPaused, setIsPaused] = useState(true);
   const [totalEverMinted, setTotalEverMinted] = useState('');
@@ -151,7 +151,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   }, [contract]);
 
   useEffect(() => {
-    if (!isWalletInstalled || !signer) {
+    if (!signer) {
       setContract(null);
       return;
     }
@@ -163,7 +163,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       newContract.removeAllListeners();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isWalletInstalled, signer]);
+  }, [signer]);
 
   const mint = async (dateHex: string, ciphertext: string): Promise<boolean> => {
     if (!contract) {

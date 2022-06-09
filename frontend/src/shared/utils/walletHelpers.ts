@@ -1,13 +1,27 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
 // import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
-import { ETH_MAINNET_JSONRPC_URL, ETH_RINKEBY_JSONRPC_URL, HARDHAT_JSONRPC_URL } from 'src/shared/constants';
-import { CHAIN_ID, Provider, WalletProvider } from 'src/shared/interfaces';
+import { ETH_MAINNET_JSONRPC_URL, ETH_RINKEBY_JSONRPC_URL } from 'src/shared/constants';
+import { CHAIN_ID, ConnectWalletResponse, ERROR_TYPE, Provider, WalletProvider } from 'src/shared/interfaces';
 
-export function getWindowEthereum(key: string): Provider[] {
+export function createErrorResponse(type: ERROR_TYPE, message: string): ConnectWalletResponse {
+  return {
+    success: false,
+    error: {
+      type,
+      message,
+    },
+  };
+}
+
+export function isWalletConnect(provider: WalletProvider): boolean {
+  return provider?.type === 'wallet-connect';
+}
+
+export function getInjectedProvider(key: string): Provider[] {
   if (!key) {
     return [];
   }
-  return window.ethereum?.providers
+  return window.ethereum?.providers?.length
     ? window.ethereum?.providers.filter((x: any) => x?.[key])
     : window?.ethereum?.[key]
     ? [window?.ethereum]
@@ -22,7 +36,6 @@ export function createWalletConnectProvider(): WalletProvider {
       rpc: {
         [parseInt(CHAIN_ID.MAIN_NET)]: ETH_MAINNET_JSONRPC_URL,
         [parseInt(CHAIN_ID.RINKEBY)]: ETH_RINKEBY_JSONRPC_URL,
-        // [parseInt(CHAIN_ID.HARD_HAT)]: HARDHAT_JSONRPC_URL,
       },
     }),
   };
@@ -73,11 +86,18 @@ export function createCoinbaseWalletProvider(provider: Provider): WalletProvider
   };
 }
 
+// TODO:
+// portis
+// authereum
+// fortmatic
+// torus?
+// frame?
+
 export function getProviders(): WalletProvider[] {
   const providers = [];
   // MetaMask
-  const metaMaskProvider = getWindowEthereum('isMetaMask');
-  if (metaMaskProvider.length > 0) {
+  const metaMaskProvider = getInjectedProvider('isMetaMask');
+  if (metaMaskProvider?.length) {
     metaMaskProvider.forEach((provider) => {
       if (!(provider as any)?.isBraveWallet && !(provider as any)?.isWalletLink) {
         // MetaMask
@@ -87,15 +107,21 @@ export function getProviders(): WalletProvider[] {
         providers.push(createBraveWalletProvider(provider));
       }
     });
+  } else {
+    // Brave
+    const braveWalletProvider = getInjectedProvider('isBraveWallet');
+    if (braveWalletProvider?.length) {
+      providers.push(createBraveWalletProvider(braveWalletProvider[0]));
+    }
   }
   // Opera
-  const operaProvider = getWindowEthereum('isOpera');
-  if (operaProvider.length > 0) {
+  const operaProvider = getInjectedProvider('isOpera');
+  if (operaProvider?.length) {
     providers.push(createOperaWalletProvider(operaProvider[0]));
   }
   // Coinbase Wallet
-  const coinbaseProvider = getWindowEthereum('isWalletLink');
-  if (coinbaseProvider.length > 0) {
+  const coinbaseProvider = getInjectedProvider('isWalletLink');
+  if (coinbaseProvider?.length) {
     providers.push(createCoinbaseWalletProvider(coinbaseProvider[0]));
   }
   // WalletConnect
