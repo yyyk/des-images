@@ -55,7 +55,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
-    tokenData && tokenData.length > 0 && _updateTokenDataStatus(contract, tokenData, walletAddress);
+    tokenData && tokenData?.length && _updateTokenDataStatus(contract, tokenData, walletAddress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
 

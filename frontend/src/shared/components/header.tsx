@@ -81,10 +81,8 @@ const WalletAddress = () => {
 };
 
 const ConnectWalletButton = () => {
-  const { checkIfWalletInstalled } = useWalletContext();
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const handleClick = () => {
-    checkIfWalletInstalled();
     setWalletModalOpen(true);
   };
   return (
@@ -141,7 +139,7 @@ const Header = () => {
       </div>
       {pathname === '/' && <CatalogLink />}
       {pathname === '/mod' && isPrevPathCatalog && <GoBackButton />}
-      {pathname === '/catalog' && (walletAddress.length > 0 ? <WalletAddress /> : <ConnectWalletButton />)}
+      {pathname === '/catalog' && (walletAddress?.length ? <WalletAddress /> : <ConnectWalletButton />)}
     </header>
   );
 };

@@ -12,7 +12,7 @@ const Collection = () => {
 
   return (
     <>
-      {ownedTokenData.length > 0 ? (
+      {ownedTokenData?.length ? (
         <ul
           className={`w-2/3 sm:w-full list-none grid gap-8 grid-cols-1 sm:grid-cols-2 grid-rows-${
             ownedTokenData.length
