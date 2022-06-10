@@ -30,24 +30,15 @@ export const useWallet = () => {
     const providers = getProviders();
     setProviders(providers);
     const wallet = localStorage.getItem(LOCAL_STORAGE_WALLET_KEY);
-    if (wallet) {
-      const index = providers.findIndex((provider) => wallet === provider.type);
-      if (index > -1) {
-        connectWallet(providers[index], false);
-      }
+    if (!wallet) {
+      return;
     }
+    const index = providers.findIndex((provider) => wallet === provider.type);
+    if (index < 0) {
+      return;
+    }
+    connectWallet(providers[index], false);
   });
-
-  // useEffect(() => {
-  //   const wallet = localStorage.getItem(LOCAL_STORAGE_WALLET_KEY);
-  //   if (wallet) {
-  //     const index = providers.findIndex((provider) => wallet === provider.type);
-  //     if (index > -1) {
-  //       connectWallet(providers[index], false);
-  //     }
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [providers]);
 
   useEffect(() => {
     if (provider?.on) {
