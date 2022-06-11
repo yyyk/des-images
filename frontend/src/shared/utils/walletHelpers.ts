@@ -126,7 +126,7 @@ export function createPortisProvider(): WalletProvider | null {
       type: 'portis',
       name: 'Portis',
       provider,
-      logout,
+      logout: logout.bind(portis),
     };
   } catch (e) {
     return null;
