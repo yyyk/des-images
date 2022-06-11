@@ -53,7 +53,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
 
   const listClasses = 'p-0 mx-0 mt-0 mb-4 last:mb-0 w-full';
   const buttonClasses =
-    'font-normal w-full px-4 py-3 flex row nowrap justify-center items-center border border-solid border-neutral-300 rounded';
+    'font-normal w-full px-4 py-3 flex row nowrap justify-center items-center border border-solid border-gray-200 rounded hover:border-gray-300 hover:bg-gray-100';
   // const linkClasses = `no-underline ${buttonClasses}`;
   const logoContainerClasses = 'w-auto h-auto max-w-[36px] max-h-[36px] mr-2';
 

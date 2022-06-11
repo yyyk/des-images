@@ -112,7 +112,6 @@ let portis: any = null;
 if (process.env.REACT_APP_PORTIS_ID && ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
   portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
 }
-
 export function createPortisProvider(): WalletProvider | null {
   // if (!process.env.REACT_APP_PORTIS_ID || !ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
   //   return null;
@@ -158,7 +157,6 @@ export function createAuthereumProvider(): WalletProvider | null {
 }
 
 let fm: any = null;
-
 if (ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
   const apiKey =
     ETH_NETWORK === CHAIN_NAME.MAIN_NET
@@ -168,7 +166,6 @@ if (ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
     fm = new Fortmatic(apiKey);
   }
 }
-
 export function createFortmaticProvider(): WalletProvider | null {
   // if (!ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
   //   return null;
