@@ -7,6 +7,7 @@ export interface WalletProvider {
   type: string;
   name: string;
   provider: Provider;
+  logout?: () => void;
 }
 
 // export type ChainName = 'mainnet' | 'rinkeby' | 'ropsten' | 'localhost' | 'hardhat';
