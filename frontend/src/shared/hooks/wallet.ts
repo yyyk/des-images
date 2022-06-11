@@ -15,6 +15,7 @@ import {
   createErrorResponse,
   createWalletConnectProvider,
   getProviders,
+  isWalletAuthereum,
   isWalletConnect,
   isWalletPortis,
 } from 'src/shared/utils/walletHelpers';
@@ -96,6 +97,13 @@ export const useWallet = () => {
         if (index >= 0) {
           setProviders([...providers.slice(0, index), createWalletConnectProvider(), ...providers.slice(index + 1)]);
         }
+        return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
+      }
+    }
+    if (isWalletAuthereum(provider)) {
+      try {
+        await (provider?.provider as any)?.enable();
+      } catch (err: any) {
         return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
       }
     }

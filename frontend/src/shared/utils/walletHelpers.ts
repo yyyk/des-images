@@ -1,5 +1,6 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Portis from '@portis/web3';
+import Authereum from 'authereum';
 // import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
 import { ETH_MAINNET_JSONRPC_URL, ETH_NETWORK, ETH_RINKEBY_JSONRPC_URL } from 'src/shared/constants';
 import { CHAIN_ID, ConnectWalletResponse, ERROR_TYPE, Provider, WalletProvider } from 'src/shared/interfaces';
@@ -20,6 +21,10 @@ export function isWalletConnect(provider: WalletProvider): boolean {
 
 export function isWalletPortis(provider: WalletProvider): boolean {
   return provider?.type === 'portis';
+}
+
+export function isWalletAuthereum(provider: WalletProvider): boolean {
+  return provider?.type === 'authereum';
 }
 
 export function getInjectedProvider(key: string): Provider[] {
@@ -92,15 +97,33 @@ export function createCoinbaseWalletProvider(provider: Provider): WalletProvider
 }
 
 export function createPortisProvider(): WalletProvider | null {
-  if (!process.env.REACT_APP_PORTIS_ID || !ETH_NETWORK) {
+  if (!process.env.REACT_APP_PORTIS_ID || !ETH_NETWORK || ETH_NETWORK === 'localhost') {
     return null;
   }
   try {
-    const portis = new Portis(process.env.REACT_APP_PORTIS_ID ?? '', 'rinkeby');
+    const portis = new Portis(process.env.REACT_APP_PORTIS_ID ?? '', ETH_NETWORK);
+    const { provider } = portis;
     return {
       type: 'portis',
       name: 'Portis',
-      provider: portis.provider,
+      provider,
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+export function createAuthereumProvider(): WalletProvider | null {
+  if (!ETH_NETWORK || ETH_NETWORK === 'localhost') {
+    return null;
+  }
+  try {
+    const authereum = new Authereum(ETH_NETWORK);
+    const provider = authereum.getProvider();
+    return {
+      type: 'authereum',
+      name: 'Authereum',
+      provider,
     };
   } catch (e) {
     return null;
@@ -108,7 +131,6 @@ export function createPortisProvider(): WalletProvider | null {
 }
 
 // TODO:
-// authereum
 // fortmatic
 // torus?
 // frame?
@@ -148,6 +170,11 @@ export function getProviders(): WalletProvider[] {
   const portisProvider = createPortisProvider();
   if (portisProvider) {
     providers.push(portisProvider);
+  }
+  // Authereum
+  const authereumProvider = createAuthereumProvider();
+  if (authereumProvider) {
+    providers.push(authereumProvider);
   }
   // WalletConnect
   providers.push(createWalletConnectProvider());

@@ -9,7 +9,29 @@ import WalletConnectLogo from 'src/shared/components/logos/walletConnect';
 import BraveLogo from 'src/shared/components/logos/brave';
 import OperaLogo from 'src/shared/components/logos/opera';
 import PortisLogo from 'src/shared/components/logos/portis';
+import AuthereumLogo from 'src/shared/components/logos/authereum';
 // import { isMobile } from 'src/shared/utils/walletHelpers';
+
+const Logo = ({ type }: { type: string }) => {
+  switch (type) {
+    case 'metamask':
+      return <MetaMaskLogo />;
+    case 'brave':
+      return <BraveLogo />;
+    case 'opera':
+      return <OperaLogo />;
+    case 'coinbase':
+      return <CoinbaseWalletLogo />;
+    case 'portis':
+      return <PortisLogo />;
+    case 'authereum':
+      return <AuthereumLogo />;
+    case 'wallet-connect':
+      return <WalletConnectLogo />;
+    default:
+      return null;
+  }
+};
 
 interface WalletModalProps {
   open: boolean;
@@ -71,12 +93,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
               onClick={handleConnectWallet(provider)}
             >
               <span className={logoContainerClasses}>
-                {provider?.type === 'metamask' && <MetaMaskLogo />}
-                {provider?.type === 'brave' && <BraveLogo />}
-                {provider?.type === 'opera' && <OperaLogo />}
-                {provider?.type === 'coinbase' && <CoinbaseWalletLogo />}
-                {provider?.type === 'portis' && <PortisLogo />}
-                {provider?.type === 'wallet-connect' && <WalletConnectLogo />}
+                <Logo type={provider?.type} />
               </span>
               <span>{provider?.name ?? ''}</span>
             </button>
