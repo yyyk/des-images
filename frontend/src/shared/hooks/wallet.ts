@@ -79,7 +79,8 @@ export const useWallet = () => {
     console.log('wallet disconnected');
     if (walletProvider && isWalletPortis(walletProvider)) {
       console.log('portis logout');
-      walletProvider?.logout && walletProvider.logout();
+      (walletProvider.provider as any)?._portis?.logout();
+      // walletProvider?.logout && walletProvider.logout();
     }
     localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
     setWalletAddress('');
@@ -145,7 +146,8 @@ export const useWallet = () => {
           chainId !== parseInt(CHAIN_ID.MAIN_NET))
       ) {
         if (isWalletPortis(provider)) {
-          provider?.logout && provider.logout();
+          // provider?.logout && provider.logout();
+          (provider.provider as any)?._portis.logout();
         }
         _handleDisconnect();
         setIsInvalidChainId(true);
@@ -171,7 +173,8 @@ export const useWallet = () => {
     }
     // console.log('error', error);
     if (isWalletPortis(provider)) {
-      provider?.logout && provider.logout();
+      // provider?.logout && provider.logout();
+      (provider.provider as any)?._portis.logout();
     }
     _handleDisconnect();
     return error;

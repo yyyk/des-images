@@ -121,12 +121,12 @@ export function createPortisProvider(): WalletProvider | null {
   }
   try {
     // const portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
-    const { provider, logout } = portis;
+    const { provider } = portis;
+    // provider._portis = portis;
     return {
       type: 'portis',
       name: 'Portis',
       provider,
-      logout: logout.bind(portis),
     };
   } catch (e) {
     return null;
