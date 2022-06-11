@@ -108,12 +108,20 @@ export function createCoinbaseWalletProvider(provider: Provider): WalletProvider
   };
 }
 
+let portis: any = null;
+if (process.env.REACT_APP_PORTIS_ID && ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
+  portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
+}
+
 export function createPortisProvider(): WalletProvider | null {
-  if (!process.env.REACT_APP_PORTIS_ID || !ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
+  // if (!process.env.REACT_APP_PORTIS_ID || !ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
+  //   return null;
+  // }
+  if (!portis) {
     return null;
   }
   try {
-    const portis = new Portis(process.env.REACT_APP_PORTIS_ID ?? '', ETH_NETWORK);
+    // const portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
     const { provider } = portis;
     return {
       type: 'portis',
@@ -125,12 +133,19 @@ export function createPortisProvider(): WalletProvider | null {
   }
 }
 
+let authereum: any = null;
+if (ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
+  authereum = new Authereum(ETH_NETWORK);
+}
 export function createAuthereumProvider(): WalletProvider | null {
-  if (!ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
+  // if (!ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
+  //   return null;
+  // }
+  if (!authereum) {
     return null;
   }
   try {
-    const authereum = new Authereum(ETH_NETWORK);
+    // const authereum = new Authereum(ETH_NETWORK);
     const provider = authereum.getProvider();
     return {
       type: 'authereum',
@@ -142,19 +157,34 @@ export function createAuthereumProvider(): WalletProvider | null {
   }
 }
 
-export function createFortmaticProvider(): WalletProvider | null {
-  if (!ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
-    return null;
-  }
+let fm: any = null;
+
+if (ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
   const apiKey =
     ETH_NETWORK === CHAIN_NAME.MAIN_NET
       ? process.env.REACT_APP_FORMATIC_MAINNET_ID
       : process.env.REACT_APP_FORMATIC_TESTNET_ID;
-  if (!apiKey) {
+  if (apiKey) {
+    fm = new Fortmatic(apiKey);
+  }
+}
+
+export function createFortmaticProvider(): WalletProvider | null {
+  // if (!ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
+  //   return null;
+  // }
+  // const apiKey =
+  //   ETH_NETWORK === CHAIN_NAME.MAIN_NET
+  //     ? process.env.REACT_APP_FORMATIC_MAINNET_ID
+  //     : process.env.REACT_APP_FORMATIC_TESTNET_ID;
+  // if (!apiKey) {
+  //   return null;
+  // }
+  if (!fm) {
     return null;
   }
   try {
-    const fm = new Fortmatic(apiKey);
+    // const fm = new Fortmatic(apiKey);
     const provider = fm.getProvider() as any as Provider;
     return {
       type: 'fortmatic',
