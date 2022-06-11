@@ -17,6 +17,7 @@ import {
   getProviders,
   isWalletAuthereum,
   isWalletConnect,
+  isWalletFortmatic,
   isWalletPortis,
 } from 'src/shared/utils/walletHelpers';
 
@@ -109,7 +110,12 @@ export const useWallet = () => {
     }
     let error: ConnectWalletResponse | undefined = undefined;
     try {
-      if (!isWalletConnect(provider) && !isWalletPortis(provider)) {
+      if (
+        !isWalletConnect(provider) &&
+        !isWalletPortis(provider) &&
+        !isWalletAuthereum(provider) &&
+        !isWalletFortmatic(provider)
+      ) {
         try {
           await (provider.provider as any).request({ method: needRequest ? 'eth_requestAccounts' : 'eth_accounts' });
         } catch (error) {

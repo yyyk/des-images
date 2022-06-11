@@ -10,6 +10,7 @@ import BraveLogo from 'src/shared/components/logos/brave';
 import OperaLogo from 'src/shared/components/logos/opera';
 import PortisLogo from 'src/shared/components/logos/portis';
 import AuthereumLogo from 'src/shared/components/logos/authereum';
+import FortmaticLogo from 'src/shared/components/logos/fortmatic';
 // import { isMobile } from 'src/shared/utils/walletHelpers';
 
 const Logo = ({ type }: { type: string }) => {
@@ -26,6 +27,8 @@ const Logo = ({ type }: { type: string }) => {
       return <PortisLogo />;
     case 'authereum':
       return <AuthereumLogo />;
+    case 'fortmatic':
+      return <FortmaticLogo />;
     case 'wallet-connect':
       return <WalletConnectLogo />;
     default:
