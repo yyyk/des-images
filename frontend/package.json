@@ -11,6 +11,7 @@
     "dependencies": {
         "@coinbase/wallet-sdk": "^3.0.8",
         "@craco/craco": "^7.0.0-alpha.3",
+        "@portis/web3": "^4.0.7",
         "@tailwindcss/typography": "^0.5.2",
         "@testing-library/jest-dom": "^5.16.4",
         "@testing-library/react": "^13.1.1",

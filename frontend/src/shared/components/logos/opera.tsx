@@ -3,7 +3,7 @@ const OperaLogo = () => (
     viewBox="0 0 81 80"
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
-    className="block w-full h-auto"
+    className="block w-[36px] h-auto"
   >
     <defs>
       <path id="a" d="M.71 0H68v79.8H.71z" />

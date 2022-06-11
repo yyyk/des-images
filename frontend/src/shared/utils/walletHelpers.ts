@@ -1,6 +1,7 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
+import Portis from '@portis/web3';
 // import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
-import { ETH_MAINNET_JSONRPC_URL, ETH_RINKEBY_JSONRPC_URL } from 'src/shared/constants';
+import { ETH_MAINNET_JSONRPC_URL, ETH_NETWORK, ETH_RINKEBY_JSONRPC_URL } from 'src/shared/constants';
 import { CHAIN_ID, ConnectWalletResponse, ERROR_TYPE, Provider, WalletProvider } from 'src/shared/interfaces';
 
 export function createErrorResponse(type: ERROR_TYPE, message: string): ConnectWalletResponse {
@@ -15,6 +16,10 @@ export function createErrorResponse(type: ERROR_TYPE, message: string): ConnectW
 
 export function isWalletConnect(provider: WalletProvider): boolean {
   return provider?.type === 'wallet-connect';
+}
+
+export function isWalletPortis(provider: WalletProvider): boolean {
+  return provider?.type === 'portis';
 }
 
 export function getInjectedProvider(key: string): Provider[] {
@@ -86,8 +91,23 @@ export function createCoinbaseWalletProvider(provider: Provider): WalletProvider
   };
 }
 
+export function createPortisProvider(): WalletProvider | null {
+  if (!process.env.REACT_APP_PORTIS_ID || !ETH_NETWORK) {
+    return null;
+  }
+  try {
+    const portis = new Portis(process.env.REACT_APP_PORTIS_ID ?? '', 'rinkeby');
+    return {
+      type: 'portis',
+      name: 'Portis',
+      provider: portis.provider,
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
 // TODO:
-// portis
 // authereum
 // fortmatic
 // torus?
@@ -123,6 +143,11 @@ export function getProviders(): WalletProvider[] {
   const coinbaseProvider = getInjectedProvider('isWalletLink');
   if (coinbaseProvider?.length) {
     providers.push(createCoinbaseWalletProvider(coinbaseProvider[0]));
+  }
+  // Portis
+  const portisProvider = createPortisProvider();
+  if (portisProvider) {
+    providers.push(portisProvider);
   }
   // WalletConnect
   providers.push(createWalletConnectProvider());

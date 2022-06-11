@@ -4,7 +4,7 @@ const BraveLogo = () => (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
-    className="block w-full h-auto"
+    className="block w-full h-[36px]"
   >
     <defs>
       <linearGradient x1="0%" y1="50.7055163%" x2="100%" y2="50.7055163%" id="linearGradient-1">

@@ -4,7 +4,7 @@ const WalletConnectLogo = () => (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
-    className="block w-full h-auto"
+    className="block w-[36px] h-[36px]"
   >
     <defs>
       <radialGradient cx="0%" cy="50%" fx="0%" fy="50%" r="100%" id="radialGradient-1">

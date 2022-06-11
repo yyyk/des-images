@@ -1,13 +1,14 @@
 import { MouseEvent, useEffect, useRef } from 'react';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import { ERROR_TYPE, NOTIFICATION_TYPE, WalletProvider } from 'src/shared/interfaces';
+import { useNotificationContext } from 'src/shared/contexts/notification';
 import Modal from 'src/shared/components/modal';
 import MetaMaskLogo from 'src/shared/components/logos/metamask';
 import CoinbaseWalletLogo from 'src/shared/components/logos/coinbaseWallet';
 import WalletConnectLogo from 'src/shared/components/logos/walletConnect';
 import BraveLogo from 'src/shared/components/logos/brave';
 import OperaLogo from 'src/shared/components/logos/opera';
-import { useNotificationContext } from 'src/shared/contexts/notification';
+import PortisLogo from 'src/shared/components/logos/portis';
 // import { isMobile } from 'src/shared/utils/walletHelpers';
 
 interface WalletModalProps {
@@ -29,7 +30,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
   const buttonClasses =
     'font-normal w-full px-4 py-3 flex row nowrap justify-center items-center border border-solid border-neutral-300 rounded';
   // const linkClasses = `no-underline ${buttonClasses}`;
-  const logoContainerClasses = 'w-9 mr-2';
+  const logoContainerClasses = 'w-auto h-auto max-w-[36px] max-h-[36px] mr-2';
 
   // useEffect(() => {
   //   try {
@@ -74,6 +75,7 @@ const WalletModal = ({ open, onClose }: WalletModalProps) => {
                 {provider?.type === 'brave' && <BraveLogo />}
                 {provider?.type === 'opera' && <OperaLogo />}
                 {provider?.type === 'coinbase' && <CoinbaseWalletLogo />}
+                {provider?.type === 'portis' && <PortisLogo />}
                 {provider?.type === 'wallet-connect' && <WalletConnectLogo />}
               </span>
               <span>{provider?.name ?? ''}</span>

@@ -16,6 +16,7 @@ import {
   createWalletConnectProvider,
   getProviders,
   isWalletConnect,
+  isWalletPortis,
 } from 'src/shared/utils/walletHelpers';
 
 export const useWallet = () => {
@@ -100,7 +101,7 @@ export const useWallet = () => {
     }
     let error: ConnectWalletResponse | undefined = undefined;
     try {
-      if (!isWalletConnect(provider)) {
+      if (!isWalletConnect(provider) && !isWalletPortis(provider)) {
         try {
           await (provider.provider as any).request({ method: needRequest ? 'eth_requestAccounts' : 'eth_accounts' });
         } catch (error) {

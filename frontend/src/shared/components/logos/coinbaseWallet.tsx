@@ -3,7 +3,7 @@ const CoinbaseWalletLogo = () => (
     viewBox="0 0 1024 1024"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className="block w-full h-auto overflow-hidden rounded"
+    className="block w-[36px] h-[36px] overflow-hidden rounded"
   >
     <rect width="1024" height="1024" fill="#0052FF" />
     <path

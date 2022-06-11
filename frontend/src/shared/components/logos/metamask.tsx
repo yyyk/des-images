@@ -5,7 +5,7 @@ const MetaMaskLogo = () => (
     version="1.1"
     viewBox="0 0 318.6 318.6"
     xmlSpace="preserve"
-    className="block w-full h-auto"
+    className="block w-[36px] h-[36px]"
   >
     <style type="text/css">
       {`.st0{fill:#E2761B;stroke:#E2761B;stroke-linecap:round;stroke-linejoin:round;}
