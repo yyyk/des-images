@@ -2,7 +2,6 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import Portis from '@portis/web3';
 import Authereum from 'authereum';
 import Fortmatic from 'fortmatic';
-// import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
 import { ETH_MAINNET_JSONRPC_URL, ETH_NETWORK, ETH_RINKEBY_JSONRPC_URL } from 'src/shared/constants';
 import {
   CHAIN_ID,
@@ -77,19 +76,6 @@ export function createOperaWalletProvider(provider: Provider): WalletProvider {
 }
 
 export function createCoinbaseWalletProvider(provider: Provider): WalletProvider {
-  // const coinbaseWallet = new CoinbaseWalletSDK({
-  //   appName: 'desImages',
-  //   appLogoUrl: '',
-  //   darkMode: false,
-  // });
-  // providers.push({
-  //   type: 'coinbase',
-  //   name: 'Coinbase Wallet',
-  //   provider: coinbaseWallet.makeWeb3Provider(
-  //     process.env.NODE_ENV === 'development' ? HARDHAT_JSONRPC_URL : ETH_MAINNET_JSONRPC_URL,
-  //     process.env.NODE_ENV === 'development' ? HARDHAT_CHAIN_ID : MAINNET_CHAIN_ID,
-  //   ),
-  // });
   return {
     type: WALLET_TYPE.COINBASE,
     name: WALLET_NAME.COINBASE,
@@ -110,19 +96,15 @@ export function createWalletConnectProvider(): WalletProvider {
   };
 }
 
-// let portis: any = null;
-// if (process.env.REACT_APP_PORTIS_ID && ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
-//   portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
-// }
+let portis: any = null;
+if (process.env.REACT_APP_PORTIS_ID && ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
+  portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
+}
 export function createPortisProvider(): WalletProvider | null {
-  if (!process.env.REACT_APP_PORTIS_ID || !ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
+  if (!portis) {
     return null;
   }
-  // if (!portis) {
-  //   return null;
-  // }
   try {
-    const portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
     const { provider } = portis;
     provider._portis = portis;
     return {
@@ -140,14 +122,10 @@ if (ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
   authereum = new Authereum(ETH_NETWORK);
 }
 export function createAuthereumProvider(): WalletProvider | null {
-  // if (!ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
-  //   return null;
-  // }
   if (!authereum) {
     return null;
   }
   try {
-    // const authereum = new Authereum(ETH_NETWORK);
     const provider = authereum.getProvider();
     return {
       type: WALLET_TYPE.AUTHEREUM,
@@ -170,21 +148,10 @@ if (ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
   }
 }
 export function createFortmaticProvider(): WalletProvider | null {
-  // if (!ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
-  //   return null;
-  // }
-  // const apiKey =
-  //   ETH_NETWORK === CHAIN_NAME.MAIN_NET
-  //     ? process.env.REACT_APP_FORMATIC_MAINNET_ID
-  //     : process.env.REACT_APP_FORMATIC_TESTNET_ID;
-  // if (!apiKey) {
-  //   return null;
-  // }
   if (!fm) {
     return null;
   }
   try {
-    // const fm = new Fortmatic(apiKey);
     const provider = fm.getProvider() as any;
     provider.fm = fm;
     return {
@@ -200,7 +167,6 @@ export function createFortmaticProvider(): WalletProvider | null {
 // TODO:
 // torus?
 // frame?
-
 export function getProviders(): WalletProvider[] {
   const providers = [];
   // MetaMask
