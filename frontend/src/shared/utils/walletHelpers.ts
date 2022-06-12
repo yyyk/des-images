@@ -112,7 +112,7 @@ export function createWalletConnectProvider(): WalletProvider {
 
 let portis: any = null;
 if (process.env.REACT_APP_PORTIS_ID && ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
-  portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
+  // portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
 }
 export function createPortisProvider(): WalletProvider | null {
   // if (!process.env.REACT_APP_PORTIS_ID || !ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
