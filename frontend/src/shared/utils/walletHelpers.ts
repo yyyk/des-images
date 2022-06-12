@@ -110,19 +110,19 @@ export function createWalletConnectProvider(): WalletProvider {
   };
 }
 
-let portis: any = null;
-if (process.env.REACT_APP_PORTIS_ID && ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
-  // portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
-}
+// let portis: any = null;
+// if (process.env.REACT_APP_PORTIS_ID && ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
+//   portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
+// }
 export function createPortisProvider(): WalletProvider | null {
-  // if (!process.env.REACT_APP_PORTIS_ID || !ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
-  //   return null;
-  // }
-  if (!portis) {
+  if (!process.env.REACT_APP_PORTIS_ID || !ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
     return null;
   }
+  // if (!portis) {
+  //   return null;
+  // }
   try {
-    // const portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
+    const portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
     const { provider } = portis;
     provider._portis = portis;
     return {
