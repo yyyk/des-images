@@ -2,14 +2,7 @@ import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ETH_NETWORK, LOCAL_STORAGE_WALLET_KEY } from 'src/shared/constants';
-import {
-  CHAIN_ID,
-  CHAIN_NAME,
-  ConnectWalletResponse,
-  ERROR_TYPE,
-  Provider,
-  WalletProvider,
-} from 'src/shared/interfaces';
+import { CHAIN_ID, CHAIN_NAME, ConnectWalletResponse, ERROR_TYPE, WalletProvider } from 'src/shared/interfaces';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import {
   createErrorResponse,
@@ -25,7 +18,6 @@ export const useWallet = () => {
   const [walletAddress, setWalletAddress] = useState('');
   const [providers, setProviders] = useState<WalletProvider[]>([]);
   const [walletProvider, setWalletProvider] = useState<WalletProvider | null>(null);
-  const [provider, setProvider] = useState<Provider | null>(null);
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner | null>(null);
   const [isInvalidChainId, setIsInvalidChainId] = useState(false);
 
@@ -44,90 +36,124 @@ export const useWallet = () => {
   });
 
   useEffect(() => {
+    if (!walletProvider) {
+      return;
+    }
+    const { provider } = walletProvider;
+    const handleAccountChange = _handleAccountChange(walletProvider);
+    const handleDisconnect = _handleDisconnect(walletProvider);
     if (provider?.on) {
-      provider.on('accountsChanged', _handleAccountChange);
+      provider.on('accountsChanged', handleAccountChange);
       provider.on('chainChanged', _handleChainChanged);
-      provider.on('disconnect', _handleDisconnect);
+      provider.on('disconnect', handleDisconnect);
       return () => {
         if (provider?.removeListener) {
-          provider.removeListener('accountsChanged', _handleAccountChange);
+          provider.removeListener('accountsChanged', handleAccountChange);
           provider.removeListener('chainChanged', _handleChainChanged);
-          provider.removeListener('disconnect', _handleDisconnect);
+          provider.removeListener('disconnect', handleDisconnect);
         }
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [provider]);
+  }, [walletProvider]);
 
-  const _handleAccountChange = (accounts: string[]) => {
-    console.log('wallet account changed:', (accounts?.length && accounts[0]) || []);
-    if (accounts && accounts?.length) {
-      setWalletAddress(accounts[0]);
-      console.log(walletProvider);
-      walletProvider && connectWallet(walletProvider);
-    } else {
-      _handleDisconnect();
-    }
-  };
+  const _handleAccountChange =
+    (walletProvider: WalletProvider) =>
+    async (accounts: string[]): Promise<void> => {
+      console.log('wallet account changed:', (accounts?.length && accounts[0]) || []);
+      if (accounts && accounts?.length) {
+        setWalletAddress(accounts[0]);
+        console.log(walletProvider);
+        walletProvider && connectWallet(walletProvider);
+      } else {
+        await _handleDisconnect(walletProvider)();
+      }
+    };
 
-  const _handleChainChanged = (_chainId: string) => {
+  // TODO:
+  const _handleChainChanged = (_chainId: string): void => {
     console.log('wallet chain changed:', parseInt(_chainId));
     window.location.reload();
   };
 
-  const _handleDisconnect = () => {
-    console.log('wallet disconnected');
-    if (walletProvider && isWalletPortis(walletProvider)) {
-      console.log('portis logout');
-      (walletProvider.provider as any)?._portis?.logout();
-      // walletProvider?.logout && walletProvider.logout();
+  const _handleDisconnect = (walletProvider: WalletProvider) => async (): Promise<void> => {
+    console.log('wallet disconnected:', walletProvider?.name);
+    if (walletProvider) {
+      await logoutWallet(walletProvider);
     }
     localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
     setWalletAddress('');
     setSigner(null);
-    setProvider(null);
     setWalletProvider(null);
     setProviders(getProviders());
     setIsInvalidChainId(false);
   };
 
-  const connectWallet = async (provider: WalletProvider, needRequest = true): Promise<ConnectWalletResponse> => {
-    if (!provider?.provider) {
+  const logoutWallet = async (walletProvider: WalletProvider): Promise<void> => {
+    try {
+      if (isWalletConnect(walletProvider)) {
+        (walletProvider?.provider as WalletConnectProvider)?.disconnect();
+      }
+      if (isWalletPortis(walletProvider)) {
+        (walletProvider.provider as any)?._portis?.logout();
+      }
+      if (isWalletAuthereum(walletProvider)) {
+        (walletProvider.provider as any)?.disable();
+      }
+      if (isWalletFortmatic(walletProvider)) {
+        await (walletProvider.provider as any)?.fm?.user?.logout();
+      }
+    } catch (e) {}
+  };
+
+  const connectWallet = async (walletProvider: WalletProvider, needRequest = true): Promise<ConnectWalletResponse> => {
+    if (!walletProvider?.provider) {
       return createErrorResponse(ERROR_TYPE.INVALID_PROVIDER, 'Invalid Provider');
     }
-    if (isWalletConnect(provider)) {
+    if (isWalletConnect(walletProvider) || isWalletAuthereum(walletProvider) || isWalletPortis(walletProvider)) {
       try {
-        await (provider?.provider as WalletConnectProvider)?.enable();
+        await (walletProvider?.provider as any)?.enable();
       } catch (err: any) {
-        const index = providers.findIndex(isWalletConnect);
-        if (index >= 0) {
-          setProviders([...providers.slice(0, index), createWalletConnectProvider(), ...providers.slice(index + 1)]);
+        await logoutWallet(walletProvider);
+        if (isWalletConnect(walletProvider)) {
+          const index = providers.findIndex(isWalletConnect);
+          if (index >= 0) {
+            setProviders([...providers.slice(0, index), createWalletConnectProvider(), ...providers.slice(index + 1)]);
+          }
         }
         return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
       }
     }
-    if (isWalletAuthereum(provider)) {
+    if (isWalletFortmatic(walletProvider)) {
       try {
-        await (provider?.provider as any)?.enable();
+        await (walletProvider.provider as any)?.fm?.user?.login();
+        const isLoggedIn = await (walletProvider.provider as any)?.fm?.user?.isLoggedIn();
+        if (!isLoggedIn) {
+          throw new Error('Failed to login to Fortmatic');
+        }
       } catch (err: any) {
+        await logoutWallet(walletProvider);
         return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
       }
     }
     let error: ConnectWalletResponse | undefined = undefined;
+    const handleDisconnect = _handleDisconnect(walletProvider);
     try {
       if (
-        !isWalletConnect(provider) &&
-        !isWalletPortis(provider) &&
-        !isWalletAuthereum(provider) &&
-        !isWalletFortmatic(provider)
+        !isWalletConnect(walletProvider) &&
+        !isWalletPortis(walletProvider) &&
+        !isWalletAuthereum(walletProvider) &&
+        !isWalletFortmatic(walletProvider)
       ) {
         try {
-          await (provider.provider as any).request({ method: needRequest ? 'eth_requestAccounts' : 'eth_accounts' });
+          await (walletProvider.provider as any).request({
+            method: needRequest ? 'eth_requestAccounts' : 'eth_accounts',
+          });
         } catch (error) {
           throw new Error('User Rejected');
         }
       }
-      const web3Provider = new ethers.providers.Web3Provider(provider.provider as any);
+      const web3Provider = new ethers.providers.Web3Provider(walletProvider.provider as any);
       const signer = web3Provider.getSigner();
       const network = await web3Provider.ready;
       const userAddress = await web3Provider.getSigner().getAddress();
@@ -145,22 +171,16 @@ export const useWallet = () => {
           chainId !== CHAIN_ID.MAIN_NET &&
           chainId !== parseInt(CHAIN_ID.MAIN_NET))
       ) {
-        if (isWalletPortis(provider)) {
-          // provider?.logout && provider.logout();
-          (provider.provider as any)?._portis.logout();
-        }
-        _handleDisconnect();
+        await handleDisconnect();
         setIsInvalidChainId(true);
-        setProvider(provider.provider);
-        setWalletProvider(provider);
+        setWalletProvider(walletProvider);
         return createErrorResponse(ERROR_TYPE.INVALID_CHAIN_ID, 'Invalid Chain ID');
       }
       // console.log('address', userAddress);
       if (userAddress && userAddress?.length) {
-        localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, provider.type);
+        localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, walletProvider.type);
         setWalletAddress(userAddress);
-        setProvider(provider.provider);
-        setWalletProvider(provider);
+        setWalletProvider(walletProvider);
         setSigner(signer);
         return { success: true };
       }
@@ -172,11 +192,7 @@ export const useWallet = () => {
       );
     }
     // console.log('error', error);
-    if (isWalletPortis(provider)) {
-      // provider?.logout && provider.logout();
-      (provider.provider as any)?._portis.logout();
-    }
-    _handleDisconnect();
+    await handleDisconnect();
     return error;
   };
 

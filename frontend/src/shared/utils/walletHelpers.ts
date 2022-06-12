@@ -11,6 +11,8 @@ import {
   ERROR_TYPE,
   Provider,
   WalletProvider,
+  WALLET_NAME,
+  WALLET_TYPE,
 } from 'src/shared/interfaces';
 
 export function createErrorResponse(type: ERROR_TYPE, message: string): ConnectWalletResponse {
@@ -24,19 +26,19 @@ export function createErrorResponse(type: ERROR_TYPE, message: string): ConnectW
 }
 
 export function isWalletConnect(provider: WalletProvider): boolean {
-  return provider?.type === 'wallet-connect';
+  return provider?.type === WALLET_TYPE.WALLET_CONNECT;
 }
 
 export function isWalletPortis(provider: WalletProvider): boolean {
-  return provider?.type === 'portis';
+  return provider?.type === WALLET_TYPE.PORTIS;
 }
 
 export function isWalletAuthereum(provider: WalletProvider): boolean {
-  return provider?.type === 'authereum';
+  return provider?.type === WALLET_TYPE.AUTHEREUM;
 }
 
 export function isWalletFortmatic(provider: WalletProvider): boolean {
-  return provider?.type === 'fortmatic';
+  return provider?.type === WALLET_TYPE.FORTMATIC;
 }
 
 export function getInjectedProvider(key: string): Provider[] {
@@ -50,39 +52,26 @@ export function getInjectedProvider(key: string): Provider[] {
     : [];
 }
 
-export function createWalletConnectProvider(): WalletProvider {
-  return {
-    type: 'wallet-connect',
-    name: 'WalletConnect',
-    provider: new WalletConnectProvider({
-      rpc: {
-        [parseInt(CHAIN_ID.MAIN_NET)]: ETH_MAINNET_JSONRPC_URL,
-        [parseInt(CHAIN_ID.RINKEBY)]: ETH_RINKEBY_JSONRPC_URL,
-      },
-    }),
-  };
-}
-
 export function createMetaMaskProvider(provider: Provider): WalletProvider {
   return {
-    type: 'metamask',
-    name: 'MetaMask',
+    type: WALLET_TYPE.METAMASK,
+    name: WALLET_NAME.METAMASK,
     provider,
   };
 }
 
 export function createBraveWalletProvider(provider: Provider): WalletProvider {
   return {
-    type: 'brave',
-    name: 'Brave Wallet',
+    type: WALLET_TYPE.BRAVE,
+    name: WALLET_NAME.BRAVE,
     provider,
   };
 }
 
 export function createOperaWalletProvider(provider: Provider): WalletProvider {
   return {
-    type: 'opera',
-    name: 'Opera Wallet',
+    type: WALLET_TYPE.OPERA,
+    name: WALLET_NAME.OPERA,
     provider,
   };
 }
@@ -102,9 +91,22 @@ export function createCoinbaseWalletProvider(provider: Provider): WalletProvider
   //   ),
   // });
   return {
-    type: 'coinbase',
-    name: 'Coinbase Wallet',
+    type: WALLET_TYPE.COINBASE,
+    name: WALLET_NAME.COINBASE,
     provider,
+  };
+}
+
+export function createWalletConnectProvider(): WalletProvider {
+  return {
+    type: WALLET_TYPE.WALLET_CONNECT,
+    name: WALLET_NAME.WALLET_CONNECT,
+    provider: new WalletConnectProvider({
+      rpc: {
+        [parseInt(CHAIN_ID.MAIN_NET)]: ETH_MAINNET_JSONRPC_URL,
+        [parseInt(CHAIN_ID.RINKEBY)]: ETH_RINKEBY_JSONRPC_URL,
+      },
+    }),
   };
 }
 
@@ -124,8 +126,8 @@ export function createPortisProvider(): WalletProvider | null {
     const { provider } = portis;
     provider._portis = portis;
     return {
-      type: 'portis',
-      name: 'Portis',
+      type: WALLET_TYPE.PORTIS,
+      name: WALLET_NAME.PORTIS,
       provider,
     };
   } catch (e) {
@@ -148,8 +150,8 @@ export function createAuthereumProvider(): WalletProvider | null {
     // const authereum = new Authereum(ETH_NETWORK);
     const provider = authereum.getProvider();
     return {
-      type: 'authereum',
-      name: 'Authereum',
+      type: WALLET_TYPE.AUTHEREUM,
+      name: WALLET_NAME.AUTHEREUM,
       provider,
     };
   } catch (e) {
@@ -183,10 +185,11 @@ export function createFortmaticProvider(): WalletProvider | null {
   }
   try {
     // const fm = new Fortmatic(apiKey);
-    const provider = fm.getProvider() as any as Provider;
+    const provider = fm.getProvider() as any;
+    provider.fm = fm;
     return {
-      type: 'fortmatic',
-      name: 'Fortmatic',
+      type: WALLET_TYPE.FORTMATIC,
+      name: WALLET_NAME.FORTMATIC,
       provider,
     };
   } catch (e) {

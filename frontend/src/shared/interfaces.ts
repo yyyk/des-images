@@ -1,11 +1,33 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ethers } from 'ethers';
 
+export enum WALLET_TYPE {
+  METAMASK = 'metamask',
+  BRAVE = 'brave',
+  OPERA = 'opera',
+  COINBASE = 'coinbase',
+  WALLET_CONNECT = 'wallet-connect',
+  PORTIS = 'portis',
+  AUTHEREUM = 'authereum',
+  FORTMATIC = 'fortmatic',
+}
+
+export enum WALLET_NAME {
+  METAMASK = 'MetaMask',
+  BRAVE = 'Brave Wallet',
+  OPERA = 'Opera Wallet',
+  COINBASE = 'Coinbase Wallet',
+  WALLET_CONNECT = 'WalletConnect',
+  PORTIS = 'Portis',
+  AUTHEREUM = 'Authereum',
+  FORTMATIC = 'Fortmatic',
+}
+
 export type Provider = ethers.providers.Provider | WalletConnectProvider;
 
 export interface WalletProvider {
-  type: string;
-  name: string;
+  type: WALLET_TYPE;
+  name: WALLET_NAME;
   provider: Provider;
   // logout?: () => void;
 }
