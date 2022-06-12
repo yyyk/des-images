@@ -83,12 +83,17 @@ export function createCoinbaseWalletProvider(provider: Provider): WalletProvider
   };
 }
 
-export function createWalletConnectProvider(): WalletProvider {
+export function createWalletConnectProvider(): WalletProvider | null {
+  const infuraId = process.env.REACT_APP_INFRA_ID ?? '';
+  if (!infuraId) {
+    return null;
+  }
   const provider = new WalletConnectProvider({
-    rpc: {
-      [parseInt(CHAIN_ID.MAIN_NET)]: ETH_MAINNET_JSONRPC_URL,
-      [parseInt(CHAIN_ID.RINKEBY)]: ETH_RINKEBY_JSONRPC_URL,
-    },
+    // rpc: {
+    //   [parseInt(CHAIN_ID.MAIN_NET)]: ETH_MAINNET_JSONRPC_URL,
+    //   [parseInt(CHAIN_ID.RINKEBY)]: ETH_RINKEBY_JSONRPC_URL,
+    // },
+    infuraId,
   });
   return {
     type: WALLET_TYPE.WALLET_CONNECT,
@@ -100,21 +105,13 @@ export function createWalletConnectProvider(): WalletProvider {
   };
 }
 
-// let portis: any = null;
-// if (process.env.REACT_APP_PORTIS_ID && ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
-//   portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
-// }
 export function createPortisProvider(): WalletProvider | null {
-  // if (!portis) {
-  //   return null;
-  // }
   if (!process.env.REACT_APP_PORTIS_ID || !ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
     return null;
   }
   try {
     const portis = new Portis(process.env.REACT_APP_PORTIS_ID, ETH_NETWORK);
     const { provider } = portis;
-    // provider._portis = portis;
     return {
       type: WALLET_TYPE.PORTIS,
       name: WALLET_NAME.PORTIS,
@@ -151,21 +148,19 @@ export function createAuthereumProvider(): WalletProvider | null {
   }
 }
 
-let fm: any = null;
-if (ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
+export function createFortmaticProvider(): WalletProvider | null {
+  if (!ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
+    return null;
+  }
   const apiKey =
     ETH_NETWORK === CHAIN_NAME.MAIN_NET
       ? process.env.REACT_APP_FORMATIC_MAINNET_ID
       : process.env.REACT_APP_FORMATIC_TESTNET_ID;
-  if (apiKey) {
-    fm = new Fortmatic(apiKey);
-  }
-}
-export function createFortmaticProvider(): WalletProvider | null {
-  if (!fm) {
+  if (!apiKey) {
     return null;
   }
   try {
+    const fm = new Fortmatic(apiKey);
     const provider = fm.getProvider() as any;
     provider.fm = fm;
     return {
@@ -215,23 +210,21 @@ export function getProviders(): WalletProvider[] {
   if (coinbaseProvider?.length) {
     providers.push(createCoinbaseWalletProvider(coinbaseProvider[0]));
   }
-  // Portis
-  const portisProvider = createPortisProvider();
-  if (portisProvider) {
-    providers.push(portisProvider);
-  }
   // Authereum
   const authereumProvider = createAuthereumProvider();
-  if (authereumProvider) {
-    providers.push(authereumProvider);
-  }
+  authereumProvider && providers.push(authereumProvider);
+
   // Fortmatic
   const fortmaticProvider = createFortmaticProvider();
-  if (fortmaticProvider) {
-    providers.push(fortmaticProvider);
-  }
+  fortmaticProvider && providers.push(fortmaticProvider);
+
+  // Portis
+  const portisProvider = createPortisProvider();
+  portisProvider && providers.push(portisProvider);
+
   // WalletConnect
-  providers.push(createWalletConnectProvider());
+  const walletConnectProvider = createWalletConnectProvider();
+  walletConnectProvider && providers.push(walletConnectProvider);
 
   return providers;
 }
