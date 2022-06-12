@@ -79,9 +79,10 @@ export const useWallet = () => {
 
   const _handleDisconnect = (walletProvider: WalletProvider) => async (): Promise<void> => {
     console.log('wallet disconnected:', walletProvider?.name);
-    if (walletProvider) {
-      await logoutWallet(walletProvider);
-    }
+    await logoutWallet(walletProvider);
+  };
+
+  const _resetState = () => {
     localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
     setWalletAddress('');
     setSigner(null);
@@ -91,31 +92,31 @@ export const useWallet = () => {
     setIsInvalidChainId(false);
   };
 
-  const logoutWallet = async (walletProvider: WalletProvider): Promise<void> => {
-    if (!walletProvider.logout) {
-      return;
-    }
-    try {
-      // if (isWalletConnect(walletProvider)) {
-      //   (walletProvider?.provider as WalletConnectProvider)?.disconnect();
-      // }
-      // if (isWalletPortis(walletProvider)) {
-      //   (walletProvider.provider as any)?._portis?.logout();
-      // }
-      // if (isWalletAuthereum(walletProvider)) {
-      //   (walletProvider.provider as any)?.disable();
-      // }
-      // if (isWalletFortmatic(walletProvider)) {
-      //   await (walletProvider.provider as any)?.fm?.user?.logout();
-      // }
-      if (isWalletFortmatic(walletProvider)) {
-        await walletProvider.logout();
-      } else {
-        walletProvider.logout();
+  const logoutWallet = async (walletProvider: WalletProvider | null, resetState: boolean = true): Promise<void> => {
+    if (walletProvider?.logout) {
+      try {
+        // if (isWalletConnect(walletProvider)) {
+        //   (walletProvider?.provider as WalletConnectProvider)?.disconnect();
+        // }
+        // if (isWalletPortis(walletProvider)) {
+        //   (walletProvider.provider as any)?._portis?.logout();
+        // }
+        // if (isWalletAuthereum(walletProvider)) {
+        //   (walletProvider.provider as any)?.disable();
+        // }
+        // if (isWalletFortmatic(walletProvider)) {
+        //   await (walletProvider.provider as any)?.fm?.user?.logout();
+        // }
+        if (isWalletFortmatic(walletProvider)) {
+          await walletProvider.logout();
+        } else {
+          walletProvider.logout();
+        }
+      } catch (e) {
+        console.log('logout failed:', e);
       }
-    } catch (e) {
-      console.log('logout failed:', e);
     }
+    resetState && _resetState();
   };
 
   const connectWallet = async (walletProvider: WalletProvider, needRequest = true): Promise<ConnectWalletResponse> => {
@@ -126,7 +127,7 @@ export const useWallet = () => {
       try {
         await (walletProvider?.provider as any)?.enable();
       } catch (err: any) {
-        await logoutWallet(walletProvider);
+        await logoutWallet(walletProvider, false);
         if (isWalletConnect(walletProvider)) {
           const index = providers.findIndex(isWalletConnect);
           if (index >= 0) {
@@ -144,7 +145,7 @@ export const useWallet = () => {
           throw new Error('Failed to login to Fortmatic');
         }
       } catch (err: any) {
-        await logoutWallet(walletProvider);
+        await logoutWallet(walletProvider, false);
         return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
       }
     }
