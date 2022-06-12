@@ -3,10 +3,10 @@ import { useCatalogContext } from 'src/shared/contexts/catalog';
 import { useContractContext } from 'src/shared/contexts/contract';
 
 const Collection = () => {
-  const { ownedTokenData, minted, burned } = useCatalogContext();
-  const { isUserTokensLoading } = useContractContext();
+  const { ownedTokenData, isUserTokensLoading, minted, burned } = useCatalogContext();
+  const { isUserTokenIDsLoading } = useContractContext();
 
-  if (isUserTokensLoading) {
+  if (isUserTokensLoading || isUserTokenIDsLoading) {
     return <p className="pt-3 sm:mt-4">Loading...</p>;
   }
 

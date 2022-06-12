@@ -19,6 +19,7 @@ import { isSameAddress } from 'src/shared/utils/contractHelpers';
 interface ContextState {
   tokenData: TokenData[];
   ownedTokenData: TokenData[];
+  isUserTokensLoading: boolean;
   add: (data: TokenData) => Promise<boolean>;
   remove: (data: TokenData) => void;
   minted: (data: TokenData) => void;
@@ -32,6 +33,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   const { contract, ownedTokenIds } = useContractContext();
   const [tokenData, setTokenData] = useState<TokenData[]>([]);
   const [ownedTokenData, setOwnedTokenData] = useState<TokenData[]>([]);
+  const [isUserTokensLoading, setIsUserTokensLoading] = useState(false);
 
   const _updateTokenData = (data: TokenData[]) => {
     setTokenData(data);
@@ -47,7 +49,9 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       setOwnedTokenData([]);
       return;
     }
+    setIsUserTokensLoading(true);
     setOwnedTokenData(await getTokenDataFromTokenIds(contract, ownedTokenIds));
+    setIsUserTokensLoading(false);
   };
 
   useEffectOnce(() => {
@@ -112,7 +116,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <CatalogContext.Provider value={{ tokenData, ownedTokenData, add, remove, minted, burned }}>
+    <CatalogContext.Provider value={{ tokenData, ownedTokenData, isUserTokensLoading, add, remove, minted, burned }}>
       {children}
     </CatalogContext.Provider>
   );

@@ -22,7 +22,7 @@ interface ContextState {
   mintPrice: string;
   burnPrice: string;
   ownedTokenIds: string[];
-  isUserTokensLoading: boolean;
+  isUserTokenIDsLoading: boolean;
   mint: (dateHex: string, ciphertext: string) => Promise<boolean>;
   burn: (tokenId: string) => Promise<boolean>;
 }
@@ -38,7 +38,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   const [mintPrice, setMintPrice] = useState('');
   const [burnPrice, setBurnPrice] = useState('');
   const [ownedTokenIds, setOwnedTokenIds] = useState<string[]>([]);
-  const [isUserTokensLoading, setIsUserTokensLoading] = useState(false);
+  const [isUserTokenIDsLoading, setIsUserTokenIDsLoading] = useState(false);
   const ownedTokenIdsRef = useRef<string[]>([]);
 
   const _updateOwnedTokenIds = (from: string, to: string, tokenId: BigNumber) => {
@@ -131,10 +131,10 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const _queryTokenIds = async (contract: Contract, walletAddress: string) => {
-    setIsUserTokensLoading(true);
+    setIsUserTokenIDsLoading(true);
     ownedTokenIdsRef.current = await queryTokenIds(contract, walletAddress);
     setOwnedTokenIds([...ownedTokenIdsRef.current]);
-    setIsUserTokensLoading(false);
+    setIsUserTokenIDsLoading(false);
   };
 
   const _setup = async (contract: Contract | null) => {
@@ -193,7 +193,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
         mintPrice,
         burnPrice,
         ownedTokenIds,
-        isUserTokensLoading,
+        isUserTokenIDsLoading,
         mint,
         burn,
       }}
