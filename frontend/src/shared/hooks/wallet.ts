@@ -113,7 +113,9 @@ export const useWallet = () => {
       } else {
         walletProvider.logout();
       }
-    } catch (e) {}
+    } catch (e) {
+      console.log('logout failed:', e);
+    }
   };
 
   const connectWallet = async (walletProvider: WalletProvider, needRequest = true): Promise<ConnectWalletResponse> => {
