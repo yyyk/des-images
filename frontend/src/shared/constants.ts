@@ -28,6 +28,3 @@ export const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS ?? '';
 export const ETH_NETWORK = process.env.REACT_APP_ETH_NETWORK ?? '';
 
 export const APP_LOGO_URL = 'https://desimages.xyz/logo512.png';
-export const ETH_MAINNET_JSONRPC_URL = process.env.REACT_APP_ETH_MAINNET_JSONRPC_URL ?? '';
-export const ETH_RINKEBY_JSONRPC_URL = process.env.REACT_APP_ETH_RINKEBY_JSONRPC_URL ?? '';
-export const HARDHAT_JSONRPC_URL = 'http://127.0.0.1:8545/';

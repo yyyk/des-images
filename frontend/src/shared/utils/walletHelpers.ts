@@ -2,9 +2,8 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import Portis from '@portis/web3';
 import Authereum from 'authereum';
 import Fortmatic from 'fortmatic';
-import { ETH_MAINNET_JSONRPC_URL, ETH_NETWORK, ETH_RINKEBY_JSONRPC_URL } from 'src/shared/constants';
+import { ETH_NETWORK } from 'src/shared/constants';
 import {
-  CHAIN_ID,
   CHAIN_NAME,
   ConnectWalletResponse,
   ERROR_TYPE,
@@ -89,10 +88,6 @@ export function createWalletConnectProvider(): WalletProvider | null {
     return null;
   }
   const provider = new WalletConnectProvider({
-    // rpc: {
-    //   [parseInt(CHAIN_ID.MAIN_NET)]: ETH_MAINNET_JSONRPC_URL,
-    //   [parseInt(CHAIN_ID.RINKEBY)]: ETH_RINKEBY_JSONRPC_URL,
-    // },
     infuraId,
   });
   return {
