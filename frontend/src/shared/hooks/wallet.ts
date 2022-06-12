@@ -92,21 +92,26 @@ export const useWallet = () => {
   };
 
   const logoutWallet = async (walletProvider: WalletProvider): Promise<void> => {
-    if (!walletProvider.canLogout) {
+    if (!walletProvider.logout) {
       return;
     }
     try {
-      if (isWalletConnect(walletProvider)) {
-        (walletProvider?.provider as WalletConnectProvider)?.disconnect();
-      }
-      if (isWalletPortis(walletProvider)) {
-        (walletProvider.provider as any)?._portis?.logout();
-      }
-      if (isWalletAuthereum(walletProvider)) {
-        (walletProvider.provider as any)?.disable();
-      }
+      // if (isWalletConnect(walletProvider)) {
+      //   (walletProvider?.provider as WalletConnectProvider)?.disconnect();
+      // }
+      // if (isWalletPortis(walletProvider)) {
+      //   (walletProvider.provider as any)?._portis?.logout();
+      // }
+      // if (isWalletAuthereum(walletProvider)) {
+      //   (walletProvider.provider as any)?.disable();
+      // }
+      // if (isWalletFortmatic(walletProvider)) {
+      //   await (walletProvider.provider as any)?.fm?.user?.logout();
+      // }
       if (isWalletFortmatic(walletProvider)) {
-        await (walletProvider.provider as any)?.fm?.user?.logout();
+        await walletProvider.logout();
+      } else {
+        walletProvider.logout();
       }
     } catch (e) {}
   };
@@ -186,7 +191,7 @@ export const useWallet = () => {
         localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, walletProvider.type);
         setWalletAddress(userAddress);
         setWalletProvider(walletProvider);
-        setCanLogout(walletProvider.canLogout);
+        setCanLogout(!!walletProvider.logout);
         setSigner(signer);
         return { success: true };
       }

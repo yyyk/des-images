@@ -29,8 +29,7 @@ export interface WalletProvider {
   type: WALLET_TYPE;
   name: WALLET_NAME;
   provider: Provider;
-  canLogout: boolean;
-  // logout?: () => void;
+  logout?: () => Promise<void> | void;
 }
 
 // export type ChainName = 'mainnet' | 'rinkeby' | 'ropsten' | 'localhost' | 'hardhat';
