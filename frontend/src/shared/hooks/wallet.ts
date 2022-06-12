@@ -20,6 +20,7 @@ export const useWallet = () => {
   const [walletProvider, setWalletProvider] = useState<WalletProvider | null>(null);
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner | null>(null);
   const [isInvalidChainId, setIsInvalidChainId] = useState(false);
+  const [canLogout, setCanLogout] = useState(false);
 
   useEffectOnce(() => {
     const providers = getProviders();
@@ -85,11 +86,15 @@ export const useWallet = () => {
     setWalletAddress('');
     setSigner(null);
     setWalletProvider(null);
+    setCanLogout(false);
     setProviders(getProviders());
     setIsInvalidChainId(false);
   };
 
   const logoutWallet = async (walletProvider: WalletProvider): Promise<void> => {
+    if (!walletProvider.canLogout) {
+      return;
+    }
     try {
       if (isWalletConnect(walletProvider)) {
         (walletProvider?.provider as WalletConnectProvider)?.disconnect();
@@ -181,6 +186,7 @@ export const useWallet = () => {
         localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, walletProvider.type);
         setWalletAddress(userAddress);
         setWalletProvider(walletProvider);
+        setCanLogout(walletProvider.canLogout);
         setSigner(signer);
         return { success: true };
       }
@@ -199,8 +205,11 @@ export const useWallet = () => {
   return {
     isInvalidChainId,
     walletAddress,
+    walletProvider,
     providers,
     signer,
+    canLogout,
     connectWallet,
+    logoutWallet,
   };
 };

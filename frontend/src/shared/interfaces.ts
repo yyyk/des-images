@@ -29,6 +29,7 @@ export interface WalletProvider {
   type: WALLET_TYPE;
   name: WALLET_NAME;
   provider: Provider;
+  canLogout: boolean;
   // logout?: () => void;
 }
 

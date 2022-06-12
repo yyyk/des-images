@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useWalletContext } from 'src/shared/contexts/wallet';
 import WalletModal from 'src/shared/components/walletModal';
+import LogoutModal from 'src/shared/components/logoutModal';
 
 const HomeLink = () => (
   <Link className="block font-extrabold text-inherit no-underline hover:underline" to="/">
@@ -23,7 +24,7 @@ const ModBadgeLink = ({ toCatalog }: { toCatalog: boolean }) => (
 
 const CatalogLink = () => (
   <>
-    <Link className="btn btn-square w-[36px] h-[36px] min-h-[36px] ml-auto flex sm:hidden" to="/catalog">
+    <Link className="btn btn-square w-[36px] h-[36px] min-h-[36px] flex sm:hidden" to="/catalog">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="h-5 w-5"
@@ -39,7 +40,7 @@ const CatalogLink = () => (
         />
       </svg>
     </Link>
-    <Link className="btn btn-md ml-auto hidden sm:flex" to="/catalog">
+    <Link className="btn btn-md hidden sm:flex" to="/catalog">
       to the catalog
     </Link>
   </>
@@ -49,10 +50,7 @@ const GoBackButton = () => {
   const navigate = useNavigate();
   return (
     <>
-      <button
-        className="btn btn-square w-[36px] h-[36px] min-h-[36px] ml-auto flex sm:hidden"
-        onClick={() => navigate(-1)}
-      >
+      <button className="btn btn-square w-[36px] h-[36px] min-h-[36px] flex sm:hidden" onClick={() => navigate(-1)}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-5 w-5"
@@ -64,7 +62,7 @@ const GoBackButton = () => {
           <path strokeLinecap="round" strokeLinejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
         </svg>
       </button>
-      <button className="btn btn-md ml-auto hidden sm:flex" onClick={() => navigate(-1)}>
+      <button className="btn btn-md hidden sm:flex" onClick={() => navigate(-1)}>
         go back
       </button>
     </>
@@ -72,11 +70,39 @@ const GoBackButton = () => {
 };
 
 const WalletAddress = () => {
-  const { walletAddress } = useWalletContext();
+  const { walletAddress, canLogout } = useWalletContext();
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const handleClick = () => {
+    setLogoutModalOpen(true);
+  };
   return (
-    <span className="hidden sm:inline ml-auto">{`Connected: ${String(walletAddress).substring(0, 6)}...${String(
-      walletAddress,
-    ).substring(38)}`}</span>
+    <>
+      <span className={`hidden sm:inline ${canLogout ? 'mr-1' : ''}`}>{`Connected: ${String(walletAddress).substring(
+        0,
+        6,
+      )}...${String(walletAddress).substring(38)}`}</span>
+      {canLogout && (
+        <>
+          <button className="w-auto h-[36px] min-h-[36px]" onClick={handleClick}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
+            </svg>
+          </button>
+          <LogoutModal open={logoutModalOpen} onClose={() => setLogoutModalOpen(false)} />
+        </>
+      )}
+    </>
   );
 };
 
@@ -88,7 +114,7 @@ const ConnectWalletButton = () => {
   return (
     <>
       <>
-        <button className="btn btn-square w-[36px] h-[36px] min-h-[36px] ml-auto flex sm:hidden" onClick={handleClick}>
+        <button className="btn btn-square w-[36px] h-[36px] min-h-[36px] flex sm:hidden" onClick={handleClick}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"
@@ -104,7 +130,7 @@ const ConnectWalletButton = () => {
             />
           </svg>
         </button>
-        <button className="btn btn-md ml-auto hidden sm:flex" onClick={handleClick}>
+        <button className="btn btn-md hidden sm:flex" onClick={handleClick}>
           Connect Wallet
         </button>
         <WalletModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
@@ -137,9 +163,11 @@ const Header = () => {
           )}
         </div>
       </div>
-      {pathname === '/' && <CatalogLink />}
-      {pathname === '/mod' && isPrevPathCatalog && <GoBackButton />}
-      {pathname === '/catalog' && (walletAddress?.length ? <WalletAddress /> : <ConnectWalletButton />)}
+      <div className="flex items-center">
+        {pathname === '/' && <CatalogLink />}
+        {pathname === '/mod' && isPrevPathCatalog && <GoBackButton />}
+        {pathname === '/catalog' && (walletAddress?.length ? <WalletAddress /> : <ConnectWalletButton />)}
+      </div>
     </header>
   );
 };

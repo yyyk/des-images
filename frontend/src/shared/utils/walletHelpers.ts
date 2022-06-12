@@ -56,6 +56,7 @@ export function createMetaMaskProvider(provider: Provider): WalletProvider {
     type: WALLET_TYPE.METAMASK,
     name: WALLET_NAME.METAMASK,
     provider,
+    canLogout: false,
   };
 }
 
@@ -64,6 +65,7 @@ export function createBraveWalletProvider(provider: Provider): WalletProvider {
     type: WALLET_TYPE.BRAVE,
     name: WALLET_NAME.BRAVE,
     provider,
+    canLogout: false,
   };
 }
 
@@ -72,6 +74,7 @@ export function createOperaWalletProvider(provider: Provider): WalletProvider {
     type: WALLET_TYPE.OPERA,
     name: WALLET_NAME.OPERA,
     provider,
+    canLogout: false,
   };
 }
 
@@ -80,6 +83,7 @@ export function createCoinbaseWalletProvider(provider: Provider): WalletProvider
     type: WALLET_TYPE.COINBASE,
     name: WALLET_NAME.COINBASE,
     provider,
+    canLogout: false,
   };
 }
 
@@ -93,6 +97,7 @@ export function createWalletConnectProvider(): WalletProvider {
         [parseInt(CHAIN_ID.RINKEBY)]: ETH_RINKEBY_JSONRPC_URL,
       },
     }),
+    canLogout: true,
   };
 }
 
@@ -111,6 +116,7 @@ export function createPortisProvider(): WalletProvider | null {
       type: WALLET_TYPE.PORTIS,
       name: WALLET_NAME.PORTIS,
       provider,
+      canLogout: true,
     };
   } catch (e) {
     return null;
@@ -131,6 +137,7 @@ export function createAuthereumProvider(): WalletProvider | null {
       type: WALLET_TYPE.AUTHEREUM,
       name: WALLET_NAME.AUTHEREUM,
       provider,
+      canLogout: true,
     };
   } catch (e) {
     return null;
@@ -158,6 +165,7 @@ export function createFortmaticProvider(): WalletProvider | null {
       type: WALLET_TYPE.FORTMATIC,
       name: WALLET_NAME.FORTMATIC,
       provider,
+      canLogout: true,
     };
   } catch (e) {
     return null;
