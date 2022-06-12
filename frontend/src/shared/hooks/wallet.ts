@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import WalletConnectProvider from '@walletconnect/web3-provider';
 import { ETH_NETWORK, LOCAL_STORAGE_WALLET_KEY } from 'src/shared/constants';
 import { CHAIN_ID, CHAIN_NAME, ConnectWalletResponse, ERROR_TYPE, WalletProvider } from 'src/shared/interfaces';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import {
   createErrorResponse,
-  createWalletConnectProvider,
   getProviders,
   isWalletAuthereum,
   isWalletConnect,
@@ -67,7 +65,7 @@ export const useWallet = () => {
         console.log(walletProvider);
         walletProvider && connectWallet(walletProvider);
       } else {
-        await _handleDisconnect(walletProvider)();
+        await logoutWallet(walletProvider);
       }
     };
 
@@ -92,21 +90,9 @@ export const useWallet = () => {
     setIsInvalidChainId(false);
   };
 
-  const logoutWallet = async (walletProvider: WalletProvider | null, resetState: boolean = true): Promise<void> => {
+  const logoutWallet = async (walletProvider: WalletProvider | null): Promise<void> => {
     if (walletProvider?.logout) {
       try {
-        // if (isWalletConnect(walletProvider)) {
-        //   (walletProvider?.provider as WalletConnectProvider)?.disconnect();
-        // }
-        // if (isWalletPortis(walletProvider)) {
-        //   (walletProvider.provider as any)?._portis?.logout();
-        // }
-        // if (isWalletAuthereum(walletProvider)) {
-        //   (walletProvider.provider as any)?.disable();
-        // }
-        // if (isWalletFortmatic(walletProvider)) {
-        //   await (walletProvider.provider as any)?.fm?.user?.logout();
-        // }
         if (isWalletFortmatic(walletProvider)) {
           await walletProvider.logout();
         } else {
@@ -116,7 +102,7 @@ export const useWallet = () => {
         console.log('logout failed:', e);
       }
     }
-    resetState && _resetState();
+    _resetState();
   };
 
   const connectWallet = async (walletProvider: WalletProvider, needRequest = true): Promise<ConnectWalletResponse> => {
@@ -127,13 +113,7 @@ export const useWallet = () => {
       try {
         await (walletProvider?.provider as any)?.enable();
       } catch (err: any) {
-        await logoutWallet(walletProvider, false);
-        if (isWalletConnect(walletProvider)) {
-          const index = providers.findIndex(isWalletConnect);
-          if (index >= 0) {
-            setProviders([...providers.slice(0, index), createWalletConnectProvider(), ...providers.slice(index + 1)]);
-          }
-        }
+        await logoutWallet(walletProvider);
         return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
       }
     }
@@ -145,12 +125,11 @@ export const useWallet = () => {
           throw new Error('Failed to login to Fortmatic');
         }
       } catch (err: any) {
-        await logoutWallet(walletProvider, false);
+        await logoutWallet(walletProvider);
         return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
       }
     }
     let error: ConnectWalletResponse | undefined = undefined;
-    const handleDisconnect = _handleDisconnect(walletProvider);
     try {
       if (
         !isWalletConnect(walletProvider) &&
@@ -184,7 +163,7 @@ export const useWallet = () => {
           chainId !== CHAIN_ID.MAIN_NET &&
           chainId !== parseInt(CHAIN_ID.MAIN_NET))
       ) {
-        await handleDisconnect();
+        await logoutWallet(walletProvider);
         setIsInvalidChainId(true);
         setWalletProvider(walletProvider);
         return createErrorResponse(ERROR_TYPE.INVALID_CHAIN_ID, 'Invalid Chain ID');
@@ -206,7 +185,7 @@ export const useWallet = () => {
       );
     }
     // console.log('error', error);
-    await handleDisconnect();
+    await logoutWallet(walletProvider);
     return error;
   };
 
