@@ -13,14 +13,12 @@ error DesImages__InvalidDate();
 error DesImages__FutureDate();
 error DesImages__NotEnoughETHSent();
 error DesImages__TokenNotForSale();
-// error DesImages__TokenNotForBurn();
 error DesImages__TokenNotOwned();
 error DesImages__CreatorTransferFail();
 error DesImages__OwnerTransferFail();
 
 /// @title DesImages
-/// @author
-/// @notice
+/// @author yyyk
 contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
     enum Status {
         FOR_SALE,
@@ -73,9 +71,8 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
         _;
     }
 
-    /// @notice Multiplies 2 numbers together
-    /// @param date_ the first uint.
-    /// @dev This function does not currently check
+    /// @notice validity of 2020-01-01~9999-12-31
+    /// @param date_ uint32 0xYYYYMDD
     modifier validDate(uint32 date_) {
         uint8 day = uint8(date_ & 0xff);
         uint8 month = uint8((date_ >> 8) & 0xf);
@@ -116,25 +113,17 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
         emit UnPaused();
     }
 
-    /// @notice Multiplies 2 numbers together
-    /// @param tokenId_ the second uint.
-    /// @return Status the product of (x * y)
-    /// @dev This function does not currently check
     function getTokenStatus(uint256 tokenId_) external view returns (Status) {
         return _tokenValues[tokenId_].status;
     }
 
-    /// @notice Multiplies 2 numbers together
-    /// @return uint256 the product of (x * y)
-    /// @dev This function does not currently check
+    /// @notice maths is done based on linear bonding curve
     function currentMintPrice() public view returns (uint256) {
         uint256 _totalSupply = totalSupply;
         return INITIAL_PRICE + _totalSupply * LINEAR_COEFFICIENT;
     }
 
-    /// @notice Multiplies 2 numbers together
-    /// @return uint256 the product of (x * y)
-    /// @dev This function does not currently check
+    /// @notice reserve cut of last mint price
     function currentBurnReward() public view returns (uint256) {
         uint256 _currentMintPrice = currentMintPrice();
         return _getReserveCut(_currentMintPrice - LINEAR_COEFFICIENT);
@@ -152,9 +141,9 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
         return uint256(keccak256(abi.encodePacked(date_, ciphertext_)));
     }
 
-    /// @notice Multiplies 2 numbers together
-    /// @param tokenId_ the first uint.
-    /// @return uint256 the product of (x * y)
+    /// @notice base64 encoded svg is used for image value
+    /// @param tokenId_ the token id
+    /// @return string the base64 encoded json string
     /// @dev See {IERC721Metadata-tokenURI}.
     function tokenURI(uint256 tokenId_)
         public
@@ -172,14 +161,11 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
             TokenURI.generateTokenURI(tokenValue.date, tokenValue.ciphertext);
     }
 
-    /* TODO: more description
-     * This allows to mint 'hacks' intentionally.
-     */
-    /// @notice Multiplies 2 numbers together
-    /// @param date_ the first uint.
-    /// @param ciphertext_ the first uint.
-    /// @return uint256 the product of (x * y)
-    /// @dev See {IERC721Metadata-tokenURI}.
+    /// @notice Mints a token. ciphertext_ can be any value as long as it's uint128 value.
+    ///         This is intended to allow mods with various plaintexts, instead of the official 'i am still alive'.
+    /// @param date_ the date key as 0xYYYYMDD
+    /// @param ciphertext_ the cipher text in 0xVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+    /// @return uint256 the token id
     function mint(uint32 date_, uint128 ciphertext_)
         external
         payable
@@ -228,17 +214,11 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
         return tokenId;
     }
 
-    /// @notice Multiplies 2 numbers together
-    /// @param tokenId_ the first uint.
-    /// @dev See {IERC721Metadata-tokenURI}.
+    /// @notice Burns a token
     function burn(uint256 tokenId_) external nonReentrant {
         if (msg.sender != ERC721.ownerOf(tokenId_)) {
             revert DesImages__TokenNotOwned();
         }
-        // TokenValue storage tokenValue = _tokenValues[tokenId_];
-        // if (tokenValue.status != Status.MINTED) {
-        //     revert DesImages__TokenNotForBurn();
-        // }
         uint256 burnReward = currentBurnReward();
         ERC721._burn(tokenId_);
         _tokenValues[tokenId_].status = Status.BURNED;
