@@ -99,7 +99,7 @@ const ModPreviewForm = ({
             <KeyLabel />
           </div>
           <DateInput
-            classNames="rounded-r-none"
+            classNames="relative sm:rounded-r-none sm:border-r-0 sm:focus:z-10"
             defaultValue={defaultDate}
             showLabel={false}
             onChange={(value) => setDate(value)}
@@ -110,14 +110,14 @@ const ModPreviewForm = ({
             <TypeSelect showHint={showHint} onChange={(value) => setTextType(value)} />
           </div>
           <TextInput
-            classNames="sm:rounded-l-none sm:rounded-r-none sm:border-x-0"
+            classNames="relative sm:rounded-l-none sm:rounded-r-none sm:border-r-0 sm:focus:border-r sm:focus:z-10"
             defaultValue={{ plaintext: defaultPlaintext, ciphertext: defaultCiphertext }}
             textType={textType}
             onChange={handleTextInputOnChange}
           />
         </div>
         <button
-          className={`btn w-full sm:w-2/12 mt-2 sm:mt-0 sm:rounded-l-none ${isLoading ? 'loading' : ''}`}
+          className={`relative btn w-full sm:w-2/12 mt-2 sm:mt-0 sm:rounded-l-none ${isLoading ? 'loading' : ''}`}
           type="submit"
           disabled={
             isLoading ||

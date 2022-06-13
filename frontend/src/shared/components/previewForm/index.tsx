@@ -27,12 +27,16 @@ const PreviewForm = ({
     <form onSubmit={handleOnPreview} className="flex justify-start items-end">
       <div className="grow">
         <DateInput
-          classNames="rounded-r-none border-r-0"
+          classNames="relative rounded-r-none border-r-0 focus:border-r focus:z-10"
           defaultValue={defaultValue}
           onChange={(value) => setDate(value)}
         />
       </div>
-      <button className={`btn rounded-l-none ${isLoading ? 'loading' : ''}`} type="submit" disabled={isLoading}>
+      <button
+        className={`relative btn rounded-l-none ${isLoading ? 'loading' : ''}`}
+        type="submit"
+        disabled={isLoading}
+      >
         Preview
       </button>
     </form>
