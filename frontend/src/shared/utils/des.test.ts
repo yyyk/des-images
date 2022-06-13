@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { generateDateString, encrypt } from './des';
+import { generateDateString, encrypt } from 'src/shared/utils/des';
 
 function _encrypt(year: number, month: number, date: number, plaintext: string = 'i am still alive'): string {
   const algorithm = 'des-ecb';
@@ -40,6 +40,18 @@ describe('encrypt', function () {
 
     expect(encrypt('20201203')).toEqual(_encrypt(2020, 12, 3));
     expect(encrypt('20201203')).toEqual(_encrypt(2021, 12, 3)); // key clustering
+
+    for (let month = 1; month <= 12; month++) {
+      for (let day = 1; day <= 31; day++) {
+        const m = month.toString().padStart(2, '0');
+        const d = day.toString().padStart(2, '0');
+        expect(encrypt(`2020${m}${d}`)).toEqual(_encrypt(2020, month, day));
+        expect(encrypt(`2021${m}${d}`)).toEqual(_encrypt(2021, month, day));
+        expect(encrypt(`2022${m}${d}`)).toEqual(_encrypt(2022, month, day));
+
+        expect(encrypt(`2020${m}${d}`, plaintext)).toEqual(_encrypt(2020, month, day, plaintext));
+      }
+    }
 
     // console.log(_decrypt('20200101', '00112233445566778899aabbccddeeff'));
   });

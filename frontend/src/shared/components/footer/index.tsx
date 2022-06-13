@@ -26,11 +26,6 @@ const Footer = () => {
           <ExternalLink href="https://twitter.com/_y_y_y_k_">twitter</ExternalLink>
         </li>
       </ul>
-      {/* <p className="mx-auto my-2 text-center">
-        <ExternalLink href={etherscanUrl}>
-          @{CONTRACT_ADDRESS}
-        </ExternalLink>
-      </p> */}
     </footer>
   );
 };
