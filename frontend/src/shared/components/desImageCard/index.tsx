@@ -22,7 +22,7 @@ const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () 
         </button>
       }
     >
-      <p className="mt-0 mb-0">Notes:</p>
+      <h5 className="mt-0 mb-0">Notes:</h5>
       <ul>
         <li>
           The smart contract is <strong>unaudited</strong>, though it's written with extra care.{' '}
