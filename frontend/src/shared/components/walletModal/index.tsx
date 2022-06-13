@@ -1,39 +1,9 @@
 import { MouseEvent } from 'react';
 import { useWalletContext } from 'src/shared/contexts/wallet';
-import { ERROR_TYPE, NOTIFICATION_TYPE, WalletProvider, WALLET_TYPE } from 'src/shared/interfaces';
+import { ERROR_TYPE, NOTIFICATION_TYPE, WalletProvider } from 'src/shared/interfaces';
 import { useNotificationContext } from 'src/shared/contexts/notification';
 import Modal from 'src/shared/components/modal';
-import MetaMaskLogo from 'src/shared/components/logos/metamask';
-import CoinbaseWalletLogo from 'src/shared/components/logos/coinbaseWallet';
-import WalletConnectLogo from 'src/shared/components/logos/walletConnect';
-import BraveLogo from 'src/shared/components/logos/brave';
-import OperaLogo from 'src/shared/components/logos/opera';
-import PortisLogo from 'src/shared/components/logos/portis';
-import AuthereumLogo from 'src/shared/components/logos/authereum';
-import FortmaticLogo from 'src/shared/components/logos/fortmatic';
-
-const Logo = ({ type }: { type: WALLET_TYPE }) => {
-  switch (type) {
-    case WALLET_TYPE.METAMASK:
-      return <MetaMaskLogo />;
-    case WALLET_TYPE.BRAVE:
-      return <BraveLogo />;
-    case WALLET_TYPE.OPERA:
-      return <OperaLogo />;
-    case WALLET_TYPE.COINBASE:
-      return <CoinbaseWalletLogo />;
-    case WALLET_TYPE.PORTIS:
-      return <PortisLogo />;
-    case WALLET_TYPE.AUTHEREUM:
-      return <AuthereumLogo />;
-    case WALLET_TYPE.FORTMATIC:
-      return <FortmaticLogo />;
-    case WALLET_TYPE.WALLET_CONNECT:
-      return <WalletConnectLogo />;
-    default:
-      return null;
-  }
-};
+import Logo from 'src/shared/components/logo';
 
 interface WalletModalProps {
   open: boolean;
