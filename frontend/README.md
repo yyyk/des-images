@@ -71,5 +71,5 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 ### TODOs
 
-- tests
-- test wallet connect, metamask in brave and opera
+- test wallet (fortmatic, authereum)
+- date input accessibility
