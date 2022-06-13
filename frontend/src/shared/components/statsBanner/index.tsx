@@ -1,6 +1,6 @@
 import { CSSProperties, useEffect, useRef, useState } from 'react';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
-import { useContractContext } from '../contexts/contract';
+import { useContractContext } from 'src/shared/contexts/contract';
 
 const Stats = ({
   totalEverMinted,
