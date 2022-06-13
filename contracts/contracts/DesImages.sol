@@ -164,7 +164,7 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
     /// @notice Mints a token. ciphertext_ can be any value as long as it's uint128 value.
     ///         This is intended to allow mods with various plaintexts, instead of the official 'i am still alive'.
     /// @param date_ the date key as 0xYYYYMDD
-    /// @param ciphertext_ the cipher text in 0xVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+    /// @param ciphertext_ the cipher text in 0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     /// @return uint256 the token id
     function mint(uint32 date_, uint128 ciphertext_)
         external
