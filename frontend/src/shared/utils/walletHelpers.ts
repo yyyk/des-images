@@ -176,35 +176,34 @@ export function createFortmaticProvider(): WalletProvider | null {
 // frame?
 export function getProviders(): WalletProvider[] {
   const providers = [];
+
   // MetaMask
   const metaMaskProvider = getInjectedProvider('isMetaMask');
   if (metaMaskProvider?.length) {
-    metaMaskProvider.forEach((provider) => {
-      if (!(provider as any)?.isBraveWallet && !(provider as any)?.isWalletLink) {
-        // MetaMask
-        providers.push(createMetaMaskProvider(provider));
-      } else if ((provider as any)?.isBraveWallet && !(provider as any)?.isWalletLink) {
-        // Brave
-        providers.push(createBraveWalletProvider(provider));
-      }
-    });
-  } else {
-    // Brave
-    const braveWalletProvider = getInjectedProvider('isBraveWallet');
-    if (braveWalletProvider?.length) {
-      providers.push(createBraveWalletProvider(braveWalletProvider[0]));
-    }
+    const index = metaMaskProvider.findIndex(
+      (provider) => !(provider as any)?.isBraveWallet && !(provider as any)?.isWalletLink,
+    );
+    index > -1 && providers.push(createMetaMaskProvider(metaMaskProvider[index]));
   }
+
+  // Brave
+  const braveWalletProvider = getInjectedProvider('isBraveWallet');
+  if (braveWalletProvider?.length) {
+    providers.push(createBraveWalletProvider(braveWalletProvider[0]));
+  }
+
   // Opera
   const operaProvider = getInjectedProvider('isOpera');
   if (operaProvider?.length) {
     providers.push(createOperaWalletProvider(operaProvider[0]));
   }
+
   // Coinbase Wallet
   const coinbaseProvider = getInjectedProvider('isWalletLink');
   if (coinbaseProvider?.length) {
     providers.push(createCoinbaseWalletProvider(coinbaseProvider[0]));
   }
+
   // Authereum
   const authereumProvider = createAuthereumProvider();
   authereumProvider && providers.push(authereumProvider);
