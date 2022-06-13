@@ -13,9 +13,9 @@ const Footer = () => {
   return (
     <footer className="w-full mx-auto mt-0 mb-4 p-0">
       <ul className="list-none p-0 m-0 flex justify-center">
-        <li className="my-0 mx-3 p-0 tooltip tooltip-top" data-tip="coming soon!">
+        {/* <li className="my-0 mx-3 p-0 tooltip tooltip-top" data-tip="coming soon!">
           discord
-        </li>
+        </li> */}
         <li className="my-0 mx-3 p-0">
           <ExternalLink href={etherscanUrl}>etherscan</ExternalLink>
         </li>

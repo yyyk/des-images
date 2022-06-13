@@ -30,7 +30,7 @@ const DateInput = ({ showLabel = true, defaultValue, classNames = '', onChange }
   return (
     <>
       {showLabel && (
-        <label className="label" htmlFor="">
+        <label className="label" htmlFor="" data-testid="date-input__label">
           <span className="label-text">choose a date</span>
         </label>
       )}
@@ -43,6 +43,7 @@ const DateInput = ({ showLabel = true, defaultValue, classNames = '', onChange }
           readOnly
           value={date}
           onClick={() => dateInputRef?.current?.focus()}
+          data-testid="date-input__text-input"
         />
         <input
           ref={dateInputRef}
@@ -54,6 +55,7 @@ const DateInput = ({ showLabel = true, defaultValue, classNames = '', onChange }
           min={DEFAULT_MIN_DATE}
           max={maxDate}
           onChange={handleOnChange}
+          data-testid="date-input__date-input"
         />
       </div>
     </>

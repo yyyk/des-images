@@ -33,7 +33,7 @@ describe('<DesImageSvg>', function () {
   it('has 16 rect tags with fill set based on ciphertext', function () {
     const view = render(<DesImageSvg date={date} ciphertext={ciphertext} />);
     const rects = view.container.getElementsByTagName('rect');
-    expect(rects.length).toEqual(16);
+    expect(rects).toHaveLength(16);
 
     for (let i = 0; i < 16; i++) {
       expect(rects[i].getAttribute('fill')).toEqual(fills[i]);

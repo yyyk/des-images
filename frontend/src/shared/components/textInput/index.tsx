@@ -96,9 +96,9 @@ const TextInput = ({
         value={textType === TextType.PLAINTEXT ? text.plaintextRaw : text.ciphertext}
         onChange={handleTextInputOnChange}
       />
-      <label className="label">
+      <div className="label">
         <span className="label-text-alt">{hintText}</span>
-      </label>
+      </div>
     </>
   );
 };

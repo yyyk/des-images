@@ -6,7 +6,7 @@ import Footer from '.';
 describe('<Footer>', function () {
   it('has footer tag', function () {
     const view = render(<Footer />);
-    expect(view.container.getElementsByTagName('footer').length).toEqual(1);
+    expect(view.container.getElementsByTagName('footer')).toHaveLength(1);
   });
 
   it('has a list of links', function () {
