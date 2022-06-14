@@ -53,32 +53,45 @@ interface DesImageCardProps {
   tokenData: TokenData;
   showPlaintext?: boolean;
   showCiphertext?: boolean;
+  showStatus?: boolean;
   onRemove?: () => void;
-  onMint?: (result: boolean) => void;
-  onBurn?: (result: boolean) => void;
+  onMint?: (tokenData: TokenData) => void | Promise<void>;
+  onBurn?: (tokenData: TokenData) => void | Promise<void>;
 }
 
 const DesImageCard = ({
   tokenData,
   showPlaintext = false,
   showCiphertext = false,
+  showStatus = false,
   onRemove,
   onMint,
   onBurn,
 }: DesImageCardProps) => {
   const { theme } = useThemeContext();
   const { walletAddress } = useWalletContext();
-  const { isPaused, mint, burn } = useContractContext();
+  const { isPaused } = useContractContext();
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const date = `#${tokenData.year}${String(tokenData.month).padStart(2, '0')}${String(tokenData.day).padStart(2, '0')}`;
   const { status, isOwner } = tokenData;
+  const showMintButton = onMint && status === TOKEN_STATUS.FOR_SALE;
+  const showBurnButton = onBurn && isOwner && status === TOKEN_STATUS.MINTED;
 
   const handleOnSubmit = async () => {
-    if (walletAddress && tokenData) {
+    if (walletAddress && tokenData && onMint) {
       setIsLoading(true);
-      const res = await mint(tokenData.dateHex, tokenData.ciphertext);
-      onMint && onMint(res);
+      const res = onMint(tokenData);
+      if (res?.then) {
+        res
+          .then(() => {
+            setIsLoading(false);
+          })
+          .catch(() => {
+            setIsLoading(false);
+          });
+        return;
+      }
       setIsLoading(false);
     }
   };
@@ -92,10 +105,19 @@ const DesImageCard = ({
 
   const handleOnBurn = async (e: MouseEvent) => {
     e.preventDefault();
-    if (walletAddress && tokenData && tokenData.tokenId) {
+    if (walletAddress && tokenData && tokenData.tokenId && onBurn) {
       setIsLoading(true);
-      const res = await burn(tokenData.tokenId);
-      onBurn && onBurn(res);
+      const res = onBurn(tokenData);
+      if (res?.then) {
+        res
+          .then(() => {
+            setIsLoading(false);
+          })
+          .catch(() => {
+            setIsLoading(false);
+          });
+        return;
+      }
       setIsLoading(false);
     }
   };
@@ -119,6 +141,7 @@ const DesImageCard = ({
             <button
               className="absolute btn btn-square btn-sm !w-[28px] !h-[28px] !min-h-[28px] right-3 sm:right-4 top-3 sm:top-4"
               onClick={handleRemove}
+              data-testid="desImagesCard__cta-remove"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -131,23 +154,33 @@ const DesImageCard = ({
               </svg>
             </button>
           )}
-          {onMint && isNil(status) && (
-            <div className="badge badge-md badge-outline mb-1">
+          {showStatus && isNil(status) && (
+            <div className="badge badge-md badge-outline mb-1" data-testid="desImagesCard__status-badge">
               {status === TOKEN_STATUS.MINTED ? 'Minted' : status === TOKEN_STATUS.BURNED ? 'Burned' : 'Available'}
             </div>
           )}
-          <h2 className="card-title !mt-0 !mb-1 sm:!mb-0 !gap-0">{date}</h2>
-          {showCiphertext && (
+          <h2 className="card-title !mt-0 !mb-1 sm:!mb-0.5 !gap-0">{date}</h2>
+          {showCiphertext && tokenData?.ciphertext && (
             <code
               className={`w-full overflow-hidden text-ellipsis font-normal opacity-60 p-0 m-0 mt-0 ${
                 showPlaintext ? 'mb-1 sm:mb-0.5' : 'mb-2'
               }`}
+              data-testid="desImagesCard__ciphertext"
             >
               {tokenData.ciphertext}
             </code>
           )}
-          {showPlaintext && <p className="w-full overflow-hidden text-ellipsis m-0 mb-2">{tokenData.plaintext}</p>}
-          {onMint && status === TOKEN_STATUS.FOR_SALE && (
+          {showPlaintext && tokenData?.plaintext && (
+            <p
+              className={`w-full overflow-hidden text-ellipsis m-0 ${
+                showMintButton || showBurnButton ? 'mb-3' : 'mb-2'
+              }`}
+              data-testid="desImagesCard__plaintext"
+            >
+              {tokenData.plaintext}
+            </p>
+          )}
+          {showMintButton && (
             <div className="card-actions justify-end">
               <div
                 className={!walletAddress || isPaused ? 'tooltip tooltip-left' : ''}
@@ -157,13 +190,14 @@ const DesImageCard = ({
                   className={`btn px-8 ${isLoading ? 'loading' : ''}`}
                   onClick={handleOnMint}
                   disabled={!walletAddress || isLoading || isPaused}
+                  data-testid="desImagesCard__cta-mint"
                 >
                   Mint
                 </button>
               </div>
             </div>
           )}
-          {onBurn && isOwner && status === TOKEN_STATUS.MINTED && (
+          {showBurnButton && (
             <div className="card-actions justify-end">
               <div
                 className={!walletAddress ? 'tooltip tooltip-left' : ''}
@@ -173,6 +207,7 @@ const DesImageCard = ({
                   className={`btn px-8 ${isLoading ? 'loading' : ''}`}
                   onClick={handleOnBurn}
                   disabled={!walletAddress || isLoading}
+                  data-testid="desImagesCard__cta-burn"
                 >
                   Burn
                 </button>

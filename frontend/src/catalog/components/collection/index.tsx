@@ -1,10 +1,23 @@
-import DesImageCard from 'src/shared/components/desImageCard';
 import { useCatalogContext } from 'src/shared/contexts/catalog';
 import { useContractContext } from 'src/shared/contexts/contract';
+import { useNotificationContext } from 'src/shared/contexts/notification';
+import { NOTIFICATION_TYPE, TokenData } from 'src/shared/interfaces';
+import DesImageCard from 'src/shared/components/desImageCard';
 
 const Collection = () => {
-  const { ownedTokenData, isUserTokensLoading, minted, burned } = useCatalogContext();
-  const { isUserTokenIDsLoading } = useContractContext();
+  const { ownedTokenData, isUserTokensLoading, burned } = useCatalogContext();
+  const { isUserTokenIDsLoading, burn } = useContractContext();
+  const { add: addNotification } = useNotificationContext();
+
+  const handleBurned = async (tokenData: TokenData) => {
+    const res = tokenData?.tokenId ? await burn(tokenData.tokenId) : false;
+    if (!res) {
+      addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Burn failed.' });
+      return;
+    }
+    addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Burned.' });
+    burned(tokenData);
+  };
 
   if (isUserTokensLoading || isUserTokenIDsLoading) {
     return <p className="pt-3 sm:mt-4">Loading...</p>;
@@ -23,12 +36,7 @@ const Collection = () => {
               key={`collection-${data.plaintext?.replace(/\s/g, '-') ?? ''}-${data.dateHex}-${data.ciphertext}`}
               className="w-full m-0 p-0"
             >
-              <DesImageCard
-                tokenData={data}
-                showPlaintext={true}
-                onMint={(res) => res && minted(data)}
-                onBurn={(res) => res && burned(data)}
-              />
+              <DesImageCard tokenData={data} showPlaintext={true} showCiphertext={true} onBurn={handleBurned} />
             </li>
           ))}
         </ul>

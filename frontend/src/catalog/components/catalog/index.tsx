@@ -1,15 +1,17 @@
 import { useRef } from 'react';
 import { useCatalogContext } from 'src/shared/contexts/catalog';
+import { useContractContext } from 'src/shared/contexts/contract';
+import { useNotificationContext } from 'src/shared/contexts/notification';
 import { NOTIFICATION_TYPE, PreviewFormData, TokenData } from 'src/shared/interfaces';
 import { getTokenData } from 'src/shared/utils/tokenDataHelpers';
 import DesImageCard from 'src/shared/components/desImageCard';
 import ModPreviewForm from 'src/shared/components/modPreviewForm';
-import { useNotificationContext } from 'src/shared/contexts/notification';
 
 const Catalog = () => {
+  const { mint, burn } = useContractContext();
   const { tokenData, add, remove, minted, burned } = useCatalogContext();
-  const scrollRef = useRef<HTMLLIElement>(null);
   const { add: addNotification } = useNotificationContext();
+  const scrollRef = useRef<HTMLLIElement>(null);
 
   const handleOnPreview = async ({ year, month, day, plaintext, ciphertext }: PreviewFormData) => {
     const tokenData = getTokenData({ year, month, day, plaintext, ciphertext });
@@ -23,22 +25,24 @@ const Catalog = () => {
     });
   };
 
-  const handleMinted = (data: TokenData) => (res: boolean) => {
+  const handleMinted = async (tokenData: TokenData) => {
+    const res = await mint(tokenData.dateHex, tokenData.ciphertext);
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Mint failed.' });
       return;
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Minted.' });
-    minted(data);
+    minted(tokenData);
   };
 
-  const handleBurned = (data: TokenData) => (res: boolean) => {
+  const handleBurned = async (tokenData: TokenData) => {
+    const res = tokenData?.tokenId ? await burn(tokenData.tokenId) : false;
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Burn failed.' });
       return;
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Burned.' });
-    burned(data);
+    burned(tokenData);
   };
 
   return (
@@ -61,8 +65,9 @@ const Catalog = () => {
               tokenData={data}
               showPlaintext={true}
               showCiphertext={true}
-              onMint={handleMinted(data)}
-              onBurn={handleBurned(data)}
+              showStatus={true}
+              onMint={handleMinted}
+              onBurn={handleBurned}
               onRemove={() => remove(data)}
             />
           </li>
