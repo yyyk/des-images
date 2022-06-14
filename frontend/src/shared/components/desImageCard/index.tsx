@@ -159,7 +159,7 @@ const DesImageCard = ({
               {status === TOKEN_STATUS.MINTED ? 'Minted' : status === TOKEN_STATUS.BURNED ? 'Burned' : 'Available'}
             </div>
           )}
-          <h2 className="card-title !mt-0 !mb-1 sm:!mb-0.5 !gap-0">{date}</h2>
+          <h2 className="card-title !mt-0 !mb-1 !gap-0">{date}</h2>
           {showCiphertext && tokenData?.ciphertext && (
             <code
               className={`w-full overflow-hidden text-ellipsis font-normal opacity-60 p-0 m-0 mt-0 ${

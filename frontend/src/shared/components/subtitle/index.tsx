@@ -29,7 +29,16 @@ const Subtitle = () => {
   return (
     <>
       <h2 className="m-0" data-testid="subtitle__heading">
-        On-chain NFT with{' '}
+        On-chain{' '}
+        <a
+          href="https://creativecommons.org/publicdomain/zero/1.0/"
+          className="font-bold text-inherit"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          CC0
+        </a>{' '}
+        NFT with{' '}
         <button
           className="btn-link btn-active font-bold text-inherit"
           onClick={() => setOpen(true)}
