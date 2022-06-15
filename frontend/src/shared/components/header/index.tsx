@@ -24,7 +24,11 @@ const ModBadgeLink = ({ toCatalog }: { toCatalog: boolean }) => (
 
 const CatalogLink = () => (
   <>
-    <Link className="btn btn-square w-[36px] h-[36px] min-h-[36px] flex sm:hidden" to="/catalog">
+    <Link
+      className="btn btn-square w-[36px] h-[36px] min-h-[36px] flex sm:hidden"
+      to="/catalog"
+      aria-label="to the catalog"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="h-5 w-5"
@@ -50,7 +54,11 @@ const GoBackButton = () => {
   const navigate = useNavigate();
   return (
     <>
-      <button className="btn btn-square w-[36px] h-[36px] min-h-[36px] flex sm:hidden" onClick={() => navigate(-1)}>
+      <button
+        className="btn btn-square w-[36px] h-[36px] min-h-[36px] flex sm:hidden"
+        onClick={() => navigate(-1)}
+        aria-label="go back"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-5 w-5"
@@ -83,7 +91,7 @@ const WalletAddress = () => {
       )}...${String(walletAddress).substring(38)}`}</span>
       {canLogout && (
         <>
-          <button className="w-auto h-[36px] min-h-[36px]" onClick={handleClick}>
+          <button className="w-auto h-[36px] min-h-[36px]" onClick={handleClick} aria-label="logout">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -114,7 +122,11 @@ const ConnectWalletButton = () => {
   return (
     <>
       <>
-        <button className="btn btn-square w-[36px] h-[36px] min-h-[36px] flex sm:hidden" onClick={handleClick}>
+        <button
+          className="btn btn-square w-[36px] h-[36px] min-h-[36px] flex sm:hidden"
+          onClick={handleClick}
+          aria-label="connect wallet"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"

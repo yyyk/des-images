@@ -142,6 +142,7 @@ const DesImageCard = ({
               className="absolute btn btn-square btn-sm !w-[28px] !h-[28px] !min-h-[28px] right-3 sm:right-4 top-3 sm:top-4"
               onClick={handleRemove}
               data-testid="desImagesCard__cta-remove"
+              aria-label="remove"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
