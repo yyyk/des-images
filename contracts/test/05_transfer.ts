@@ -103,7 +103,59 @@ describe("DesImages--transfer", function () {
         });
       });
     });
-  });
 
-  // TODO: approve
+    describe("approve()", function () {
+      it("approves another address for the right of transfer", async function () {
+        const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
+        const tokenId = BigNumber.from(getTokenId(date, ciphertext));
+        let tx = await desImages.connect(user).mint(date, ciphertext, {
+          value: mintPrice,
+        });
+        await tx.wait();
+
+        const operator = wallets[2];
+        tx = await desImages.connect(user).approve(operator.address, tokenId);
+        await tx.wait();
+
+        await expect(
+          desImages
+            .connect(operator)
+            .transferFrom(user.address, wallets[3].address, tokenId)
+        )
+          .to.emit(desImages, "Transfer")
+          .withArgs(user.address, wallets[3].address, tokenId);
+      });
+    });
+
+    describe("setApprovalForAll()", function () {
+      it("approves other addresses for the right of transfer", async function () {
+        const { date, ciphertext } = getDateAndCiphertext(2020, 1, 1);
+        const tokenId = BigNumber.from(getTokenId(date, ciphertext));
+        let tx = await desImages.connect(user).mint(date, ciphertext, {
+          value: mintPrice,
+        });
+        await tx.wait();
+
+        let operator = wallets[2];
+        tx = await desImages
+          .connect(user)
+          .setApprovalForAll(operator.address, tokenId);
+        await tx.wait();
+
+        operator = wallets[3];
+        tx = await desImages
+          .connect(user)
+          .setApprovalForAll(operator.address, tokenId);
+        await tx.wait();
+
+        await expect(
+          desImages
+            .connect(operator)
+            .transferFrom(user.address, wallets[4].address, tokenId)
+        )
+          .to.emit(desImages, "Transfer")
+          .withArgs(user.address, wallets[4].address, tokenId);
+      });
+    });
+  });
 });

@@ -58,7 +58,7 @@ library TokenURI {
                 size,
                 '" ',
                 generateFill(i, ciphertext_),
-                ' stroke="none"/>',
+                ' stroke="none" />',
                 rects
             );
         }
@@ -86,7 +86,7 @@ library TokenURI {
                                     abi.encodePacked(
                                         '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="512" height="512" viewBox="0 0 128 128"><title>',
                                         title,
-                                        "</title>",
+                                        '</title><metadata xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cc="http://creativecommons.org/ns#"><rdf:RDF><cc:Work rdf:about=""><cc:license rdf:resource="https://creativecommons.org/publicdomain/zero/1.0/" /></cc:Work></rdf:RDF></metadata>',
                                         generateRects(ciphertext_),
                                         "</svg>"
                                     )
