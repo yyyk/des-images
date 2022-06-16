@@ -17,7 +17,7 @@ const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () 
       open={open}
       onClose={onClose}
       actions={
-        <button className="btn btn-primary" onClick={handleOnClick}>
+        <button className="btn btn-primary" onClick={handleOnClick} data-testid="ConfirmModal__cta">
           Confirm Mint
         </button>
       }
@@ -133,7 +133,7 @@ const DesImageCard = ({
           theme === 'lofi' ? 'bg-base-100 shadow-xl' : theme === 'black' ? 'bg-neutral text-neutral-content' : ''
         }`}
       >
-        <figure className="!m-0 !p-0 !block">
+        <figure className="!m-0 !p-0 !block" data-testid="desImagesCard__image">
           <DesImageSvg date={date} ciphertext={tokenData.ciphertext} />
         </figure>
         <div className={`relative card-body !gap-0 ${onMint && status === TOKEN_STATUS.FOR_SALE ? '!pb-5' : ''}`}>
@@ -160,7 +160,9 @@ const DesImageCard = ({
               {status === TOKEN_STATUS.MINTED ? 'Minted' : status === TOKEN_STATUS.BURNED ? 'Burned' : 'Available'}
             </div>
           )}
-          <h2 className="card-title !mt-0 !mb-1 !gap-0">{date}</h2>
+          <h2 className="card-title !mt-0 !mb-1 !gap-0" data-testid="desImagesCard__title">
+            {date}
+          </h2>
           {showCiphertext && tokenData?.ciphertext && (
             <code
               className={`w-full overflow-hidden text-ellipsis font-normal opacity-60 p-0 m-0 mt-0 ${
