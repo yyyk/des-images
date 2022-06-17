@@ -155,7 +155,7 @@ const DesImageCard = ({
               </svg>
             </button>
           )}
-          {showStatus && isNil(status) && (
+          {showStatus && !isNil(status) && (
             <div className="badge badge-md badge-outline mb-1" data-testid="desImagesCard__status-badge">
               {status === TOKEN_STATUS.MINTED ? 'Minted' : status === TOKEN_STATUS.BURNED ? 'Burned' : 'Available'}
             </div>
