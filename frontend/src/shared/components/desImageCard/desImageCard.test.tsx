@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import * as ThemeContext from 'src/shared/contexts/theme';
 import * as CatalogContext from 'src/shared/contexts/catalog';
 import * as ContractContext from 'src/shared/contexts/contract';
