@@ -25,7 +25,7 @@ const Catalog = () => {
     });
   };
 
-  const handleMinted = async (tokenData: TokenData) => {
+  const handleMint = async (tokenData: TokenData) => {
     const res = await mint(tokenData.dateHex, tokenData.ciphertext);
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Mint failed.' });
@@ -35,7 +35,7 @@ const Catalog = () => {
     minted(tokenData);
   };
 
-  const handleBurned = async (tokenData: TokenData) => {
+  const handleBurn = async (tokenData: TokenData) => {
     const res = tokenData?.tokenId ? await burn(tokenData.tokenId) : false;
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Burn failed.' });
@@ -66,8 +66,8 @@ const Catalog = () => {
               showPlaintext={true}
               showCiphertext={true}
               showStatus={true}
-              onMint={handleMinted}
-              onBurn={handleBurned}
+              onMint={handleMint}
+              onBurn={handleBurn}
               onRemove={() => remove(data)}
             />
           </li>

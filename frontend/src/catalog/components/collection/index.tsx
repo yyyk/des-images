@@ -9,7 +9,7 @@ const Collection = () => {
   const { isUserTokenIDsLoading, burn } = useContractContext();
   const { add: addNotification } = useNotificationContext();
 
-  const handleBurned = async (tokenData: TokenData) => {
+  const handleBurn = async (tokenData: TokenData) => {
     const res = tokenData?.tokenId ? await burn(tokenData.tokenId) : false;
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Burn failed.' });
@@ -36,7 +36,7 @@ const Collection = () => {
               key={`collection-${data.plaintext?.replace(/\s/g, '-') ?? ''}-${data.dateHex}-${data.ciphertext}`}
               className="w-full m-0 p-0"
             >
-              <DesImageCard tokenData={data} showPlaintext={true} showCiphertext={true} onBurn={handleBurned} />
+              <DesImageCard tokenData={data} showPlaintext={true} showCiphertext={true} onBurn={handleBurn} />
             </li>
           ))}
         </ul>
