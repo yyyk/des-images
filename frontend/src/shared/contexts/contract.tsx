@@ -121,18 +121,17 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const _setupContractListeners = async (contract: Contract, walletAddress: string) => {
-    const startBlockNumber = await contract.provider.getBlockNumber();
-    contract.on(contract.filters.Transfer(walletAddress, walletAddress), _eventHandler('Transfer', startBlockNumber));
-    contract.on(contract.filters.Minted(), _eventHandler('Minted', startBlockNumber));
-    contract.on(contract.filters.Burned(), _eventHandler('Burned', startBlockNumber));
-    // contract.on(contract.filters.Paused(), _eventHandler('Paused', startBlockNumber));
-    // contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', startBlockNumber));
+  const _setupContractListeners = async (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
+    contract.on(contract.filters.Transfer(walletAddress, walletAddress), _eventHandler('Transfer', currentBlockNumber));
+    contract.on(contract.filters.Minted(), _eventHandler('Minted', currentBlockNumber));
+    contract.on(contract.filters.Burned(), _eventHandler('Burned', currentBlockNumber));
+    // contract.on(contract.filters.Paused(), _eventHandler('Paused', currentBlockNumber));
+    // contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', currentBlockNumber));
   };
 
-  const _queryTokenIds = async (contract: Contract, walletAddress: string) => {
+  const _queryTokenIds = async (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
     setIsUserTokenIDsLoading(true);
-    ownedTokenIdsRef.current = await queryTokenIds(contract, walletAddress);
+    ownedTokenIdsRef.current = await queryTokenIds(contract, walletAddress, currentBlockNumber);
     setOwnedTokenIds([...ownedTokenIdsRef.current]);
     setIsUserTokenIDsLoading(false);
   };
@@ -155,10 +154,14 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       setContract(null);
       return;
     }
+    async function setup(contract: Contract) {
+      const currentBlockNumber = await contract.provider.getBlockNumber();
+      await _queryTokenIds(contract, walletAddress, currentBlockNumber);
+      await _setupContractListeners(contract, walletAddress, currentBlockNumber);
+      setContract(contract);
+    }
     const newContract = new ethers.Contract(CONTRACT_ADDRESS, DesImages.abi, signer);
-    _queryTokenIds(newContract, walletAddress);
-    _setupContractListeners(newContract, walletAddress);
-    setContract(newContract);
+    setup(newContract);
     return () => {
       newContract.removeAllListeners();
     };

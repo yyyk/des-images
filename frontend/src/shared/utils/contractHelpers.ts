@@ -1,9 +1,14 @@
 import { BigNumber, Contract, ethers } from 'ethers';
 import { BASE_MINT_PRICE, ETH_NETWORK, MINT_PRICE_COEF, RESERVE_CUT_OVER_10000 } from 'src/shared/constants';
 import { CHAIN_NAME } from 'src/shared/interfaces';
+import { isNil } from 'src/shared/utils/isNil';
 
 // TODO: replace with subgraph in the future?
-export async function queryTokenIds(contract: Contract, walletAddress: string): Promise<string[]> {
+export async function queryTokenIds(
+  contract: Contract,
+  walletAddress: string,
+  currentBlock?: number,
+): Promise<string[]> {
   const startBlock = parseInt(
     ETH_NETWORK === CHAIN_NAME.RINKEBY
       ? '10793462'
@@ -11,7 +16,7 @@ export async function queryTokenIds(contract: Contract, walletAddress: string): 
       ? '14859331' // TODO: update needed once contract deployed
       : '0',
   );
-  const endBlock = await contract.provider.getBlockNumber();
+  const endBlock = (isNil(currentBlock) ? await contract.provider.getBlockNumber() : currentBlock) as number;
   let result: string[] = [];
   for (let i = startBlock; i <= endBlock; i += 5000) {
     const _startBlock = i;
