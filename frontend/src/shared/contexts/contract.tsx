@@ -132,6 +132,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   const _queryTokenIds = async (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
     setIsUserTokenIDsLoading(true);
     ownedTokenIdsRef.current = await queryTokenIds(contract, walletAddress, currentBlockNumber);
+    console.log('ownedTokenIdsRef', ownedTokenIdsRef.current);
     setOwnedTokenIds([...ownedTokenIdsRef.current]);
     setIsUserTokenIDsLoading(false);
   };
