@@ -38,8 +38,10 @@ export async function queryTokenIds(
           continue;
         }
         if (isSameAddress(to ?? '', walletAddress)) {
+          console.log('add:', from, tokenId.toHexString());
           owned.add(tokenId.toHexString());
         } else if (isSameAddress(from ?? '', walletAddress)) {
+          console.log('delete:', from, tokenId.toHexString());
           owned.delete(tokenId.toHexString());
         }
       }
