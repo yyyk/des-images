@@ -18,7 +18,7 @@ const BCOModal = ({ open, onClose }: { open: boolean; onClose: () => void }) => 
         creator.
       </li>
       <li className="mb-0">
-        Burning a token rewards the owner of the token the amount equals to <strong>99.5% of last mint price</strong>.
+        Burning a token rewards the owner of the token the amount equal to <strong>99.5% of last mint price</strong>.
       </li>
     </ul>
   </Modal>

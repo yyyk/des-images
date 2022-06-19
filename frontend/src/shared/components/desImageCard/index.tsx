@@ -22,7 +22,7 @@ const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () 
         </button>
       }
     >
-      <h5 className="mt-0 mb-0">Notes:</h5>
+      <h5 className="mt-0 mb-0">Disclaimer:</h5>
       <ul>
         <li>
           The smart contract is <strong>unaudited</strong>, though it's written with extra care.{' '}
@@ -40,7 +40,7 @@ const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () 
           <strong>The unused part of the buffer will be refunded.</strong>
         </li>
         <li className="mb-0">
-          If more than 10 mints occur in one block, your mint transaction might fail. In such case,{' '}
+          If more than ten mints occur in one block, your mint transaction might fail. In such a case,{' '}
           <strong>you would still be charged for the transaction fee</strong>, though the Ether sent to the contract
           would be returned.
         </li>
