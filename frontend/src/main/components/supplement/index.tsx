@@ -7,7 +7,7 @@ const Supplement = () => {
         same. This is a product of a situation where two or more different keys produce the same ciphertext.
       </p>
       <p>
-        The assigned number for <i>0</i> in ASCII-based standard character encodings is forty-eight, while 1 is
+        The assigned number for <i>0</i> in ASCII-based standard character encodings is forty-eight, while <i>1</i> is
         forty-nine. In binary representation, forty-eight is <code>00110000</code> and forty-nine is{' '}
         <code>00110001</code>. The DES algorithm treats them as the same character because only the first seven bits of
         each byte are actual material in a DES key. This applies to the pairs of <i>2</i> and <i>3</i>, <i>4</i> and{' '}
