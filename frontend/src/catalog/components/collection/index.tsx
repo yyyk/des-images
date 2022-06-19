@@ -19,7 +19,6 @@ const Collection = () => {
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Burned.' });
     burned(tokenData);
-    processEnded(tokenData);
   };
 
   if (isUserTokensLoading || isUserTokenIDsLoading) {

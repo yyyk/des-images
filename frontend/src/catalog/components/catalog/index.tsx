@@ -35,7 +35,6 @@ const Catalog = () => {
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Minted.' });
     minted(tokenData);
-    processEnded(tokenData);
   };
 
   const handleBurn = async (tokenData: TokenData) => {
@@ -48,7 +47,6 @@ const Catalog = () => {
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Burned.' });
     burned(tokenData);
-    processEnded(tokenData);
   };
 
   return (
