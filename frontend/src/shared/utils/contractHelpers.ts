@@ -17,7 +17,7 @@ export async function queryTokenIds(
       : '0',
   );
   const endBlock = (isNil(currentBlock) ? await contract.provider.getBlockNumber() : currentBlock) as number;
-  let result: string[] = [];
+  const owned: Set<string> = new Set();
   for (let i = startBlock; i <= endBlock; i += 5000) {
     const _startBlock = i;
     const _endBlock = Math.min(endBlock, i + 4999);
@@ -30,7 +30,6 @@ export async function queryTokenIds(
     const logs = sentLogs
       .concat(receivedLogs)
       .sort((a, b) => a.blockNumber - b.blockNumber || a.transactionIndex - b.transactionIndex);
-    const owned: Set<string> = new Set();
     for (const log of logs) {
       if (log) {
         const { from, to, tokenId } = log?.args ?? ({} as any);
@@ -44,8 +43,8 @@ export async function queryTokenIds(
         }
       }
     }
-    result = result.concat(Array.from(owned));
   }
+  const result = Array.from(owned);
   return result.reverse();
 }
 

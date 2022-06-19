@@ -175,7 +175,6 @@ export const useWallet = () => {
         setWalletProvider(walletProvider);
         setCanLogout(!!walletProvider.logout);
         setSigner(signer);
-        console.log('setSigner');
         return { success: true };
       }
       error = createErrorResponse(ERROR_TYPE.NO_ADDRESS_FOUND, 'No address found.');

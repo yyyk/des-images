@@ -155,7 +155,6 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     async function setup(contract: Contract) {
-      console.log('setup');
       const currentBlockNumber = await contract.provider.getBlockNumber();
       await _queryTokenIds(contract, walletAddress, currentBlockNumber);
       await _setupContractListeners(contract, walletAddress, currentBlockNumber);
