@@ -45,8 +45,6 @@ export async function queryTokenIds(
       }
     }
     result = result.concat(Array.from(owned));
-    console.log('owned', owned);
-    console.log('result', result);
   }
   return result.reverse();
 }
