@@ -24,6 +24,8 @@ interface ContextState {
   remove: (data: TokenData) => void;
   minted: (data: TokenData) => void;
   burned: (data: TokenData) => void;
+  processStarted: (data: TokenData) => void;
+  processEnded: (data: TokenData) => void;
 }
 
 const CatalogContext = createContext({} as ContextState);
@@ -87,12 +89,28 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const _process = (data: TokenData, isInProcess: boolean) => {
+    const newData: TokenData = {
+      ...data,
+      isInProcess,
+    };
+    let index = tokenData.findIndex((_data) => isSameTokenData(_data, newData));
+    if (index >= 0) {
+      _updateTokenData([...tokenData.slice(0, index), { ...newData }, ...tokenData.slice(index + 1)]);
+    }
+    index = ownedTokenData.findIndex((_data) => isSameTokenData(_data, newData));
+    if (index >= 0) {
+      setOwnedTokenData([...ownedTokenData.slice(0, index), { ...newData }, ...ownedTokenData.slice(index + 1)]);
+    }
+  };
+
   const minted = (data: TokenData) => {
     const newData: TokenData = {
       ...data,
       isOwner: true,
       status: TOKEN_STATUS.MINTED,
       tokenId: data.tokenId || getTokenId(data.dateHex, data.ciphertext),
+      isInProcess: false,
     };
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, newData));
     if (index >= 0) {
@@ -107,6 +125,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       isOwner: false,
       status: TOKEN_STATUS.BURNED,
       tokenId: data.tokenId || getTokenId(data.dateHex, data.ciphertext),
+      isInProcess: false,
     };
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, newData));
     if (index >= 0) {
@@ -116,7 +135,19 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <CatalogContext.Provider value={{ tokenData, ownedTokenData, isUserTokensLoading, add, remove, minted, burned }}>
+    <CatalogContext.Provider
+      value={{
+        tokenData,
+        ownedTokenData,
+        isUserTokensLoading,
+        add,
+        remove,
+        minted,
+        burned,
+        processStarted: (data: TokenData) => _process(data, true),
+        processEnded: (data: TokenData) => _process(data, false),
+      }}
+    >
       {children}
     </CatalogContext.Provider>
   );

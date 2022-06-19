@@ -71,6 +71,7 @@ export interface TokenData {
   status?: TOKEN_STATUS;
   isOwner?: boolean;
   tokenId?: string;
+  isInProcess?: boolean;
 }
 
 export interface PreviewFormData {

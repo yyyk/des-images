@@ -5,18 +5,21 @@ import { NOTIFICATION_TYPE, TokenData } from 'src/shared/interfaces';
 import DesImageCard from 'src/shared/components/desImageCard';
 
 const Collection = () => {
-  const { ownedTokenData, isUserTokensLoading, burned } = useCatalogContext();
+  const { ownedTokenData, isUserTokensLoading, burned, processStarted, processEnded } = useCatalogContext();
   const { isUserTokenIDsLoading, burn } = useContractContext();
   const { add: addNotification } = useNotificationContext();
 
   const handleBurn = async (tokenData: TokenData) => {
+    processStarted(tokenData);
     const res = tokenData?.tokenId ? await burn(tokenData.tokenId) : false;
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Burn failed.' });
+      processEnded(tokenData);
       return;
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Burned.' });
     burned(tokenData);
+    processEnded(tokenData);
   };
 
   if (isUserTokensLoading || isUserTokenIDsLoading) {

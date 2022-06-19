@@ -58,6 +58,8 @@ describe('<DesImageCard>', function () {
       remove: jest.fn(),
       minted: jest.fn(),
       burned: jest.fn(),
+      processStarted: jest.fn(),
+      processEnded: jest.fn(),
     }));
   });
 

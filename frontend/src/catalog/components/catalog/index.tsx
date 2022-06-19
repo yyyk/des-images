@@ -9,7 +9,7 @@ import ModPreviewForm from 'src/shared/components/modPreviewForm';
 
 const Catalog = () => {
   const { mint, burn } = useContractContext();
-  const { tokenData, add, remove, minted, burned } = useCatalogContext();
+  const { tokenData, add, remove, minted, burned, processStarted, processEnded } = useCatalogContext();
   const { add: addNotification } = useNotificationContext();
   const scrollRef = useRef<HTMLLIElement>(null);
 
@@ -26,23 +26,29 @@ const Catalog = () => {
   };
 
   const handleMint = async (tokenData: TokenData) => {
+    processStarted(tokenData);
     const res = await mint(tokenData.dateHex, tokenData.ciphertext);
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Mint failed.' });
+      processEnded(tokenData);
       return;
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Minted.' });
     minted(tokenData);
+    processEnded(tokenData);
   };
 
   const handleBurn = async (tokenData: TokenData) => {
+    processStarted(tokenData);
     const res = tokenData?.tokenId ? await burn(tokenData.tokenId) : false;
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Burn failed.' });
+      processEnded(tokenData);
       return;
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Burned.' });
     burned(tokenData);
+    processEnded(tokenData);
   };
 
   return (
