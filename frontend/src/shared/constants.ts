@@ -28,3 +28,5 @@ export const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS ?? '';
 export const ETH_NETWORK = process.env.REACT_APP_ETH_NETWORK ?? '';
 
 export const APP_LOGO_URL = 'https://desimages.xyz/logo512.png';
+
+export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';

@@ -53,6 +53,7 @@ export function convertTokenURIToTokenData(
   tokenId: string,
   isOwner = true,
   status = TOKEN_STATUS.MINTED,
+  isInProcess = false,
 ): TokenData {
   try {
     const json = JSON.parse(atob(uri?.replace('data:application/json;base64,', '') ?? ''));
@@ -68,10 +69,17 @@ export function convertTokenURIToTokenData(
       isOwner,
       status,
       tokenId,
+      isInProcess,
     };
   } catch (err: any) {
     throw new Error(err);
   }
+}
+
+const cachedTokenData: { [key: string]: TokenData } = {};
+
+export function deleteTokenDataCacheOf(id: string): void {
+  cachedTokenData[id] && delete cachedTokenData[id];
 }
 
 export async function getTokenDataFromTokenIds(contract: Contract, ids: string[]): Promise<TokenData[]> {
@@ -81,9 +89,14 @@ export async function getTokenDataFromTokenIds(contract: Contract, ids: string[]
   }
   for (const id of ids) {
     if (id) {
+      if (cachedTokenData[id]) {
+        res.push({ ...cachedTokenData[id] });
+        continue;
+      }
       try {
         const uri = await tokenURI(contract, id);
         const data = convertTokenURIToTokenData(uri, id);
+        cachedTokenData[id] = { ...data };
         res.push(data);
       } catch (err) {
         console.error(err);

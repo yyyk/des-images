@@ -21,7 +21,7 @@ const Collection = () => {
     burned(tokenData);
   };
 
-  if (isUserTokensLoading || isUserTokenIDsLoading) {
+  if ((isUserTokensLoading && ownedTokenData?.length === 0) || isUserTokenIDsLoading) {
     return <p className="pt-3 sm:mt-4">Loading...</p>;
   }
 

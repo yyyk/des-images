@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { ethers, Contract, BigNumber } from 'ethers';
 import { useWalletContext } from 'src/shared/contexts/wallet';
-import { CONTRACT_ADDRESS, MINT_PRICE_COEF } from 'src/shared/constants';
+import { CONTRACT_ADDRESS, MINT_PRICE_COEF, NULL_ADDRESS } from 'src/shared/constants';
 import {
   mint as _mint,
   burn as _burn,
@@ -13,6 +13,7 @@ import {
 } from 'src/shared/services/contract';
 import DesImages from 'src/abi/DesImages.json';
 import { calcBurnReward, calcMintPrice, isSameAddress, queryTokenIds } from 'src/shared/utils/contractHelpers';
+import { deleteTokenDataCacheOf } from 'src/shared/utils/tokenDataHelpers';
 
 interface ContextState {
   contract: Contract | null;
@@ -46,6 +47,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     const index = ownedTokenIdsRef.current.findIndex((id) => id === _tokenId);
     if (isSameAddress(from, walletAddress)) {
       // console.log('remove', _tokenId, index);
+      deleteTokenDataCacheOf(_tokenId);
       if (index > -1) {
         ownedTokenIdsRef.current = [
           ...ownedTokenIdsRef.current.slice(0, index),
@@ -56,7 +58,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     } else if (isSameAddress(to, walletAddress)) {
       // console.log('add', _tokenId, index);
       if (index === -1) {
-        ownedTokenIdsRef.current = ownedTokenIdsRef.current.concat(_tokenId);
+        ownedTokenIdsRef.current = [_tokenId, ...ownedTokenIdsRef.current];
         setOwnedTokenIds([...ownedTokenIdsRef.current]);
       }
     }
@@ -122,7 +124,10 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const _setupContractListeners = async (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
-    contract.on(contract.filters.Transfer(walletAddress, walletAddress), _eventHandler('Transfer', currentBlockNumber));
+    contract.on(
+      contract.filters.Transfer([NULL_ADDRESS, walletAddress], [NULL_ADDRESS, walletAddress]),
+      _eventHandler('Transfer', currentBlockNumber),
+    );
     contract.on(contract.filters.Minted(), _eventHandler('Minted', currentBlockNumber));
     contract.on(contract.filters.Burned(), _eventHandler('Burned', currentBlockNumber));
     // contract.on(contract.filters.Paused(), _eventHandler('Paused', currentBlockNumber));
