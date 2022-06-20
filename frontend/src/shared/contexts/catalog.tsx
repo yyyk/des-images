@@ -51,7 +51,13 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const _updateTokenDataStatus = async (contract: Contract | null, data: TokenData[], walletAddress: string) => {
-    _updateTokenData(await updateTokenDataStatus(contract, data, walletAddress));
+    const newData = await updateTokenDataStatus(contract, data, walletAddress);
+    const res: TokenData[] = [];
+    tokenDataRef.current.forEach((_data) => {
+      const index = newData.findIndex((d) => isSameTokenData(d, _data));
+      index >= 0 && res.push({ ...newData[index] });
+    });
+    _updateTokenData(res);
   };
 
   const _fetchOwnedTokenData = async (contract: Contract | null, ownedTokenIds: string[]) => {
@@ -76,7 +82,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     tokenDataRef.current &&
       tokenDataRef.current?.length &&
-      _updateTokenDataStatus(contract, tokenDataRef.current, walletAddress);
+      _updateTokenDataStatus(contract, [...tokenDataRef.current], walletAddress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
 
