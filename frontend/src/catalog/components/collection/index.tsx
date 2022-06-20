@@ -9,16 +9,16 @@ const Collection = () => {
   const { isUserTokenIDsLoading, burn } = useContractContext();
   const { add: addNotification } = useNotificationContext();
 
-  const handleBurn = async (tokenData: TokenData) => {
-    processStarted(tokenData);
-    const res = tokenData?.tokenId ? await burn(tokenData.tokenId) : false;
+  const handleBurn = async (data: TokenData) => {
+    processStarted(data);
+    const res = data?.tokenId ? await burn(data.tokenId) : false;
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Burn failed.' });
-      processEnded(tokenData);
+      processEnded(data);
       return;
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Burned.' });
-    burned(tokenData);
+    burned(data);
   };
 
   if ((isUserTokensLoading && ownedTokenData?.length === 0) || isUserTokenIDsLoading) {
@@ -35,7 +35,9 @@ const Collection = () => {
         >
           {ownedTokenData.map((data) => (
             <li
-              key={`collection-${data.plaintext?.replace(/\s/g, '-') ?? ''}-${data.dateHex}-${data.ciphertext}`}
+              key={`collection-${data.plaintext?.replace(/\s/g, '-') ?? ''}-${data.dateHex}-${data.ciphertext}-${
+                data.status
+              }-${data.isInProcess ? 'loaded' : 'loading'}`}
               className="w-full m-0 p-0"
             >
               <DesImageCard tokenData={data} showPlaintext={true} showCiphertext={true} onBurn={handleBurn} />

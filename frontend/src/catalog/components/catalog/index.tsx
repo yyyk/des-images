@@ -14,8 +14,8 @@ const Catalog = () => {
   const scrollRef = useRef<HTMLLIElement>(null);
 
   const handleOnPreview = async ({ year, month, day, plaintext, ciphertext }: PreviewFormData) => {
-    const tokenData = getTokenData({ year, month, day, plaintext, ciphertext });
-    const result = await add(tokenData);
+    const _tokenData = getTokenData({ year, month, day, plaintext, ciphertext });
+    const result = await add(_tokenData);
     if (!result) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Preview already exists.' });
       return;
@@ -25,28 +25,28 @@ const Catalog = () => {
     });
   };
 
-  const handleMint = async (tokenData: TokenData) => {
-    processStarted(tokenData);
-    const res = await mint(tokenData.dateHex, tokenData.ciphertext);
+  const handleMint = async (data: TokenData) => {
+    processStarted(data);
+    const res = await mint(data.dateHex, data.ciphertext);
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Mint failed.' });
-      processEnded(tokenData);
+      processEnded(data);
       return;
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Minted.' });
-    minted(tokenData);
+    minted(data);
   };
 
-  const handleBurn = async (tokenData: TokenData) => {
-    processStarted(tokenData);
-    const res = tokenData?.tokenId ? await burn(tokenData.tokenId) : false;
+  const handleBurn = async (data: TokenData) => {
+    processStarted(data);
+    const res = data?.tokenId ? await burn(data.tokenId) : false;
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Burn failed.' });
-      processEnded(tokenData);
+      processEnded(data);
       return;
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Burned.' });
-    burned(tokenData);
+    burned(data);
   };
 
   return (
@@ -62,7 +62,9 @@ const Catalog = () => {
         {tokenData.map((data, index) => (
           <li
             ref={index === 0 ? scrollRef : undefined}
-            key={`catalog-${data.plaintext?.replace(/\s/g, '-') ?? ''}-${data.dateHex}-${data.ciphertext}`}
+            key={`catalog-${data.plaintext?.replace(/\s/g, '-') ?? ''}-${data.dateHex}-${data.ciphertext}-${
+              data.status
+            }-${data.isInProcess ? 'loaded' : 'loading'}`}
             className="w-full m-0 p-0"
           >
             <DesImageCard
