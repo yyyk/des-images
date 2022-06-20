@@ -81,7 +81,7 @@ const DesImageCard = ({
   const handleOnSubmit = async () => {
     if (walletAddress && tokenData && onMint) {
       setIsLoading(true);
-      const res = onMint(tokenData);
+      const res = onMint({ ...tokenData });
       if (res?.then) {
         res
           .then(() => {
@@ -107,7 +107,7 @@ const DesImageCard = ({
     e.preventDefault();
     if (walletAddress && tokenData && tokenData.tokenId && onBurn) {
       setIsLoading(true);
-      const res = onBurn(tokenData);
+      const res = onBurn({ ...tokenData });
       if (res?.then) {
         res
           .then(() => {

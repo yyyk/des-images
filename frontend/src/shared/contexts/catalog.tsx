@@ -56,10 +56,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     setIsUserTokensLoading(true);
     const _ownedTokenData = (await getTokenDataFromTokenIds(contract, ownedTokenIds)).map((data) => {
       const index = ownedTokenIdsRef.current.findIndex((_data) => isSameTokenData(_data, data));
-      if (index >= 0 && ownedTokenIdsRef.current[index].isInProcess) {
-        data.isInProcess = true;
-      }
-      return data;
+      return { ...data, isInProcess: index >= 0 && ownedTokenIdsRef.current[index].isInProcess };
     });
     ownedTokenIdsRef.current = [..._ownedTokenData];
     setOwnedTokenData(_ownedTokenData);
