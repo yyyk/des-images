@@ -5,7 +5,7 @@ import { NOTIFICATION_TYPE, TokenData } from 'src/shared/interfaces';
 import DesImageCard from 'src/shared/components/desImageCard';
 
 const Collection = () => {
-  const { ownedTokenData, isUserTokensLoading, burned, processStarted, processEnded } = useCatalogContext();
+  const { ownedTokenData, burned, processStarted, processEnded } = useCatalogContext();
   const { isUserTokenIDsLoading, ownedTokenIds, burn } = useContractContext();
   const { add: addNotification } = useNotificationContext();
 
@@ -21,7 +21,7 @@ const Collection = () => {
     burned(data);
   };
 
-  if ((isUserTokensLoading && ownedTokenData.length === 0 && ownedTokenIds.length) || isUserTokenIDsLoading) {
+  if ((ownedTokenData.length === 0 && ownedTokenIds.length) || isUserTokenIDsLoading) {
     return <p className="pt-3 sm:mt-4">Loading...</p>;
   }
 
