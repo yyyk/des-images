@@ -59,7 +59,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       return { ...data, isInProcess: index >= 0 && ownedTokenIdsRef.current[index].isInProcess };
     });
     ownedTokenIdsRef.current = [..._ownedTokenData];
-    setOwnedTokenData(_ownedTokenData);
+    setOwnedTokenData([...ownedTokenIdsRef.current]);
     setIsUserTokensLoading(false);
   };
 
@@ -81,7 +81,10 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     async function beforeunloadListener() {
-      if (walletProvider && tokenData.some((data) => data.isInProcess)) {
+      if (
+        walletProvider &&
+        (tokenData.some((data) => data.isInProcess) || ownedTokenData.some((data) => data.isInProcess))
+      ) {
         await logout(walletProvider);
       }
     }
@@ -90,7 +93,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       window.removeEventListener('beforeunload', beforeunloadListener);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletProvider, tokenData]);
+  }, [walletProvider, tokenData, ownedTokenData]);
 
   const add = async (data: TokenData) => {
     const index = tokenData.findIndex((_data) => isSameTokenData(_data, data));
@@ -130,6 +133,14 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       ];
       setOwnedTokenData([...ownedTokenIdsRef.current]);
     }
+  };
+
+  const processStarted = (data: TokenData) => {
+    _process(data, true);
+  };
+
+  const processEnded = (data: TokenData) => {
+    _process(data, false);
   };
 
   const minted = (data: TokenData) => {
@@ -174,8 +185,8 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
         remove,
         minted,
         burned,
-        processStarted: (data: TokenData) => _process(data, true),
-        processEnded: (data: TokenData) => _process(data, false),
+        processStarted,
+        processEnded,
       }}
     >
       {children}

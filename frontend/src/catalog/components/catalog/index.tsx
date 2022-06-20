@@ -6,6 +6,7 @@ import { NOTIFICATION_TYPE, PreviewFormData, TokenData } from 'src/shared/interf
 import { getTokenData } from 'src/shared/utils/tokenDataHelpers';
 import DesImageCard from 'src/shared/components/desImageCard';
 import ModPreviewForm from 'src/shared/components/modPreviewForm';
+import { isNil } from 'src/shared/utils/isNil';
 
 const Catalog = () => {
   const { mint, burn } = useContractContext();
@@ -63,8 +64,8 @@ const Catalog = () => {
           <li
             ref={index === 0 ? scrollRef : undefined}
             key={`catalog-${data.plaintext?.replace(/\s/g, '-') ?? ''}-${data.dateHex}-${data.ciphertext}-${
-              data.status
-            }-${data.isInProcess ? 'loaded' : 'loading'}`}
+              isNil(data.status) ? '' : data.status
+            }-${data.isInProcess ? 'loading' : 'loaded'}`}
             className="w-full m-0 p-0"
           >
             <DesImageCard
@@ -72,6 +73,7 @@ const Catalog = () => {
               showPlaintext={true}
               showCiphertext={true}
               showStatus={true}
+              isLoading={data.isInProcess ?? false}
               onMint={handleMint}
               onBurn={handleBurn}
               onRemove={() => remove(data)}

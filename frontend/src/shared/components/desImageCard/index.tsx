@@ -54,6 +54,7 @@ interface DesImageCardProps {
   showPlaintext?: boolean;
   showCiphertext?: boolean;
   showStatus?: boolean;
+  isLoading?: boolean;
   onRemove?: () => void;
   onMint?: (tokenData: TokenData) => void | Promise<void>;
   onBurn?: (tokenData: TokenData) => void | Promise<void>;
@@ -64,6 +65,7 @@ const DesImageCard = ({
   showPlaintext = false,
   showCiphertext = false,
   showStatus = false,
+  isLoading = false,
   onRemove,
   onMint,
   onBurn,
@@ -71,7 +73,6 @@ const DesImageCard = ({
   const { theme } = useThemeContext();
   const { walletAddress } = useWalletContext();
   const { isPaused } = useContractContext();
-  const [isLoading, setIsLoading] = useState(tokenData?.isInProcess ?? false);
   const [open, setOpen] = useState(false);
   const date = `#${tokenData.year}${String(tokenData.month).padStart(2, '0')}${String(tokenData.day).padStart(2, '0')}`;
   const { status, isOwner } = tokenData;
@@ -80,19 +81,7 @@ const DesImageCard = ({
 
   const handleOnSubmit = async () => {
     if (walletAddress && tokenData && onMint) {
-      setIsLoading(true);
-      const res = onMint({ ...tokenData });
-      if (res?.then) {
-        res
-          .then(() => {
-            setIsLoading(false);
-          })
-          .catch(() => {
-            setIsLoading(false);
-          });
-        return;
-      }
-      setIsLoading(false);
+      onMint(tokenData);
     }
   };
 
@@ -106,19 +95,7 @@ const DesImageCard = ({
   const handleOnBurn = async (e: MouseEvent) => {
     e.preventDefault();
     if (walletAddress && tokenData && tokenData.tokenId && onBurn) {
-      setIsLoading(true);
-      const res = onBurn({ ...tokenData });
-      if (res?.then) {
-        res
-          .then(() => {
-            setIsLoading(false);
-          })
-          .catch(() => {
-            setIsLoading(false);
-          });
-        return;
-      }
-      setIsLoading(false);
+      onBurn(tokenData);
     }
   };
 
