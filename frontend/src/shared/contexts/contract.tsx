@@ -135,10 +135,8 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const _queryTokenIds = async (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
-    setIsUserTokenIDsLoading(true);
     ownedTokenIdsRef.current = await queryTokenIds(contract, walletAddress, currentBlockNumber);
     setOwnedTokenIds([...ownedTokenIdsRef.current]);
-    setIsUserTokenIDsLoading(false);
   };
 
   const _setup = async (contract: Contract | null) => {
@@ -160,10 +158,12 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     async function setup(contract: Contract) {
+      setIsUserTokenIDsLoading(true);
       const currentBlockNumber = await contract.provider.getBlockNumber();
       await _queryTokenIds(contract, walletAddress, currentBlockNumber);
       await _setupContractListeners(contract, walletAddress, currentBlockNumber);
       setContract(contract);
+      setIsUserTokenIDsLoading(false);
     }
     const newContract = new ethers.Contract(CONTRACT_ADDRESS, DesImages.abi, signer);
     setup(newContract);
