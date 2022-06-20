@@ -3,7 +3,6 @@ import { useContractContext } from 'src/shared/contexts/contract';
 import { useNotificationContext } from 'src/shared/contexts/notification';
 import { NOTIFICATION_TYPE, TokenData } from 'src/shared/interfaces';
 import DesImageCard from 'src/shared/components/desImageCard';
-import { isNil } from 'src/shared/utils/isNil';
 
 const Collection = () => {
   const { ownedTokenData, isUserTokensLoading, burned, processStarted, processEnded } = useCatalogContext();
