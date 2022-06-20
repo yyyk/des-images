@@ -36,9 +36,7 @@ const Collection = () => {
         >
           {ownedTokenData.map((data) => (
             <li
-              key={`collection-${data.plaintext?.replace(/\s/g, '-') ?? ''}-${data.dateHex}-${data.ciphertext}-${
-                isNil(data.status) ? '' : data.status
-              }-${data.isInProcess ? 'loading' : 'loaded'}`}
+              key={`collection-${data.plaintext?.replace(/\s/g, '-') ?? ''}-${data.dateHex}-${data.ciphertext}`}
               className="w-full m-0 p-0"
             >
               <DesImageCard
