@@ -40,7 +40,8 @@ const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () 
           <strong>The unused part of the buffer will be refunded.</strong>
         </li>
         <li className="mb-0">
-          If more than ten mints occur in one block, your mint transaction might fail. In such a case,{' '}
+          If more than ten mints occur in one block or if someone else is also minting the same token at around the same
+          time, your mint transaction might fail. In such a case,{' '}
           <strong>you would still be charged for the transaction fee</strong>, though the Ether sent to the contract
           would be returned.
         </li>
@@ -76,8 +77,8 @@ const DesImageCard = ({
   const [open, setOpen] = useState(false);
   const date = `#${tokenData.year}${String(tokenData.month).padStart(2, '0')}${String(tokenData.day).padStart(2, '0')}`;
   const { status, isOwner } = tokenData;
-  const showMintButton = onMint && status === TOKEN_STATUS.FOR_SALE;
-  const showBurnButton = onBurn && isOwner && status === TOKEN_STATUS.MINTED;
+  const showMintButton = onMint && (status === TOKEN_STATUS.FOR_SALE || status === TOKEN_STATUS.MINTED);
+  const showBurnButton = onBurn && isOwner && status === TOKEN_STATUS.BURNED;
 
   const handleOnSubmit = async () => {
     if (walletAddress && tokenData && onMint) {
