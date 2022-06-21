@@ -77,8 +77,8 @@ const DesImageCard = ({
   const [open, setOpen] = useState(false);
   const date = `#${tokenData.year}${String(tokenData.month).padStart(2, '0')}${String(tokenData.day).padStart(2, '0')}`;
   const { status, isOwner } = tokenData;
-  const showMintButton = onMint && (status === TOKEN_STATUS.FOR_SALE || status === TOKEN_STATUS.MINTED);
-  const showBurnButton = onBurn && isOwner && status === TOKEN_STATUS.BURNED;
+  const showMintButton = onMint && status === TOKEN_STATUS.FOR_SALE;
+  const showBurnButton = onBurn && isOwner && status === TOKEN_STATUS.MINTED;
 
   const handleOnSubmit = async () => {
     if (walletAddress && tokenData && onMint) {
