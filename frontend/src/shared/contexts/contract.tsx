@@ -87,6 +87,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
             return;
           }
           console.log('Minted');
+          // TODO: update catalog from sale to minted
           setTotalSupply(totalSupply.toString());
           setTotalEverMinted(totalEverMinted.toString());
           setMintPrice(calcMintPrice(totalSupply));
@@ -98,6 +99,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
             return;
           }
           console.log('Burned');
+          // TODO: update catalog from minted to burned
           setTotalSupply(totalSupply.toString());
           setMintPrice(calcMintPrice(totalSupply));
           setBurnPrice(calcBurnReward(totalSupply));

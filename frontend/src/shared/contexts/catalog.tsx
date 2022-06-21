@@ -83,6 +83,18 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     tokenDataRef.current &&
       tokenDataRef.current?.length &&
       _updateTokenDataStatus(contract, [...tokenDataRef.current], walletAddress);
+
+    function storageListener() {
+      // TODO: add loading states of each data?
+      tokenDataRef.current = getTokenDataFromLocalStorage();
+      tokenDataRef.current?.length
+        ? _updateTokenDataStatus(contract, [...tokenDataRef.current], walletAddress)
+        : setTokenData([]);
+    }
+    window.addEventListener('storage', storageListener);
+    return () => {
+      window.removeEventListener('storage', storageListener);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
 
