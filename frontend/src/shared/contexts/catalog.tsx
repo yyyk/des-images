@@ -32,7 +32,7 @@ const CatalogContext = createContext({} as ContextState);
 
 const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   const { walletAddress, walletProvider, logout } = useWalletContext();
-  const { contract, ownedTokenIds } = useContractContext();
+  const { contract, ownedTokenIds, mintedToken, burnedToken } = useContractContext();
   const [tokenData, setTokenData] = useState<TokenData[]>([]);
   const [ownedTokenData, setOwnedTokenData] = useState<TokenData[]>([]);
   const [isUserTokensLoading, setIsUserTokensLoading] = useState(false);
@@ -121,6 +121,34 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletProvider, tokenData, ownedTokenData]);
+
+  useEffect(() => {
+    if (!mintedToken) {
+      return;
+    }
+    tokenDataRef.current = tokenDataRef.current.map((d: TokenData) => {
+      const tokenId = getTokenId(d.dateHex, d.ciphertext);
+      if (tokenId !== mintedToken.id) {
+        return { ...d, tokenId: tokenId };
+      }
+      return { ...d, tokenId: tokenId, status: 1, isOwner: walletAddress === mintedToken.to };
+    });
+    setTokenData([...tokenDataRef.current]);
+  }, [mintedToken, walletAddress]);
+
+  useEffect(() => {
+    if (!burnedToken) {
+      return;
+    }
+    tokenDataRef.current = tokenDataRef.current.map((d: TokenData) => {
+      const tokenId = getTokenId(d.dateHex, d.ciphertext);
+      if (tokenId !== burnedToken.id) {
+        return { ...d, tokenId: tokenId };
+      }
+      return { ...d, tokenId: tokenId, status: 2, isOwner: false };
+    });
+    setTokenData([...tokenDataRef.current]);
+  }, [burnedToken, walletAddress]);
 
   const add = async (data: TokenData) => {
     const index = tokenDataRef.current.findIndex((_data) => isSameTokenData(_data, data));

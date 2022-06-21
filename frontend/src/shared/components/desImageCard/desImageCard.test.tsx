@@ -46,6 +46,8 @@ describe('<DesImageCard>', function () {
       burnPrice: '',
       ownedTokenIds: [],
       isUserTokenIDsLoading: false,
+      mintedToken: null,
+      burnedToken: null,
       mint: (dateHex: string, ciphertext: string) => new Promise((resolve, reject) => resolve(true)),
       burn: (tokenId: string) => new Promise((resolve, reject) => resolve(true)),
     }));

@@ -24,6 +24,8 @@ interface ContextState {
   burnPrice: string;
   ownedTokenIds: string[];
   isUserTokenIDsLoading: boolean;
+  mintedToken: { to: string; id: string } | null;
+  burnedToken: { from: string; id: string } | null;
   mint: (dateHex: string, ciphertext: string) => Promise<boolean>;
   burn: (tokenId: string) => Promise<boolean>;
 }
@@ -40,6 +42,8 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   const [burnPrice, setBurnPrice] = useState('');
   const [ownedTokenIds, setOwnedTokenIds] = useState<string[]>([]);
   const [isUserTokenIDsLoading, setIsUserTokenIDsLoading] = useState(false);
+  const [mintedToken, setMintedToken] = useState<{ to: string; id: string } | null>(null);
+  const [burnedToken, setBurnedToken] = useState<{ from: string; id: string } | null>(null);
   const ownedTokenIdsRef = useRef<string[]>([]);
 
   const _updateOwnedTokenIds = (from: string, to: string, tokenId: BigNumber) => {
@@ -76,8 +80,8 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
         };
       case 'Minted':
         return (
-          _to: string,
-          _tokenId: BigNumber,
+          to: string,
+          tokenId: BigNumber,
           _mintPrice: BigNumber,
           totalSupply: BigNumber,
           totalEverMinted: BigNumber,
@@ -87,19 +91,19 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
             return;
           }
           console.log('Minted');
-          // TODO: update catalog from sale to minted
+          setMintedToken({ to, id: tokenId.toHexString() });
           setTotalSupply(totalSupply.toString());
           setTotalEverMinted(totalEverMinted.toString());
           setMintPrice(calcMintPrice(totalSupply));
           setBurnPrice(calcBurnReward(totalSupply));
         };
       case 'Burned':
-        return (_from: string, _tokenId: BigNumber, _burnReward: BigNumber, totalSupply: BigNumber, event: any) => {
+        return (from: string, tokenId: BigNumber, _burnReward: BigNumber, totalSupply: BigNumber, event: any) => {
           if (event?.blockNumber <= startBlockNumber) {
             return;
           }
           console.log('Burned');
-          // TODO: update catalog from minted to burned
+          setBurnedToken({ from, id: tokenId.toHexString() });
           setTotalSupply(totalSupply.toString());
           setMintPrice(calcMintPrice(totalSupply));
           setBurnPrice(calcBurnReward(totalSupply));
@@ -204,6 +208,8 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
         burnPrice,
         ownedTokenIds,
         isUserTokenIDsLoading,
+        mintedToken,
+        burnedToken,
         mint,
         burn,
       }}
