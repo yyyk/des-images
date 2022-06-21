@@ -127,7 +127,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     tokenDataRef.current = tokenDataRef.current.map((d: TokenData) => {
-      const tokenId = getTokenId(d.dateHex, d.ciphertext);
+      const tokenId = d?.tokenId || getTokenId(d.dateHex, d.ciphertext);
       if (tokenId !== mintedToken.id) {
         return { ...d, tokenId: tokenId };
       }
@@ -141,7 +141,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     tokenDataRef.current = tokenDataRef.current.map((d: TokenData) => {
-      const tokenId = getTokenId(d.dateHex, d.ciphertext);
+      const tokenId = d?.tokenId || getTokenId(d.dateHex, d.ciphertext);
       if (tokenId !== burnedToken.id) {
         return { ...d, tokenId: tokenId };
       }
