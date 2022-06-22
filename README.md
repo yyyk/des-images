@@ -40,5 +40,5 @@ key = b"20200101"
 ciphertext = bytes.fromhex("79030f7920aaa3cfbbd92afbb93e70ba")
 des = DES.new(key, DES.MODE_ECB)
 plaintext = des.decrypt(ciphertext)
-print(plaintext) # b'i am still alive'
+print(plaintext) # b"i am still alive"
 ```
