@@ -1,6 +1,6 @@
 # desImages NFT
 
-**i am still alive** is a plaintext made up of sixteen [ISO-8859-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1) characters encrypted into a 128-bit ciphertext using the [DES](https://en.wikipedia.org/wiki/Data_Encryption_Standard) algorithm in ECB mode. The phrase refers to Japanese artist [On Kawara](https://en.wikipedia.org/wiki/On_Kawara)'s canonical series of telegram artworks from 1969.
+***i am still alive*** is a plaintext made up of sixteen [ISO-8859-1](https://en.wikipedia.org/wiki/ISO/IEC_8859-1) characters encrypted into a 128-bit ciphertext using the [DES](https://en.wikipedia.org/wiki/Data_Encryption_Standard) algorithm in ECB mode. The phrase refers to Japanese artist [On Kawara](https://en.wikipedia.org/wiki/On_Kawara)'s canonical series of telegram artworks from 1969.
 
 Upon encryption, the ciphertext is then divided up into sixteen units of 8-bit value. Each unit is used to derive the shades of sixteen squares, which are layered on each other in a manner similar to the paintings *[Homage to the Square](https://en.wikipedia.org/wiki/Josef_Albers#Homage_to_the_Square)* by German-American artist [Josef Albers](https://en.wikipedia.org/wiki/Josef_Albers). The leftmost 8-bit value corresponds to the shade of the outermost square, while the rightmost value corresponds to the shade of the innermost square.
 
