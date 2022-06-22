@@ -1,6 +1,6 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import Portis from '@portis/web3';
-import Authereum from 'authereum';
+// import Authereum from 'authereum';
 import Fortmatic from 'fortmatic';
 import { ETH_NETWORK } from 'src/shared/constants';
 import {
@@ -120,28 +120,28 @@ export function createPortisProvider(): WalletProvider | null {
   }
 }
 
-let authereum: any = null;
-if (ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
-  authereum = new Authereum(ETH_NETWORK);
-}
-export function createAuthereumProvider(): WalletProvider | null {
-  if (!authereum) {
-    return null;
-  }
-  try {
-    const provider = authereum.getProvider();
-    return {
-      type: WALLET_TYPE.AUTHEREUM,
-      name: WALLET_NAME.AUTHEREUM,
-      provider,
-      logout: () => {
-        provider.disable();
-      },
-    };
-  } catch (e) {
-    return null;
-  }
-}
+// let authereum: any = null;
+// if (ETH_NETWORK && ETH_NETWORK !== CHAIN_NAME.LOCALHOST) {
+//   authereum = new Authereum(ETH_NETWORK);
+// }
+// export function createAuthereumProvider(): WalletProvider | null {
+//   if (!authereum) {
+//     return null;
+//   }
+//   try {
+//     const provider = authereum.getProvider();
+//     return {
+//       type: WALLET_TYPE.AUTHEREUM,
+//       name: WALLET_NAME.AUTHEREUM,
+//       provider,
+//       logout: () => {
+//         provider.disable();
+//       },
+//     };
+//   } catch (e) {
+//     return null;
+//   }
+// }
 
 export function createFortmaticProvider(): WalletProvider | null {
   if (!ETH_NETWORK || ETH_NETWORK === CHAIN_NAME.LOCALHOST) {
@@ -205,8 +205,8 @@ export function getProviders(): WalletProvider[] {
   }
 
   // Authereum
-  const authereumProvider = createAuthereumProvider();
-  authereumProvider && providers.push(authereumProvider);
+  // const authereumProvider = createAuthereumProvider();
+  // authereumProvider && providers.push(authereumProvider);
 
   // Fortmatic
   const fortmaticProvider = createFortmaticProvider();
