@@ -35,15 +35,17 @@ const ContractContext = createContext({} as ContextState);
 const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   const { signer, walletAddress } = useWalletContext();
   const [contract, setContract] = useState<Contract | null>(null);
+  // TODO: contract state + its ref ------------
   const [isPaused, setIsPaused] = useState(true);
   const [totalEverMinted, setTotalEverMinted] = useState('');
   const [totalSupply, setTotalSupply] = useState('');
   const [mintPrice, setMintPrice] = useState('');
   const [burnPrice, setBurnPrice] = useState('');
-  const [ownedTokenIds, setOwnedTokenIds] = useState<string[]>([]);
-  const [isUserTokenIDsLoading, setIsUserTokenIDsLoading] = useState(false);
+  // -------------------------------------------
   const [mintedToken, setMintedToken] = useState<{ to: string; id: string } | null>(null);
   const [burnedToken, setBurnedToken] = useState<{ from: string; id: string } | null>(null);
+  const [isUserTokenIDsLoading, setIsUserTokenIDsLoading] = useState(false);
+  const [ownedTokenIds, setOwnedTokenIds] = useState<string[]>([]);
   const ownedTokenIdsRef = useRef<string[]>([]);
 
   const _updateOwnedTokenIds = (from: string, to: string, tokenId: BigNumber) => {
@@ -145,17 +147,15 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     setOwnedTokenIds([...ownedTokenIdsRef.current]);
   };
 
-  const _setup = async (contract: Contract | null) => {
-    setIsPaused(!!contract ? await _isPaused(contract) : true);
-    setTotalSupply(!!contract ? await getTotalSupply(contract) : '');
-    setTotalEverMinted(!!contract ? await getTotalEverMinted(contract) : '');
-    setMintPrice(!!contract ? await getCurrentPrice(contract) : '');
-    setBurnPrice(!!contract ? await getCurrentBurnReward(contract) : '');
-  };
-
   useEffect(() => {
-    _setup(contract);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    async function _setupInitialContractState(contract: Contract | null) {
+      setIsPaused(!!contract ? await _isPaused(contract) : true);
+      setTotalSupply(!!contract ? await getTotalSupply(contract) : '');
+      setTotalEverMinted(!!contract ? await getTotalEverMinted(contract) : '');
+      setMintPrice(!!contract ? await getCurrentPrice(contract) : '');
+      setBurnPrice(!!contract ? await getCurrentBurnReward(contract) : '');
+    }
+    _setupInitialContractState(contract);
   }, [contract]);
 
   useEffect(() => {
@@ -163,7 +163,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       setContract(null);
       return;
     }
-    async function setup(contract: Contract) {
+    async function setupContract(contract: Contract) {
       setIsUserTokenIDsLoading(true);
       const currentBlockNumber = await contract.provider.getBlockNumber();
       await _queryTokenIds(contract, walletAddress, currentBlockNumber);
@@ -172,7 +172,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       setIsUserTokenIDsLoading(false);
     }
     const newContract = new ethers.Contract(CONTRACT_ADDRESS, DesImages.abi, signer);
-    setup(newContract);
+    setupContract(newContract);
     return () => {
       newContract.removeAllListeners();
     };

@@ -2,6 +2,7 @@ import { useCatalogContext } from 'src/shared/contexts/catalog';
 import { useContractContext } from 'src/shared/contexts/contract';
 import { useNotificationContext } from 'src/shared/contexts/notification';
 import { NOTIFICATION_TYPE, TokenData } from 'src/shared/interfaces';
+import { getTokenId } from 'src/shared/utils/tokenDataHelpers';
 import DesImageCard from 'src/shared/components/desImageCard';
 
 const Collection = () => {
@@ -11,7 +12,7 @@ const Collection = () => {
 
   const handleBurn = async (data: TokenData) => {
     processStarted(data);
-    const res = data?.tokenId ? await burn(data.tokenId) : false;
+    const res = await burn(data?.tokenId || getTokenId(data.dateHex, data.ciphertext));
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Burn failed.' });
       processEnded(data);

@@ -45,44 +45,45 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     writeTokenDataToLocalStorage(data);
   };
 
+  const _resetTokenData = () => {
+    tokenDataRef.current = tokenDataRef.current.map((d) => ({
+      year: d.year,
+      month: d.month,
+      day: d.day,
+      dateHex: d.dateHex,
+      ciphertext: d.ciphertext,
+      plaintext: d.plaintext,
+    }));
+    setTokenData([...tokenDataRef.current]);
+  };
+
   const _updateOwnedTokenData = (data: TokenData[]) => {
     ownedTokenDataRef.current = [...data];
     setOwnedTokenData([...ownedTokenDataRef.current]);
   };
 
-  const _updateTokenDataStatus = async (contract: Contract | null, data: TokenData[], walletAddress: string) => {
-    const newData = await updateTokenDataStatus(contract, data, walletAddress);
-    const res: TokenData[] = [];
-    tokenDataRef.current.forEach((_data) => {
-      const index = newData.findIndex((d) => isSameTokenData(d, _data));
-      index >= 0 && res.push({ ...newData[index] });
-    });
-    _updateTokenData(res);
-  };
-
-  const _fetchOwnedTokenData = async (contract: Contract | null, ownedTokenIds: string[]) => {
-    if (!contract || !ownedTokenIds || ownedTokenIds.length === 0) {
-      _updateOwnedTokenData([]);
-      return;
-    }
-    setIsUserTokensLoading(true);
-    const _ownedTokenData = (await getTokenDataFromTokenIds(contract, ownedTokenIds)).map((data) => {
-      const index = ownedTokenDataRef.current.findIndex((_data) => isSameTokenData(_data, data));
-      return { ...data, isInProcess: index >= 0 && ownedTokenDataRef.current[index].isInProcess };
-    });
-    _updateOwnedTokenData(_ownedTokenData);
-    setIsUserTokensLoading(false);
-  };
-
+  // Read tokenData from local storage.
   useEffectOnce(() => {
     tokenDataRef.current = getTokenDataFromLocalStorage();
     setTokenData([...tokenDataRef.current]);
   });
 
+  // When the contract or wallet address is changed, tokenData statuses are updated.
+  // Also, when local storage is updated in another tab, it updates all the tabs.
   useEffect(() => {
-    tokenDataRef.current &&
-      tokenDataRef.current?.length &&
-      _updateTokenDataStatus(contract, [...tokenDataRef.current], walletAddress);
+    if (!walletAddress || !contract) {
+      _resetTokenData();
+      return;
+    }
+    async function _updateTokenDataStatus(contract: Contract | null, data: TokenData[], walletAddress: string) {
+      const newData = await updateTokenDataStatus(contract, data, walletAddress);
+      const res: TokenData[] = [];
+      tokenDataRef.current.forEach((_data) => {
+        const index = newData.findIndex((d) => isSameTokenData(d, _data));
+        index >= 0 && res.push({ ...newData[index] });
+      });
+      _updateTokenData(res);
+    }
 
     function storageListener() {
       // TODO: add loading states of each data?
@@ -91,18 +92,37 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
         ? _updateTokenDataStatus(contract, [...tokenDataRef.current], walletAddress)
         : setTokenData([]);
     }
+
+    tokenDataRef.current &&
+      tokenDataRef.current?.length &&
+      _updateTokenDataStatus(contract, [...tokenDataRef.current], walletAddress);
+
     window.addEventListener('storage', storageListener);
     return () => {
       window.removeEventListener('storage', storageListener);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract]);
+  }, [contract, walletAddress]);
 
+  // update ownedTokenData by listening the ownedTokenIds's change.
   useEffect(() => {
-    _fetchOwnedTokenData(contract, ownedTokenIds);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    async function fetchOwnedTokenData(contract: Contract | null, ownedTokenIds: string[]) {
+      if (!contract || !ownedTokenIds || ownedTokenIds.length === 0) {
+        _updateOwnedTokenData([]);
+        return;
+      }
+      setIsUserTokensLoading(true);
+      const _ownedTokenData = (await getTokenDataFromTokenIds(contract, ownedTokenIds)).map((data) => {
+        const index = ownedTokenDataRef.current.findIndex((_data) => isSameTokenData(_data, data));
+        return { ...data, isInProcess: index >= 0 && ownedTokenDataRef.current[index].isInProcess };
+      });
+      _updateOwnedTokenData(_ownedTokenData);
+      setIsUserTokensLoading(false);
+    }
+    fetchOwnedTokenData(contract, ownedTokenIds);
   }, [contract, ownedTokenIds]);
 
+  // If the user leaves the page while mint or burn is in progress, logout the wallet
+  // to prevent the user seeing mint or burn button not in loading state after reload.
   useEffect(() => {
     if (!walletProvider) {
       return;
@@ -119,9 +139,9 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       window.removeEventListener('beforeunload', beforeunloadListener);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletProvider, tokenData, ownedTokenData]);
+  }, [walletProvider, tokenData, ownedTokenData, logout]);
 
+  // When Minted event is emitted from contract, the token is updated in tokenData.
   useEffect(() => {
     if (!mintedToken) {
       return;
@@ -131,11 +151,12 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       if (tokenId !== mintedToken.id) {
         return { ...d, tokenId: tokenId };
       }
-      return { ...d, tokenId: tokenId, status: 1, isOwner: walletAddress === mintedToken.to };
+      return { ...d, tokenId: tokenId, status: 1, isOwner: isSameAddress(walletAddress, mintedToken.to) };
     });
     setTokenData([...tokenDataRef.current]);
   }, [mintedToken, walletAddress]);
 
+  // When Burned event is emitted from contract, the token is updated in tokenData.
   useEffect(() => {
     if (!burnedToken) {
       return;

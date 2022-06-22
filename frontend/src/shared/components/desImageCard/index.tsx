@@ -40,11 +40,16 @@ const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () 
           <strong>The unused part of the buffer will be refunded.</strong>
         </li>
         <li className="mb-0">
-          If more than ten mints occur in one block or if someone else is also minting the same token at around the same
-          time, your mint transaction might fail. In such a case,{' '}
+          In case <strong>more than ten mints occur in one block</strong> or{' '}
+          <strong>someone else also mints the same token at around the same time</strong>, your mint transaction might
+          fail. Even though the Ether sent to the contract would be returned,{' '}
+          <strong>you would still be charged for the transaction fee</strong>.
+        </li>
+        {/* <li className="mb-0">
+          If more than ten mints occur in one block, your mint transaction might fail. In such a case,{' '}
           <strong>you would still be charged for the transaction fee</strong>, though the Ether sent to the contract
           would be returned.
-        </li>
+        </li> */}
       </ul>
     </Modal>
   );
@@ -88,14 +93,14 @@ const DesImageCard = ({
 
   const handleOnMint = async (e: MouseEvent) => {
     e.preventDefault();
-    if (walletAddress && tokenData) {
+    if (walletAddress && tokenData && onMint) {
       setOpen(true);
     }
   };
 
   const handleOnBurn = async (e: MouseEvent) => {
     e.preventDefault();
-    if (walletAddress && tokenData && tokenData.tokenId && onBurn) {
+    if (walletAddress && tokenData && onBurn) {
       onBurn(tokenData);
     }
   };
