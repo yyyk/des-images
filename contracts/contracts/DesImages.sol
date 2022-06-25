@@ -141,9 +141,9 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
         return uint256(keccak256(abi.encodePacked(date_, ciphertext_)));
     }
 
-    /// @notice base64 encoded svg is used for image value
-    /// @param tokenId_ the token id
-    /// @return string the base64 encoded json string
+    /// @notice base64 encoded json + base64 encoded svg for image value
+    /// @param tokenId_ token id
+    /// @return string base64 encoded json string
     /// @dev See {IERC721Metadata-tokenURI}.
     function tokenURI(uint256 tokenId_)
         public
@@ -161,11 +161,12 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
             TokenURI.generateTokenURI(tokenValue.date, tokenValue.ciphertext);
     }
 
-    /// @notice Mints a token. ciphertext_ can be any value as long as it's uint128 value.
-    ///         This is intended to allow mods with various plaintexts, instead of the official 'i am still alive'.
-    /// @param date_ the date key as 0xYYYYMDD
-    /// @param ciphertext_ the cipher text in 0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    /// @return uint256 the token id
+    /// @notice Mints a token.
+    ///         ciphertext_ can be any value as long as it's in uint128. This is intended
+    ///         to allow mods with various plaintexts other than the official 'i am still alive'.
+    /// @param date_ date key as 0xYYYYMDD
+    /// @param ciphertext_ ciphertext as 0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    /// @return uint256 token id
     function mint(uint32 date_, uint128 ciphertext_)
         external
         payable
