@@ -78,7 +78,9 @@ const DesImageCard = ({
 }: DesImageCardProps) => {
   const { theme } = useThemeContext();
   const { walletAddress } = useWalletContext();
-  const { isPaused } = useContractContext();
+  const {
+    contractState: { isPaused },
+  } = useContractContext();
   const [open, setOpen] = useState(false);
   const date = `#${tokenData.year}${String(tokenData.month).padStart(2, '0')}${String(tokenData.day).padStart(2, '0')}`;
   const { status, isOwner } = tokenData;

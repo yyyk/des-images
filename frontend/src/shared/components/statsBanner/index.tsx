@@ -29,7 +29,9 @@ const Stats = ({
 };
 
 const StatsBanner = () => {
-  const { totalEverMinted, totalSupply, mintPrice, burnPrice } = useContractContext();
+  const {
+    contractState: { totalEverMinted, totalSupply, mintPrice, burnPrice },
+  } = useContractContext();
   const [width, setWidth] = useState(0);
   const [amount, setAmount] = useState(1);
   const [duration, setDuration] = useState('1');

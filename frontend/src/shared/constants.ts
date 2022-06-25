@@ -1,3 +1,5 @@
+import { ContractState } from 'src/shared/interfaces';
+
 export const defaultTokenData = {
   year: '2020',
   month: '01',
@@ -30,3 +32,11 @@ export const ETH_NETWORK = process.env.REACT_APP_ETH_NETWORK ?? '';
 export const APP_LOGO_URL = 'https://desimages.xyz/logo512.png';
 
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+export const DEFAULT_CONTRACT_STATE: ContractState = {
+  isPaused: true,
+  totalSupply: '',
+  totalEverMinted: '',
+  mintPrice: '',
+  burnPrice: '',
+};

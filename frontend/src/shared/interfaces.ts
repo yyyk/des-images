@@ -106,3 +106,11 @@ export interface ConnectWalletResponse {
   success: boolean;
   error?: { type: string; message: string };
 }
+
+export interface ContractState {
+  isPaused: boolean;
+  totalSupply: string;
+  totalEverMinted: string;
+  mintPrice: string;
+  burnPrice: string;
+}

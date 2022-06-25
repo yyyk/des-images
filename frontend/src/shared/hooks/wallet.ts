@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { ETH_NETWORK, LOCAL_STORAGE_WALLET_KEY } from 'src/shared/constants';
-import { CHAIN_ID, CHAIN_NAME, ConnectWalletResponse, ERROR_TYPE, WalletProvider } from 'src/shared/interfaces';
+import { LOCAL_STORAGE_WALLET_KEY } from 'src/shared/constants';
+import { ConnectWalletResponse, ERROR_TYPE, WalletProvider } from 'src/shared/interfaces';
 import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import {
   createErrorResponse,
   getProviders,
+  isInvalidChain,
   isWalletAuthereum,
   isWalletConnect,
   isWalletFortmatic,
@@ -148,21 +149,11 @@ export const useWallet = () => {
       const web3Provider = new ethers.providers.Web3Provider(walletProvider.provider as any);
       const signer = web3Provider.getSigner();
       const network = await web3Provider.ready;
-      const userAddress = await web3Provider.getSigner().getAddress();
+      const userAddress = await signer.getAddress();
       // const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
       const chainId: number | string = await web3Provider.send('eth_chainId', []);
       console.log(`connected to ${network?.name}`);
-      if (
-        (ETH_NETWORK === CHAIN_NAME.LOCALHOST &&
-          chainId !== CHAIN_ID.LOCALHOST &&
-          chainId !== parseInt(CHAIN_ID.LOCALHOST)) ||
-        (ETH_NETWORK === CHAIN_NAME.RINKEBY &&
-          chainId !== CHAIN_ID.RINKEBY &&
-          chainId !== parseInt(CHAIN_ID.RINKEBY)) ||
-        (ETH_NETWORK === CHAIN_NAME.MAIN_NET &&
-          chainId !== CHAIN_ID.MAIN_NET &&
-          chainId !== parseInt(CHAIN_ID.MAIN_NET))
-      ) {
+      if (isInvalidChain(chainId)) {
         await logoutWallet(walletProvider);
         setIsInvalidChainId(true);
         setWalletProvider(walletProvider);

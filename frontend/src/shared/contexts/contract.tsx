@@ -1,7 +1,8 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { ethers, Contract, BigNumber } from 'ethers';
 import { useWalletContext } from 'src/shared/contexts/wallet';
-import { CONTRACT_ADDRESS, MINT_PRICE_COEF, NULL_ADDRESS } from 'src/shared/constants';
+import { CONTRACT_ADDRESS, DEFAULT_CONTRACT_STATE, MINT_PRICE_COEF, NULL_ADDRESS } from 'src/shared/constants';
+import { ContractState } from 'src/shared/interfaces';
 import {
   mint as _mint,
   burn as _burn,
@@ -17,11 +18,7 @@ import { deleteTokenDataCacheOf } from 'src/shared/utils/tokenDataHelpers';
 
 interface ContextState {
   contract: Contract | null;
-  isPaused: boolean;
-  totalSupply: string;
-  totalEverMinted: string;
-  mintPrice: string;
-  burnPrice: string;
+  contractState: ContractState;
   ownedTokenIds: string[];
   isUserTokenIDsLoading: boolean;
   mintedToken: { to: string; id: string } | null;
@@ -35,13 +32,8 @@ const ContractContext = createContext({} as ContextState);
 const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   const { signer, walletAddress } = useWalletContext();
   const [contract, setContract] = useState<Contract | null>(null);
-  // TODO: contract state + its ref ------------
-  const [isPaused, setIsPaused] = useState(true);
-  const [totalEverMinted, setTotalEverMinted] = useState('');
-  const [totalSupply, setTotalSupply] = useState('');
-  const [mintPrice, setMintPrice] = useState('');
-  const [burnPrice, setBurnPrice] = useState('');
-  // -------------------------------------------
+  const [contractState, setContractState] = useState(DEFAULT_CONTRACT_STATE);
+  const contractStateRef = useRef({ ...contractState });
   const [mintedToken, setMintedToken] = useState<{ to: string; id: string } | null>(null);
   const [burnedToken, setBurnedToken] = useState<{ from: string; id: string } | null>(null);
   const [isUserTokenIDsLoading, setIsUserTokenIDsLoading] = useState(false);
@@ -94,10 +86,14 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           }
           console.log('Minted');
           setMintedToken({ to, id: tokenId.toHexString() });
-          setTotalSupply(totalSupply.toString());
-          setTotalEverMinted(totalEverMinted.toString());
-          setMintPrice(calcMintPrice(totalSupply));
-          setBurnPrice(calcBurnReward(totalSupply));
+          contractStateRef.current = {
+            ...contractStateRef.current,
+            totalSupply: totalSupply.toString(),
+            totalEverMinted: totalEverMinted.toString(),
+            mintPrice: calcMintPrice(totalSupply),
+            burnPrice: calcBurnReward(totalSupply),
+          };
+          setContractState({ ...contractStateRef.current });
         };
       case 'Burned':
         return (from: string, tokenId: BigNumber, _burnReward: BigNumber, totalSupply: BigNumber, event: any) => {
@@ -106,9 +102,13 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           }
           console.log('Burned');
           setBurnedToken({ from, id: tokenId.toHexString() });
-          setTotalSupply(totalSupply.toString());
-          setMintPrice(calcMintPrice(totalSupply));
-          setBurnPrice(calcBurnReward(totalSupply));
+          contractStateRef.current = {
+            ...contractStateRef.current,
+            totalSupply: totalSupply.toString(),
+            mintPrice: calcMintPrice(totalSupply),
+            burnPrice: calcBurnReward(totalSupply),
+          };
+          setContractState({ ...contractStateRef.current });
         };
       case 'Paused':
         return (event: any) => {
@@ -116,7 +116,11 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
             return;
           }
           console.log('Paused');
-          setIsPaused(true);
+          contractStateRef.current = {
+            ...contractStateRef.current,
+            isPaused: true,
+          };
+          setContractState({ ...contractStateRef.current });
         };
       case 'UnPaused':
         return (event: any) => {
@@ -124,7 +128,11 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
             return;
           }
           console.log('UnPaused');
-          setIsPaused(false);
+          contractStateRef.current = {
+            ...contractStateRef.current,
+            isPaused: false,
+          };
+          setContractState({ ...contractStateRef.current });
         };
       default:
         return () => {};
@@ -149,11 +157,18 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     async function _setupInitialContractState(contract: Contract | null) {
-      setIsPaused(!!contract ? await _isPaused(contract) : true);
-      setTotalSupply(!!contract ? await getTotalSupply(contract) : '');
-      setTotalEverMinted(!!contract ? await getTotalEverMinted(contract) : '');
-      setMintPrice(!!contract ? await getCurrentPrice(contract) : '');
-      setBurnPrice(!!contract ? await getCurrentBurnReward(contract) : '');
+      if (!!contract) {
+        contractStateRef.current = {
+          isPaused: await _isPaused(contract),
+          totalSupply: await getTotalSupply(contract),
+          totalEverMinted: await getTotalEverMinted(contract),
+          mintPrice: await getCurrentPrice(contract),
+          burnPrice: await getCurrentBurnReward(contract),
+        };
+      } else {
+        contractStateRef.current = { ...DEFAULT_CONTRACT_STATE };
+      }
+      setContractState({ ...contractStateRef.current });
     }
     _setupInitialContractState(contract);
   }, [contract]);
@@ -201,11 +216,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     <ContractContext.Provider
       value={{
         contract,
-        isPaused,
-        totalSupply,
-        totalEverMinted,
-        mintPrice,
-        burnPrice,
+        contractState,
         ownedTokenIds,
         isUserTokenIDsLoading,
         mintedToken,

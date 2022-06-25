@@ -4,6 +4,7 @@ import Portis from '@portis/web3';
 import Fortmatic from 'fortmatic';
 import { ETH_NETWORK } from 'src/shared/constants';
 import {
+  CHAIN_ID,
   CHAIN_NAME,
   ConnectWalletResponse,
   ERROR_TYPE,
@@ -221,6 +222,16 @@ export function getProviders(): WalletProvider[] {
   walletConnectProvider && providers.push(walletConnectProvider);
 
   return providers;
+}
+
+export function isInvalidChain(chainId: number | string): boolean {
+  return (
+    (ETH_NETWORK === CHAIN_NAME.LOCALHOST &&
+      chainId !== CHAIN_ID.LOCALHOST &&
+      chainId !== parseInt(CHAIN_ID.LOCALHOST)) ||
+    (ETH_NETWORK === CHAIN_NAME.RINKEBY && chainId !== CHAIN_ID.RINKEBY && chainId !== parseInt(CHAIN_ID.RINKEBY)) ||
+    (ETH_NETWORK === CHAIN_NAME.MAIN_NET && chainId !== CHAIN_ID.MAIN_NET && chainId !== parseInt(CHAIN_ID.MAIN_NET))
+  );
 }
 
 export function isMobile(): boolean {

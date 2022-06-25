@@ -39,11 +39,13 @@ describe('<DesImageCard>', function () {
 
     contractMock = jest.spyOn(ContractContext, 'useContractContext').mockImplementation(() => ({
       contract: null,
-      isPaused: false,
-      totalSupply: '',
-      totalEverMinted: '',
-      mintPrice: '',
-      burnPrice: '',
+      contractState: {
+        isPaused: false,
+        totalSupply: '',
+        totalEverMinted: '',
+        mintPrice: '',
+        burnPrice: '',
+      },
       ownedTokenIds: [],
       isUserTokenIDsLoading: false,
       mintedToken: null,
