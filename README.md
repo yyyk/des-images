@@ -6,6 +6,14 @@ Upon encryption, the ciphertext is then divided up into sixteen units of 8-bit v
 
 Each token is titled with a [UTC](https://en.wikipedia.org/wiki/Coordinated_Universal_Time) date written in the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format (YYYYMMDD) between 2020-01-01 and the timestamp date of the current block. These eight ISO-8859-1 characters form a 64-bit key for the DES algorithm.
 
+## Links
+
+[desImages](https://desimages.xyz/)
+
+[contract](https://)
+
+## Directories
+
 ### `/contract`
 
 contains solidity files
@@ -14,9 +22,9 @@ contains solidity files
 
 contains react frontend app
 
-### DES decryption examples
+## DES decryption examples
 
-#### Node.js
+### Node.js
 
 ```js
 const crypto = require('crypto');
@@ -31,7 +39,7 @@ plaintext += decipher.final('latin1');
 console.log(plaintext) // 'i am still alive'
 ```
 
-#### Python
+### Python
 
 ```python
 from Crypto.Cipher import DES
