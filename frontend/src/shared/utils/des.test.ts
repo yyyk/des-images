@@ -43,16 +43,22 @@ describe('encrypt', function () {
 
     for (let month = 1; month <= 12; month++) {
       for (let day = 1; day <= 31; day++) {
-        const m = month.toString().padStart(2, '0');
-        const d = day.toString().padStart(2, '0');
-        expect(encrypt(`2020${m}${d}`)).toEqual(_encrypt(2020, month, day));
-        expect(encrypt(`2021${m}${d}`)).toEqual(_encrypt(2021, month, day));
-        expect(encrypt(`2022${m}${d}`)).toEqual(_encrypt(2022, month, day));
+        for (let year = 20; year < 99; year++) {
+          const y = year.toString().padStart(2, '0');
+          const yInt = parseInt(`20${y}`);
+          const m = month.toString().padStart(2, '0');
+          const d = day.toString().padStart(2, '0');
 
-        expect(encrypt(`2020${m}${d}`, plaintext)).toEqual(_encrypt(2020, month, day, plaintext));
+          expect(encrypt(`20${y}${m}${d}`)).toEqual(_encrypt(yInt, month, day));
+          expect(encrypt(`20${y}${m}${d}`, plaintext)).toEqual(_encrypt(yInt, month, day, plaintext));
+
+          // const randomText = Array.from({ length: 16 }, (_, i) => i)
+          //   .map(() => String.fromCharCode(Math.floor(Math.random() * 256)))
+          //   .join('');
+          // expect(encrypt(`20${y}${m}${d}`, randomText)).toEqual(_encrypt(yInt, month, day, randomText));
+        }
       }
     }
-
     // console.log(_decrypt('20200101', '00112233445566778899aabbccddeeff'));
   });
 });
