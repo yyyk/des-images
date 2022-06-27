@@ -1,7 +1,7 @@
 const Supplement = () => {
   return (
     <div className="sm:text-lg sm:leading-8">
-      <h4 className="mt-0">Key Clustering:</h4>
+      <h4 className="mt-0">Key Clustering</h4>
       <p>
         When entering different dates, it is possible to encounter images generated for different dates that look the
         same. This is a product of a situation where two or more different keys produce the same ciphertext.
@@ -13,7 +13,7 @@ const Supplement = () => {
         each byte are actual material in a DES key. This applies to the pairs of <i>2</i> and <i>3</i>, <i>4</i> and{' '}
         <i>5</i>, <i>6</i> and <i>7</i>, and <i>8</i> and <i>9</i>.
       </p>
-      <h4>Protection of token uniqueness:</h4>
+      <h4>Protection of token uniqueness</h4>
       <p>
         Even though images can appear the same as other tokens due to key clustering (as described above), the
         uniqueness of each token ID is protected.
@@ -26,7 +26,7 @@ const Supplement = () => {
         Furthermore, the key is included in the <code>&lt;title&gt;</code> element of the token's image SVG, along with
         the <code>&lt;rect&gt;</code> elements indicating the ciphertext.
       </p>
-      <h4>Decipherment:</h4>
+      <h4>Decipherment</h4>
       <p>
         The hexadecimal ciphertext can be reconstructed by taking the last two characters from the hexadecimal
         fill-color values of each <code>&lt;rect&gt;</code> element, while the key can be found in the{' '}
