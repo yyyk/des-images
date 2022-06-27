@@ -13,8 +13,8 @@ export async function queryTokenIds(
     ETH_NETWORK === CHAIN_NAME.RINKEBY
       ? '10793462'
       : ETH_NETWORK === CHAIN_NAME.MAIN_NET
-      ? '14859331' // TODO: update needed once contract deployed
-      : '0',
+      ? '15030881' // TODO: update needed once contract deployed
+      : '0', // localhost
   );
   const endBlock = (isNil(currentBlock) ? await contract.provider.getBlockNumber() : currentBlock) as number;
   const owned: Set<string> = new Set();
