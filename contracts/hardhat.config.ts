@@ -10,7 +10,12 @@ import "tsconfig-paths/register";
 
 dotenv.config();
 
-const { RINKEBY_API_URL, PRIVATE_KEY } = process.env;
+const {
+  MAINNET_API_URL,
+  MAINNET_PRIVATE_KEY,
+  RINKEBY_API_URL,
+  RINKEBY_PRIVATE_KEY,
+} = process.env;
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -26,7 +31,6 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
-  // solidity: "0.8.4",
   solidity: {
     version: "0.8.13",
     settings: {
@@ -42,14 +46,18 @@ const config: HardhatUserConfig = {
       // https://hardhat.org/metamask-issue.html
       chainId: 1337,
     },
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-    },
+    // ropsten: {
+    //   url: process.env.ROPSTEN_URL || "",
+    //   accounts:
+    //     process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    // },
     rinkeby: {
       url: RINKEBY_API_URL,
-      accounts: [`0x${PRIVATE_KEY}`],
+      accounts: [`0x${RINKEBY_PRIVATE_KEY}`],
+    },
+    mainnet: {
+      url: MAINNET_API_URL,
+      accounts: [`0x${MAINNET_PRIVATE_KEY}`],
     },
   },
   gasReporter: {

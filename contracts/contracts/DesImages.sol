@@ -161,8 +161,7 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
             TokenURI.generateTokenURI(tokenValue.date, tokenValue.ciphertext);
     }
 
-    /// @notice Mints a token.
-    ///         ciphertext_ can be any value as long as it's in uint128. This is intended
+    /// @notice ciphertext_ can be any value as long as it's in uint128. This is intended
     ///         to allow mods with various plaintexts other than the official 'i am still alive'.
     /// @param date_ date key as 0xYYYYMDD
     /// @param ciphertext_ ciphertext as 0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -195,6 +194,7 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
             revert DesImages__CreatorTransferFail();
         }
 
+        // send back ETH if more than mintPrice is sent
         if (msg.value > mintPrice) {
             (success, ) = payable(msg.sender).call{
                 value: msg.value - mintPrice
@@ -215,7 +215,6 @@ contract DesImages is ERC2981, ERC721, Ownable, ReentrancyGuard {
         return tokenId;
     }
 
-    /// @notice Burns a token
     function burn(uint256 tokenId_) external nonReentrant {
         if (msg.sender != ERC721.ownerOf(tokenId_)) {
             revert DesImages__TokenNotOwned();
