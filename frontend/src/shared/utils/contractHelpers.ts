@@ -10,11 +10,7 @@ export async function queryTokenIds(
   currentBlock?: number,
 ): Promise<string[]> {
   const startBlock = parseInt(
-    ETH_NETWORK === CHAIN_NAME.RINKEBY
-      ? '10793462'
-      : ETH_NETWORK === CHAIN_NAME.MAIN_NET
-      ? '15030881' // TODO: update needed once contract deployed
-      : '0', // localhost
+    ETH_NETWORK === CHAIN_NAME.RINKEBY ? '10793462' : ETH_NETWORK === CHAIN_NAME.MAIN_NET ? '15074398' : '0', // localhost
   );
   const endBlock = (isNil(currentBlock) ? await contract.provider.getBlockNumber() : currentBlock) as number;
   const owned: Set<string> = new Set();

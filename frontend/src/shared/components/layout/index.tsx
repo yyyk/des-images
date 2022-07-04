@@ -13,7 +13,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div data-theme={theme} className="min-h-screen w-full flex flex-col flex-nowrap">
-      <div className="alert alert-info justify-center rounded-none w-screen bg-primary text-primary-content">
+      {/* <div className="alert alert-info justify-center rounded-none w-screen bg-primary text-primary-content">
         <div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -30,7 +30,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
           </svg>
           <span>Currently in beta on rinkeby network</span>
         </div>
-      </div>
+      </div> */}
       {isInvalidChainId && <AlertBanner />}
       {walletAddress && <StatsBanner />}
       <div className="prose w-full mx-auto flex flex-col flex-nowrap grow px-3 py-0 overflow-x-hidden">
