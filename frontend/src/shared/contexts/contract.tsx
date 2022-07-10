@@ -200,7 +200,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     }
     let cost = await getCurrentPrice(contract);
     cost = ethers.utils.formatEther(
-      ethers.utils.parseEther(cost), //.add(ethers.utils.parseEther(MINT_PRICE_COEF).mul(10)),
+      ethers.utils.parseEther(cost).add(ethers.utils.parseEther(MINT_PRICE_COEF).mul(10)),
     );
     return await _mint(contract, dateHex, ciphertext, cost);
   };
