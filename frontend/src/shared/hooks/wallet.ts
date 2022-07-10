@@ -152,6 +152,7 @@ export const useWallet = () => {
       const userAddress = await signer.getAddress();
       // const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
       const chainId: number | string = await web3Provider.send('eth_chainId', []);
+      // const chainId: number = await signer.getChainId();
       console.log(`connected to ${network?.name}`);
       if (isInvalidChain(chainId)) {
         await logoutWallet(walletProvider);
