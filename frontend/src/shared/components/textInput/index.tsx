@@ -29,7 +29,7 @@ const TextInput = ({
   });
 
   const inputStateClasses =
-    (textType === TextType.PLAINTEXT && text.plaintext.length === PLAINTEXT_LENGTH && text.isValidPlaintext) ||
+    (textType === TextType.PLAINTEXT && text.plaintext.length <= PLAINTEXT_LENGTH && text.isValidPlaintext) ||
     (textType === TextType.CIPHERTEXT && text.ciphertext.length === CIPHERTEXT_LENGTH && text.isValidCiphertext)
       ? 'focus:input-success'
       : (textType === TextType.PLAINTEXT && text.plaintext.length === 0) ||

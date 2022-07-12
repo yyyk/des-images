@@ -68,7 +68,7 @@ const ModPreviewForm = ({
     e.preventDefault();
     if (
       !date ||
-      (textType === TextType.PLAINTEXT && text.plaintext.length !== PLAINTEXT_LENGTH) ||
+      (textType === TextType.PLAINTEXT && text.plaintext.length > PLAINTEXT_LENGTH) ||
       (textType === TextType.CIPHERTEXT && text.ciphertext.length !== CIPHERTEXT_LENGTH)
     ) {
       return;
@@ -76,7 +76,7 @@ const ModPreviewForm = ({
     setIsLoading(true);
     onSubmit({
       ...destructDateInputValue(date),
-      plaintext: textType === TextType.CIPHERTEXT ? undefined : text.plaintext,
+      plaintext: textType === TextType.CIPHERTEXT ? undefined : text.plaintext.padEnd(PLAINTEXT_LENGTH, ' '),
       ciphertext: textType === TextType.CIPHERTEXT ? text.ciphertext : undefined,
     });
     setIsLoading(false);
@@ -122,7 +122,7 @@ const ModPreviewForm = ({
           disabled={
             isLoading ||
             !text.isValid ||
-            (textType === TextType.PLAINTEXT && text.plaintext.length !== PLAINTEXT_LENGTH) ||
+            (textType === TextType.PLAINTEXT && text.plaintext.length > PLAINTEXT_LENGTH) ||
             (textType === TextType.CIPHERTEXT && text.ciphertext.length !== CIPHERTEXT_LENGTH)
           }
         >
