@@ -5,6 +5,7 @@ import { BigNumber, Contract, Wallet } from "ethers";
 import { ethers, waffle } from "hardhat";
 import { getDateAndCiphertext } from "test/utils/getDateAndCiphertext";
 import { getTokenId } from "test/utils/getTokenId";
+import { NULL_ADDRESS } from "test/utils/constants";
 
 describe("DesImages--burn", function () {
   let desImages: Contract;
@@ -107,11 +108,7 @@ describe("DesImages--burn", function () {
 
         await expect(desImages.connect(user).burn(tokenId))
           .to.emit(desImages, "Transfer")
-          .withArgs(
-            user.address,
-            "0x0000000000000000000000000000000000000000",
-            tokenId
-          );
+          .withArgs(user.address, NULL_ADDRESS, tokenId);
       });
 
       it("sends the reward ether to the token owner", async function () {

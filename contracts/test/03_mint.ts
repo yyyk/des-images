@@ -5,6 +5,7 @@ import { BigNumber, Contract, Wallet } from "ethers";
 import { ethers, waffle } from "hardhat";
 import { getDateAndCiphertext } from "test/utils/getDateAndCiphertext";
 import { getTokenId } from "test/utils/getTokenId";
+import { NULL_ADDRESS } from "test/utils/constants";
 
 describe("DesImages--mint", function () {
   let desImages: Contract;
@@ -101,7 +102,7 @@ describe("DesImages--mint", function () {
         )
           .to.emit(desImages, "Transfer")
           .withArgs(
-            "0x0000000000000000000000000000000000000000",
+            NULL_ADDRESS,
             user.address,
             BigNumber.from(getTokenId(date, ciphertext))
           );
