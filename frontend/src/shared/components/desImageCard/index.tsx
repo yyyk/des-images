@@ -160,7 +160,7 @@ const DesImageCard = ({
           )}
           {showPlaintext && tokenData?.plaintext && (
             <p
-              className={`w-full overflow-hidden text-ellipsis m-0 ${
+              className={`w-full overflow-hidden text-ellipsis whitespace-pre m-0 ${
                 showMintButton || showBurnButton ? 'mb-3' : 'mb-2'
               }`}
               data-testid="desImagesCard__plaintext"
