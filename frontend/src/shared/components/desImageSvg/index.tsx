@@ -5,7 +5,7 @@ interface DesImageSvgProps {
 
 const DesImageSvg = ({ ciphertext, date }: DesImageSvgProps) => {
   const hex = ciphertext.replace(/^0x/, '');
-  const hexArr = [];
+  const hexArr: string[] = [];
   for (let i = 0; i < hex.length; i += 2) {
     hexArr.push(`${hex.charAt(i)}${hex.charAt(i + 1)}`);
   }
