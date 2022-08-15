@@ -121,32 +121,30 @@ const ConnectWalletButton = () => {
   };
   return (
     <>
-      <>
-        <button
-          className="btn btn-square w-[36px] h-[36px] min-h-[36px] flex sm:hidden"
-          onClick={handleClick}
-          aria-label="connect wallet"
+      <button
+        className="btn btn-square w-[36px] h-[36px] min-h-[36px] flex sm:hidden"
+        onClick={handleClick}
+        aria-label="connect wallet"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-            />
-          </svg>
-        </button>
-        <button className="btn btn-md hidden sm:flex" onClick={handleClick}>
-          Connect Wallet
-        </button>
-        <WalletModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
-      </>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+          />
+        </svg>
+      </button>
+      <button className="btn btn-md hidden sm:flex" onClick={handleClick}>
+        Connect Wallet
+      </button>
+      <WalletModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
     </>
   );
 };
