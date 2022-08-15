@@ -23,7 +23,7 @@ const Collection = () => {
   };
 
   if ((ownedTokenData.length === 0 && ownedTokenIds.length) || isUserTokenIDsLoading) {
-    return <p className="pt-3 sm:mt-4">Loading...</p>;
+    return <p className="pt-3 sm:mt-4">Loading... (it may take some time)</p>;
   }
 
   return (
