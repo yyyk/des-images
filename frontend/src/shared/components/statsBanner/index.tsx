@@ -42,8 +42,9 @@ const StatsBanner = () => {
     const elWidth = el?.current?.getBoundingClientRect()?.width ?? 1;
     const n = window.innerWidth / elWidth;
     const nCeiled = Math.ceil(n);
-    setDuration((60 * n).toFixed(2));
-    setWidth(elWidth * nCeiled);
+    const newWidth = elWidth * nCeiled;
+    setDuration((newWidth / 30).toFixed(2));
+    setWidth(newWidth);
     setAmount(nCeiled);
   };
 
@@ -55,60 +56,39 @@ const StatsBanner = () => {
   });
 
   useEffect(() => {
-    if (!totalEverMinted || !totalSupply || !mintPrice || !burnPrice) {
-      return;
-    }
     setup();
   }, [totalEverMinted, totalSupply, mintPrice, burnPrice]);
 
-  if (!totalEverMinted || !totalSupply || !mintPrice || !burnPrice) {
-    return null;
-  }
-
   return (
     <div className="sticky top-0 z-50 w-full flex flex-nowrap overflow-hidden bg-primary text-primary-content py-0.5 px-0 rounded-bl-[56px]">
-      <div
-        className={marqueeContainerClasses}
-        style={
-          {
-            '--from-position': '0px',
-            '--to-position': `-${width}px`,
-            animation: `marquee ${duration}s linear infinite`,
-          } as CSSProperties
-        }
-      >
-        {Array.from({ length: amount }, (_, i) => i).map((i) => (
-          <span ref={i === 0 ? el : undefined} key={i + '-0'}>
-            <Stats
-              totalEverMinted={totalEverMinted}
-              totalSupply={totalSupply}
-              mintPrice={mintPrice}
-              burnPrice={burnPrice}
-            />
-          </span>
-        ))}
-      </div>
-      <div
-        className={marqueeContainerClasses}
-        style={
-          {
-            '--from-position': '0px',
-            '--to-position': `-${width}px`,
-            animation: `marquee ${duration}s linear infinite`,
-          } as CSSProperties
-        }
-      >
-        {Array.from({ length: amount }, (_, i) => i).map((i) => (
-          <span key={i + '-1'}>
-            <Stats
-              totalEverMinted={totalEverMinted}
-              totalSupply={totalSupply}
-              mintPrice={mintPrice}
-              burnPrice={burnPrice}
-            />
-          </span>
-        ))}
-      </div>
+      {[0, 1].map((x) => (
+        <div
+          key={`container--${x}`}
+          className={marqueeContainerClasses}
+          style={
+            {
+              '--from-position': '0px',
+              '--to-position': `-${width}px`,
+              animation: `marquee ${duration}s linear infinite`,
+            } as CSSProperties
+          }
+        >
+          {Array.from({ length: amount }, (_, i) => i).map((y) => (
+            <span ref={x === 0 && y === 0 ? el : undefined} key={`child--${x}-${y}`}>
+              {!totalEverMinted || !totalSupply || !mintPrice || !burnPrice ? (
+                <span className="px-4">Loading...</span>
+              ) : (
+                <Stats
+                  totalEverMinted={totalEverMinted}
+                  totalSupply={totalSupply}
+                  mintPrice={mintPrice}
+                  burnPrice={burnPrice}
+                />
+              )}
+            </span>
+          ))}
+        </div>
+      ))}
     </div>
   );
 };

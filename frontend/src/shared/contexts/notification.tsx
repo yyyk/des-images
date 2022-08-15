@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useRef, useState } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 import { Notification } from 'src/shared/interfaces';
 
 interface ContextState {
@@ -10,21 +10,17 @@ const NotificationContext = createContext({} as ContextState);
 
 const NotificationContextProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const notificationsRef = useRef<Notification[]>([]);
 
   const add = (notification: Omit<Notification, 'id'>) => {
     const id = new Date().toISOString();
-    notificationsRef.current = [{ ...notification, id }, ...notificationsRef.current];
-    setNotifications([...notificationsRef.current]);
+    setNotifications((prev) => [{ ...notification, id }, ...prev]);
     setTimeout(() => {
-      notificationsRef.current = [
-        ...notificationsRef.current.filter(
-          (n) => !(n.id === id && n.type === notification.type && n.text === notification.text),
-        ),
-      ];
-      setNotifications([...notificationsRef.current]);
+      setNotifications((prev) =>
+        prev.filter((n) => !(n.id === id && n.type === notification.type && n.text === notification.text)),
+      );
     }, 3300);
   };
+
   return <NotificationContext.Provider value={{ notifications, add }}>{children}</NotificationContext.Provider>;
 };
 

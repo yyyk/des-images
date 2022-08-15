@@ -18,8 +18,8 @@ interface ModalProps {
 const Modal = ({ children, open, disableClose = false, actions, 'data-testid': dataTestId, onClose }: ModalProps) => {
   const { theme } = useThemeContext();
   const [wrapperElement, setWrapperElement] = useState<HTMLElement | null>(null);
-  const overlayRef = useRef(null as null | HTMLDivElement);
-  const lastActiveElementRef = useRef(null as null | Element);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const lastActiveElementRef = useRef<HTMLElement>(null);
 
   useEffectOnce(() => {
     let element = document.getElementById('modal');
@@ -50,7 +50,7 @@ const Modal = ({ children, open, disableClose = false, actions, 'data-testid': d
     if (!open) {
       return;
     }
-    lastActiveElementRef.current = document.activeElement;
+    (lastActiveElementRef as any).current = document.activeElement;
     (overlayRef?.current?.querySelectorAll(focusableElements)[0] as HTMLElement)?.focus();
     const closeOnEscapeKey = (e: KeyboardEvent) => {
       if (!open) {

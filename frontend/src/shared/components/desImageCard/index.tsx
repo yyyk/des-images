@@ -7,7 +7,15 @@ import { isNil } from 'src/shared/utils/isNil';
 import DesImageSvg from 'src/shared/components/desImageSvg';
 import Modal from 'src/shared/components/modal';
 
-const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () => void; onSubmit: () => void }) => {
+const MintConfirmModal = ({
+  open,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: () => void;
+}) => {
   const handleOnClick = () => {
     onClose();
     onSubmit();
@@ -17,7 +25,7 @@ const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () 
       open={open}
       onClose={onClose}
       actions={
-        <button className="btn btn-primary" onClick={handleOnClick} data-testid="ConfirmModal__cta">
+        <button className="btn btn-primary" onClick={handleOnClick} data-testid="MintConfirmModal__cta">
           Confirm Mint
         </button>
       }
@@ -55,6 +63,34 @@ const ConfirmModal = ({ open, onClose, onSubmit }: { open: boolean; onClose: () 
   );
 };
 
+const BurnConfirmModal = ({
+  open,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: () => void;
+}) => {
+  const handleOnClick = () => {
+    onClose();
+    onSubmit();
+  };
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      actions={
+        <button className="btn btn-primary" onClick={handleOnClick} data-testid="BurnConfirmModal__cta">
+          Confirm Burn
+        </button>
+      }
+    >
+      <p>Are you sure to burn this token?</p>
+    </Modal>
+  );
+};
+
 interface DesImageCardProps {
   tokenData: TokenData;
   showPlaintext?: boolean;
@@ -81,29 +117,36 @@ const DesImageCard = ({
   const {
     contractState: { isPaused },
   } = useContractContext();
-  const [open, setOpen] = useState(false);
+  const [openMintModal, setOpenMintModal] = useState(false);
+  const [openBurnModal, setOpenBurnModal] = useState(false);
   const date = `#${tokenData.year}${String(tokenData.month).padStart(2, '0')}${String(tokenData.day).padStart(2, '0')}`;
   const { status, isOwner } = tokenData;
   const showMintButton = onMint && status === TOKEN_STATUS.FOR_SALE;
   const showBurnButton = onBurn && isOwner && status === TOKEN_STATUS.MINTED;
 
-  const handleOnSubmit = async () => {
+  const handleOnMintSubmit = async () => {
     if (walletAddress && tokenData && onMint) {
       onMint(tokenData);
+    }
+  };
+
+  const handleOnBurnSubmit = async () => {
+    if (walletAddress && tokenData && onBurn) {
+      onBurn(tokenData);
     }
   };
 
   const handleOnMint = async (e: MouseEvent) => {
     e.preventDefault();
     if (walletAddress && tokenData && onMint) {
-      setOpen(true);
+      setOpenMintModal(true);
     }
   };
 
   const handleOnBurn = async (e: MouseEvent) => {
     e.preventDefault();
     if (walletAddress && tokenData && onBurn) {
-      onBurn(tokenData);
+      setOpenBurnModal(true);
     }
   };
 
@@ -204,7 +247,8 @@ const DesImageCard = ({
           )}
         </div>
       </div>
-      <ConfirmModal open={open} onClose={() => setOpen(false)} onSubmit={handleOnSubmit} />
+      <MintConfirmModal open={openMintModal} onClose={() => setOpenMintModal(false)} onSubmit={handleOnMintSubmit} />
+      <BurnConfirmModal open={openBurnModal} onClose={() => setOpenBurnModal(false)} onSubmit={handleOnBurnSubmit} />
     </>
   );
 };

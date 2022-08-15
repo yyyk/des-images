@@ -145,7 +145,7 @@ describe('<DesImageCard>', function () {
         />,
       );
       fireEvent.click(screen.getByTestId('desImagesCard__cta-mint'));
-      fireEvent.click(screen.getByTestId('ConfirmModal__cta'));
+      fireEvent.click(screen.getByTestId('MintConfirmModal__cta'));
       expect(handleOnMint).toHaveBeenCalledTimes(1);
     });
   });
@@ -195,6 +195,7 @@ describe('<DesImageCard>', function () {
         />,
       );
       fireEvent.click(screen.getByTestId('desImagesCard__cta-burn'));
+      fireEvent.click(screen.getByTestId('BurnConfirmModal__cta'));
       expect(handleOnBurn).toHaveBeenCalledTimes(1);
     });
   });

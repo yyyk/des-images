@@ -34,10 +34,9 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   const { walletAddress, walletProvider, logout } = useWalletContext();
   const { contract, ownedTokenIds, mintedToken, burnedToken } = useContractContext();
   const [tokenData, setTokenData] = useState<TokenData[]>([]);
+  const tokenDataRef = useRef<TokenData[]>([]); // TODO: needs refactor
   const [ownedTokenData, setOwnedTokenData] = useState<TokenData[]>([]);
   const [isUserTokensLoading, setIsUserTokensLoading] = useState(false);
-  const tokenDataRef = useRef<TokenData[]>([]);
-  const ownedTokenDataRef = useRef<TokenData[]>([]);
 
   const _updateTokenData = (data: TokenData[]) => {
     tokenDataRef.current = [...data];
@@ -55,11 +54,6 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       plaintext: d.plaintext,
     }));
     setTokenData([...tokenDataRef.current]);
-  };
-
-  const _updateOwnedTokenData = (data: TokenData[]) => {
-    ownedTokenDataRef.current = [...data];
-    setOwnedTokenData([...ownedTokenDataRef.current]);
   };
 
   // Read tokenData from local storage.
@@ -107,15 +101,17 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     async function fetchOwnedTokenData(contract: Contract | null, ownedTokenIds: string[]) {
       if (!contract || !ownedTokenIds || ownedTokenIds.length === 0) {
-        _updateOwnedTokenData([]);
+        setOwnedTokenData([]);
         return;
       }
       setIsUserTokensLoading(true);
-      const _ownedTokenData = (await getTokenDataFromTokenIds(contract, ownedTokenIds)).map((data) => {
-        const index = ownedTokenDataRef.current.findIndex((_data) => isSameTokenData(_data, data));
-        return { ...data, isInProcess: index >= 0 && ownedTokenDataRef.current[index].isInProcess };
-      });
-      _updateOwnedTokenData(_ownedTokenData);
+      const data = await getTokenDataFromTokenIds(contract, ownedTokenIds);
+      setOwnedTokenData((prev) =>
+        data.map((d) => {
+          const index = prev.findIndex((_d) => isSameTokenData(_d, d));
+          return { ...d, isInProcess: index >= 0 && prev[index].isInProcess };
+        }),
+      );
       setIsUserTokensLoading(false);
     }
     fetchOwnedTokenData(contract, ownedTokenIds);
@@ -196,7 +192,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       ...data,
       isInProcess,
     };
-    let index = tokenDataRef.current.findIndex((_data) => isSameTokenData(_data, newData));
+    const index = tokenDataRef.current.findIndex((_data) => isSameTokenData(_data, newData));
     if (index >= 0) {
       _updateTokenData([
         ...tokenDataRef.current.slice(0, index),
@@ -204,14 +200,10 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
         ...tokenDataRef.current.slice(index + 1),
       ]);
     }
-    index = ownedTokenDataRef.current.findIndex((_data) => isSameTokenData(_data, newData));
-    if (index >= 0) {
-      _updateOwnedTokenData([
-        ...ownedTokenDataRef.current.slice(0, index),
-        { ...newData },
-        ...ownedTokenDataRef.current.slice(index + 1),
-      ]);
-    }
+    setOwnedTokenData((prev) => {
+      const index = prev.findIndex((_data) => isSameTokenData(_data, newData));
+      return index >= 0 ? [...prev.slice(0, index), { ...newData }, ...prev.slice(index + 1)] : [...prev];
+    });
   };
 
   const processStarted = (data: TokenData) => {
@@ -238,10 +230,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
         ...tokenDataRef.current.slice(index + 1),
       ]);
     }
-    _updateOwnedTokenData([
-      { ...newData },
-      ...ownedTokenDataRef.current.filter((_data) => !isSameTokenData(_data, newData)),
-    ]);
+    setOwnedTokenData((prev) => [{ ...newData }, ...prev.filter((_data) => !isSameTokenData(_data, newData))]);
   };
 
   const burned = (data: TokenData) => {
@@ -260,7 +249,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
         ...tokenDataRef.current.slice(index + 1),
       ]);
     }
-    _updateOwnedTokenData(ownedTokenDataRef.current.filter((_data) => !isSameTokenData(_data, newData)));
+    setOwnedTokenData((prev) => prev.filter((_data) => !isSameTokenData(_data, newData)));
   };
 
   return (
