@@ -14,9 +14,9 @@ export async function queryTokenIds(
   );
   const endBlock = (isNil(currentBlock) ? await contract.provider.getBlockNumber() : currentBlock) as number;
   const owned: Set<string> = new Set();
-  for (let i = startBlock; i <= endBlock; i += 5000) {
+  for (let i = startBlock; i <= endBlock; i += 2000) {
     const _startBlock = i;
-    const _endBlock = Math.min(endBlock, i + 4999);
+    const _endBlock = Math.min(endBlock, i + 1999);
     const sentLogs = await contract.queryFilter(contract.filters.Transfer(walletAddress, null), _startBlock, _endBlock);
     const receivedLogs = await contract.queryFilter(
       contract.filters.Transfer(null, walletAddress),
