@@ -128,13 +128,17 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const _setupContractListeners = (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
-    contract.on(
-      contract.filters.Transfer([NULL_ADDRESS, walletAddress], [NULL_ADDRESS, walletAddress]),
-      _eventHandler('Transfer', currentBlockNumber, walletAddress),
-    );
-    contract.on(contract.filters.Minted(), _eventHandler('Minted', currentBlockNumber, walletAddress));
-    contract.on(contract.filters.Burned(), _eventHandler('Burned', currentBlockNumber, walletAddress));
-    // contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', currentBlockNumber, walletAddress));
+    try {
+      contract.on(
+        contract.filters.Transfer([NULL_ADDRESS, walletAddress], [NULL_ADDRESS, walletAddress]),
+        _eventHandler('Transfer', currentBlockNumber, walletAddress),
+      );
+      contract.on(contract.filters.Minted(), _eventHandler('Minted', currentBlockNumber, walletAddress));
+      contract.on(contract.filters.Burned(), _eventHandler('Burned', currentBlockNumber, walletAddress));
+      // contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', currentBlockNumber, walletAddress));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const _queryTokenIds = async (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
@@ -184,8 +188,9 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
         });
         setContract(contract);
         const currentBlockNumber = await contract.provider?.getBlockNumber();
-        _setupContractListeners(contract, walletAddress, currentBlockNumber);
-        await _queryTokenIds(contract, walletAddress, currentBlockNumber);
+        console.log('currentBlockNumber', currentBlockNumber);
+        currentBlockNumber && _setupContractListeners(contract, walletAddress, currentBlockNumber);
+        currentBlockNumber && (await _queryTokenIds(contract, walletAddress, currentBlockNumber));
       } catch (err) {
         console.error(err);
       }
