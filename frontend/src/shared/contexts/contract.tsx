@@ -166,6 +166,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!signer) {
+      setContractState({ ...DEFAULT_CONTRACT_STATE });
       setContract(null);
       return;
     }
@@ -173,18 +174,15 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       setIsUserTokenIDsLoading(true);
       console.log('setupContract start');
       try {
-        const state = !!contract
-          ? {
-              isPaused: await _isPaused(contract),
-              totalSupply: await getTotalSupply(contract),
-              totalEverMinted: await getTotalEverMinted(contract),
-              mintPrice: await getCurrentPrice(contract),
-              burnPrice: await getCurrentBurnReward(contract),
-            }
-          : { ...DEFAULT_CONTRACT_STATE };
-        setContractState(state);
+        setContractState({
+          isPaused: await _isPaused(contract),
+          totalSupply: await getTotalSupply(contract),
+          totalEverMinted: await getTotalEverMinted(contract),
+          mintPrice: await getCurrentPrice(contract),
+          burnPrice: await getCurrentBurnReward(contract),
+        });
         const currentBlockNumber = await contract.provider.getBlockNumber();
-        await _queryTokenIds(contract, walletAddress, currentBlockNumber);
+        // await _queryTokenIds(contract, walletAddress, currentBlockNumber);
         setContract(contract);
         _setupContractListeners(contract, walletAddress, currentBlockNumber);
       } catch (err) {
