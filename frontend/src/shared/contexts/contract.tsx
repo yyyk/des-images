@@ -171,10 +171,17 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     }
     async function setupContract(contract: Contract) {
       setIsUserTokenIDsLoading(true);
-      setContract(contract);
-      const currentBlockNumber = await contract.provider.getBlockNumber();
-      await _queryTokenIds(contract, walletAddress, currentBlockNumber);
-      _setupContractListeners(contract, walletAddress, currentBlockNumber);
+      console.log('setupContract start');
+      try {
+        setContract(contract);
+        const currentBlockNumber = await contract.provider.getBlockNumber();
+        await _queryTokenIds(contract, walletAddress, currentBlockNumber);
+        _setupContractListeners(contract, walletAddress, currentBlockNumber);
+      } catch (err) {
+        console.error(err);
+        setContract(null);
+      }
+      console.log('setupContract finish');
       setIsUserTokenIDsLoading(false);
     }
     const newContract = new ethers.Contract(CONTRACT_ADDRESS, DesImages.abi, signer);
