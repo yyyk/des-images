@@ -41,15 +41,16 @@ export const useWallet = () => {
     }
     const { provider } = walletProvider;
     const handleAccountChange = _handleAccountChange(walletProvider);
+    const handleChainChanged = _handleChainChanged(walletProvider);
     const handleDisconnect = _handleDisconnect(walletProvider);
     if (provider?.on) {
       provider.on('accountsChanged', handleAccountChange);
-      provider.on('chainChanged', _handleChainChanged);
+      provider.on('chainChanged', handleChainChanged);
       provider.on('disconnect', handleDisconnect);
       return () => {
         if (provider?.removeListener) {
           provider.removeListener('accountsChanged', handleAccountChange);
-          provider.removeListener('chainChanged', _handleChainChanged);
+          provider.removeListener('chainChanged', handleChainChanged);
           provider.removeListener('disconnect', handleDisconnect);
         }
       };
@@ -71,10 +72,13 @@ export const useWallet = () => {
     };
 
   // TODO:
-  const _handleChainChanged = (_chainId: string): void => {
-    console.log('wallet chain changed:', parseInt(_chainId));
-    window.location.reload();
-  };
+  const _handleChainChanged =
+    (walletProvider: WalletProvider) =>
+    async (_chainId: string): Promise<void> => {
+      console.log('wallet chain changed:', parseInt(_chainId));
+      await logoutWallet(walletProvider);
+      // window.location.reload();
+    };
 
   const _handleDisconnect = (walletProvider: WalletProvider) => async (): Promise<void> => {
     console.log('wallet disconnected:', walletProvider?.name);
