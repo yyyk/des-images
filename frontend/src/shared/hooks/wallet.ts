@@ -156,16 +156,14 @@ export const useWallet = () => {
       // const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
       const chainId: number | string = await web3Provider.send('eth_chainId', []);
       // const chainId: number = await signer.getChainId();
-      console.log(network);
       console.log(`connected to ${network?.name}`);
       if (isInvalidChain(chainId)) {
-        console.log('InvalidChain');
         await logoutWallet(walletProvider);
         setIsInvalidChainId(true);
         setWalletProvider(walletProvider);
         return createErrorResponse(ERROR_TYPE.INVALID_CHAIN_ID, 'Invalid Chain ID');
       }
-      console.log('address', userAddress);
+      // console.log('address', userAddress);
       if (userAddress && userAddress?.length) {
         localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, walletProvider.type);
         setWalletAddress(userAddress);

@@ -139,7 +139,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const _queryTokenIds = async (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
-    setOwnedTokenIds(await queryTokenIds(contract, walletAddress, currentBlockNumber));
+    // setOwnedTokenIds(await queryTokenIds(contract, walletAddress, currentBlockNumber));
   };
 
   useEffect(() => {
