@@ -161,7 +161,6 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   // }, [contract]);
 
   useEffect(() => {
-    console.log('signer', signer);
     if (!signer) {
       setContractState({ ...DEFAULT_CONTRACT_STATE });
       setContract(null);
