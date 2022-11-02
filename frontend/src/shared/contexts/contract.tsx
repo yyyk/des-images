@@ -142,9 +142,36 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     setOwnedTokenIds(await queryTokenIds(contract, walletAddress, currentBlockNumber));
   };
 
+  // useEffect(() => {
+  //   async function _setupInitialContractState(contract: Contract | null) {
+  //     console.log('setContractState start');
+  //     try {
+  //       const state = !!contract
+  //         ? {
+  //             isPaused: await _isPaused(contract),
+  //             totalSupply: await getTotalSupply(contract),
+  //             totalEverMinted: await getTotalEverMinted(contract),
+  //             mintPrice: await getCurrentPrice(contract),
+  //             burnPrice: await getCurrentBurnReward(contract),
+  //           }
+  //         : { ...DEFAULT_CONTRACT_STATE };
+  //       setContractState(state);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //     console.log('setContractState finish');
+  //   }
+  //   _setupInitialContractState(contract);
+  // }, [contract]);
+
   useEffect(() => {
-    async function _setupInitialContractState(contract: Contract | null) {
-      console.log('setContractState start');
+    if (!signer) {
+      setContract(null);
+      return;
+    }
+    async function setupContract(contract: Contract) {
+      setIsUserTokenIDsLoading(true);
+      console.log('setupContract start');
       try {
         const state = !!contract
           ? {
@@ -156,26 +183,9 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
             }
           : { ...DEFAULT_CONTRACT_STATE };
         setContractState(state);
-      } catch (err) {
-        console.error(err);
-      }
-      console.log('setContractState finish');
-    }
-    _setupInitialContractState(contract);
-  }, [contract]);
-
-  useEffect(() => {
-    if (!signer) {
-      setContract(null);
-      return;
-    }
-    async function setupContract(contract: Contract) {
-      setIsUserTokenIDsLoading(true);
-      console.log('setupContract start');
-      try {
-        setContract(contract);
         const currentBlockNumber = await contract.provider.getBlockNumber();
         await _queryTokenIds(contract, walletAddress, currentBlockNumber);
+        setContract(contract);
         _setupContractListeners(contract, walletAddress, currentBlockNumber);
       } catch (err) {
         console.error(err);
