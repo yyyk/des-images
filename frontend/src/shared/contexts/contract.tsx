@@ -181,10 +181,10 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           mintPrice: await getCurrentPrice(contract),
           burnPrice: await getCurrentBurnReward(contract),
         });
-        const currentBlockNumber = await contract.provider?.getBlockNumber();
+        // const currentBlockNumber = await contract.provider?.getBlockNumber();
         // await _queryTokenIds(contract, walletAddress, currentBlockNumber);
         // setContract(contract);
-        _setupContractListeners(contract, walletAddress, currentBlockNumber);
+        // _setupContractListeners(contract, walletAddress, currentBlockNumber);
       } catch (err) {
         console.error(err);
       }
