@@ -185,6 +185,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
         const totalEverMinted = await getTotalEverMinted(contract);
         const mintPrice = await getCurrentPrice(contract);
         const burnPrice = await getCurrentBurnReward(contract);
+        console.log('currentBlockNumber done');
         setContractState({
           isPaused,
           totalSupply,
