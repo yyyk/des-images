@@ -179,6 +179,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     async function setupContract(contract: Contract) {
       setIsUserTokenIDsLoading(true);
       try {
+        console.log('currentBlockNumber');
         const isPaused = await _isPaused(contract);
         const totalSupply = await getTotalSupply(contract);
         const totalEverMinted = await getTotalEverMinted(contract);
@@ -191,7 +192,6 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           mintPrice,
           burnPrice,
         });
-        console.log('currentBlockNumber');
         setContract(contract);
         const currentBlockNumber = await contract.provider?.getBlockNumber();
         currentBlockNumber && _setupContractListeners(contract, walletAddress, currentBlockNumber);
