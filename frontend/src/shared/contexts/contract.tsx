@@ -173,7 +173,6 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     }
     async function setupContract(contract: Contract) {
       setIsUserTokenIDsLoading(true);
-      console.log('setupContract start');
       try {
         setContractState({
           isPaused: await _isPaused(contract),
@@ -187,15 +186,14 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
         setContract(contract);
         _setupContractListeners(contract, walletAddress, currentBlockNumber);
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
-      console.log('setupContract finish');
       setIsUserTokenIDsLoading(false);
     }
     console.log('before newContract');
     const newContract = new ethers.Contract(CONTRACT_ADDRESS, DesImages.abi, signer);
-    console.log('after newContract');
-    newContract && setupContract(newContract);
+    console.log('after newContract', newContract);
+    // newContract && setupContract(newContract);
     return () => {
       newContract.removeAllListeners();
     };
