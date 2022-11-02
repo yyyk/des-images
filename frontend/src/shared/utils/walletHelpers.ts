@@ -24,6 +24,14 @@ export function createErrorResponse(type: ERROR_TYPE, message: string): ConnectW
   };
 }
 
+export function isCoinbaseWallet(provider: WalletProvider): boolean {
+  return provider?.type === WALLET_TYPE.COINBASE;
+}
+
+export function isCoinbaseWalletAndDisconnected(provider: WalletProvider): boolean {
+  return isCoinbaseWallet(provider) && !(provider.provider as any)?.selectedAddress;
+}
+
 export function isWalletConnect(provider: WalletProvider): boolean {
   return provider?.type === WALLET_TYPE.WALLET_CONNECT;
 }

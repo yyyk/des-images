@@ -6,6 +6,7 @@ import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import {
   createErrorResponse,
   getProviders,
+  isCoinbaseWalletAndDisconnected,
   isInvalidChain,
   isWalletAuthereum,
   isWalletConnect,
@@ -32,7 +33,11 @@ export const useWallet = () => {
     if (index < 0) {
       return;
     }
-    connectWallet(providers[index], false);
+    if (isCoinbaseWalletAndDisconnected(providers[index])) {
+      _resetState();
+      return;
+    }
+    connectWallet(providers[index]);
   });
 
   useEffect(() => {
@@ -109,7 +114,7 @@ export const useWallet = () => {
     _resetState();
   };
 
-  const connectWallet = async (walletProvider: WalletProvider, needRequest = true): Promise<ConnectWalletResponse> => {
+  const connectWallet = async (walletProvider: WalletProvider): Promise<ConnectWalletResponse> => {
     if (!walletProvider?.provider) {
       return createErrorResponse(ERROR_TYPE.INVALID_PROVIDER, 'Invalid Provider');
     }
@@ -143,7 +148,7 @@ export const useWallet = () => {
       ) {
         try {
           await (walletProvider.provider as any).request({
-            method: needRequest ? 'eth_requestAccounts' : 'eth_accounts',
+            method: 'eth_requestAccounts',
           });
         } catch (error) {
           throw new Error('User Rejected');
@@ -172,7 +177,7 @@ export const useWallet = () => {
         setSigner(signer);
         return { success: true };
       }
-      error = createErrorResponse(ERROR_TYPE.NO_ADDRESS_FOUND, 'No address found.');
+      error = createErrorResponse(ERROR_TYPE.NO_ADDRESS_FOUND, 'No address found');
     } catch (err: any) {
       error = createErrorResponse(
         err?.message === 'User Rejected' ? ERROR_TYPE.USER_CONNECTION_REJECTED : ERROR_TYPE.UNKNOWN_CONNECTION_ERROR,
