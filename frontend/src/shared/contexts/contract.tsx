@@ -128,26 +128,18 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const _setupContractListeners = (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
-    try {
-      contract.on(
-        contract.filters.Transfer([NULL_ADDRESS, walletAddress], [NULL_ADDRESS, walletAddress]),
-        _eventHandler('Transfer', currentBlockNumber, walletAddress),
-      );
-      contract.on(contract.filters.Minted(), _eventHandler('Minted', currentBlockNumber, walletAddress));
-      contract.on(contract.filters.Burned(), _eventHandler('Burned', currentBlockNumber, walletAddress));
-      // contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', currentBlockNumber, walletAddress));
-    } catch (err) {
-      console.error(err);
-    }
+    contract.on(
+      contract.filters.Transfer([NULL_ADDRESS, walletAddress], [NULL_ADDRESS, walletAddress]),
+      _eventHandler('Transfer', currentBlockNumber, walletAddress),
+    );
+    contract.on(contract.filters.Minted(), _eventHandler('Minted', currentBlockNumber, walletAddress));
+    contract.on(contract.filters.Burned(), _eventHandler('Burned', currentBlockNumber, walletAddress));
+    // contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', currentBlockNumber, walletAddress));
   };
 
   const _queryTokenIds = async (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
-    try {
-      const ids = await queryTokenIds(contract, walletAddress, currentBlockNumber);
-      setOwnedTokenIds(ids);
-    } catch (err) {
-      console.error(err);
-    }
+    const ids = await queryTokenIds(contract, walletAddress, currentBlockNumber);
+    setOwnedTokenIds(ids);
   };
 
   // useEffect(() => {
@@ -179,25 +171,19 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     async function setupContract(contract: Contract) {
       setIsUserTokenIDsLoading(true);
       try {
-        // const isPaused = await _isPaused(contract);
-        // const totalSupply = await getTotalSupply(contract);
-        // const totalEverMinted = await getTotalEverMinted(contract);
-        // const mintPrice = await getCurrentPrice(contract);
-        // const burnPrice = await getCurrentBurnReward(contract);
-        // setContractState({
-        //   isPaused,
-        //   totalSupply,
-        //   totalEverMinted,
-        //   mintPrice,
-        //   burnPrice,
-        // });
-        console.log('walletAddress', walletAddress);
+        setContractState({
+          isPaused: await _isPaused(contract),
+          totalSupply: await getTotalSupply(contract),
+          totalEverMinted: await getTotalEverMinted(contract),
+          mintPrice: await getCurrentPrice(contract),
+          burnPrice: await getCurrentBurnReward(contract),
+        });
         setContract(contract);
         const currentBlockNumber = await contract.provider?.getBlockNumber();
-        currentBlockNumber && _setupContractListeners(contract, walletAddress, currentBlockNumber);
-        currentBlockNumber && (await _queryTokenIds(contract, walletAddress, currentBlockNumber));
+        _setupContractListeners(contract, walletAddress, currentBlockNumber);
+        await _queryTokenIds(contract, walletAddress, currentBlockNumber);
       } catch (err) {
-        console.error(err);
+        // console.error(err);
       }
       setIsUserTokenIDsLoading(false);
     }
