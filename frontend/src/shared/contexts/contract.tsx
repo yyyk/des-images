@@ -176,15 +176,15 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       try {
         setContractState({
           isPaused: await _isPaused(contract),
-          totalSupply: '', // await getTotalSupply(contract),
-          totalEverMinted: '', // await getTotalEverMinted(contract),
-          mintPrice: '', // await getCurrentPrice(contract),
-          burnPrice: '', // await getCurrentBurnReward(contract),
+          totalSupply: await getTotalSupply(contract),
+          totalEverMinted: await getTotalEverMinted(contract),
+          mintPrice: await getCurrentPrice(contract),
+          burnPrice: await getCurrentBurnReward(contract),
         });
-        // const currentBlockNumber = await contract.provider?.getBlockNumber();
+        const currentBlockNumber = await contract.provider?.getBlockNumber();
         // await _queryTokenIds(contract, walletAddress, currentBlockNumber);
-        setContract(contract);
-        // _setupContractListeners(contract, walletAddress, currentBlockNumber);
+        // setContract(contract);
+        _setupContractListeners(contract, walletAddress, currentBlockNumber);
       } catch (err) {
         console.error(err);
       }
