@@ -144,6 +144,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     async function _setupInitialContractState(contract: Contract | null) {
+      console.log('setContractState start');
       const state = !!contract
         ? {
             isPaused: await _isPaused(contract),
@@ -154,6 +155,7 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           }
         : { ...DEFAULT_CONTRACT_STATE };
       setContractState(state);
+      console.log('setContractState finish');
     }
     _setupInitialContractState(contract);
   }, [contract]);
