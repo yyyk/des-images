@@ -180,14 +180,14 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
       setIsUserTokenIDsLoading(true);
       try {
         console.log('currentBlockNumber');
-        const isPaused = await _isPaused(contract);
+        // const isPaused = await _isPaused(contract);
         const totalSupply = await getTotalSupply(contract);
         const totalEverMinted = await getTotalEverMinted(contract);
         const mintPrice = await getCurrentPrice(contract);
         const burnPrice = await getCurrentBurnReward(contract);
         console.log('currentBlockNumber done');
         setContractState({
-          isPaused,
+          isPaused: false,
           totalSupply,
           totalEverMinted,
           mintPrice,
