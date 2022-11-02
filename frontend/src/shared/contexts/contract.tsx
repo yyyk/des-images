@@ -136,8 +136,14 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     contract.on(contract.filters.Burned(), _eventHandler('Burned', currentBlockNumber, walletAddress));
     // contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', currentBlockNumber, walletAddress));
   };
+
   const _queryTokenIds = async (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
-    setOwnedTokenIds(await queryTokenIds(contract, walletAddress, currentBlockNumber));
+    try {
+      const ids = await queryTokenIds(contract, walletAddress, currentBlockNumber);
+      setOwnedTokenIds(ids);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   // useEffect(() => {
