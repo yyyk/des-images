@@ -63,9 +63,21 @@ export const useWallet = () => {
     async (accounts: string[]): Promise<void> => {
       console.log('wallet account changed:', (accounts?.length && accounts[0]) || []);
       if (accounts && accounts?.length) {
-        setWalletAddress(accounts[0]);
-        console.log(walletProvider);
-        walletProvider && connectWallet(walletProvider);
+        try {
+          const web3Provider = new ethers.providers.Web3Provider(walletProvider.provider as any);
+          const signer = web3Provider.getSigner();
+          await web3Provider.ready;
+          const userAddress = await signer.getAddress();
+          if (userAddress === accounts[0]) {
+            return;
+          }
+          setWalletAddress(accounts[0]);
+          // console.log(walletProvider);
+          walletProvider && connectWallet(walletProvider);
+        } catch (err) {
+          console.error(err);
+          await logoutWallet(walletProvider);
+        }
       } else {
         await logoutWallet(walletProvider);
       }
