@@ -145,16 +145,20 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     async function _setupInitialContractState(contract: Contract | null) {
       console.log('setContractState start');
-      const state = !!contract
-        ? {
-            isPaused: await _isPaused(contract),
-            totalSupply: await getTotalSupply(contract),
-            totalEverMinted: await getTotalEverMinted(contract),
-            mintPrice: await getCurrentPrice(contract),
-            burnPrice: await getCurrentBurnReward(contract),
-          }
-        : { ...DEFAULT_CONTRACT_STATE };
-      setContractState(state);
+      try {
+        const state = !!contract
+          ? {
+              isPaused: await _isPaused(contract),
+              totalSupply: await getTotalSupply(contract),
+              totalEverMinted: await getTotalEverMinted(contract),
+              mintPrice: await getCurrentPrice(contract),
+              burnPrice: await getCurrentBurnReward(contract),
+            }
+          : { ...DEFAULT_CONTRACT_STATE };
+        setContractState(state);
+      } catch (err) {
+        console.error(err);
+      }
       console.log('setContractState finish');
     }
     _setupInitialContractState(contract);
