@@ -77,7 +77,7 @@ export const useWallet = () => {
     async (_chainId: string): Promise<void> => {
       console.log('wallet chain changed:', parseInt(_chainId));
       await logoutWallet(walletProvider);
-      // window.location.reload();
+      window.location.reload();
     };
 
   const _handleDisconnect = (walletProvider: WalletProvider) => async (): Promise<void> => {
