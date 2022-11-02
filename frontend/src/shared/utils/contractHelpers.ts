@@ -46,6 +46,7 @@ export async function queryTokenIds(
       }
     } catch (err) {
       console.error(err);
+      break;
     }
   }
   const result = Array.from(owned);
