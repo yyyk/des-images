@@ -210,12 +210,12 @@ export function getProviders(): WalletProvider[] {
   // authereumProvider && providers.push(authereumProvider);
 
   // Fortmatic
-  // const fortmaticProvider = createFortmaticProvider();
-  // fortmaticProvider && providers.push(fortmaticProvider);
+  const fortmaticProvider = createFortmaticProvider();
+  fortmaticProvider && providers.push(fortmaticProvider);
 
   // Portis
-  // const portisProvider = createPortisProvider();
-  // portisProvider && providers.push(portisProvider);
+  const portisProvider = createPortisProvider();
+  portisProvider && providers.push(portisProvider);
 
   // WalletConnect
   const walletConnectProvider = createWalletConnectProvider();

@@ -134,17 +134,14 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
     );
     contract.on(contract.filters.Minted(), _eventHandler('Minted', currentBlockNumber, walletAddress));
     contract.on(contract.filters.Burned(), _eventHandler('Burned', currentBlockNumber, walletAddress));
-    // contract.on(contract.filters.Paused(), _eventHandler('Paused', currentBlockNumber, walletAddress));
     // contract.on(contract.filters.UnPaused(), _eventHandler('UnPaused', currentBlockNumber, walletAddress));
   };
-
   const _queryTokenIds = async (contract: Contract, walletAddress: string, currentBlockNumber: number) => {
     setOwnedTokenIds(await queryTokenIds(contract, walletAddress, currentBlockNumber));
   };
 
   // useEffect(() => {
   //   async function _setupInitialContractState(contract: Contract | null) {
-  //     console.log('setContractState start');
   //     try {
   //       const state = !!contract
   //         ? {
@@ -159,7 +156,6 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
   //     } catch (err) {
   //       console.error(err);
   //     }
-  //     console.log('setContractState finish');
   //   }
   //   _setupInitialContractState(contract);
   // }, [contract]);
@@ -181,18 +177,16 @@ const ContractContextProvider = ({ children }: { children: ReactNode }) => {
           mintPrice: await getCurrentPrice(contract),
           burnPrice: await getCurrentBurnReward(contract),
         });
-        // const currentBlockNumber = await contract.provider?.getBlockNumber();
-        // await _queryTokenIds(contract, walletAddress, currentBlockNumber);
-        // setContract(contract);
-        // _setupContractListeners(contract, walletAddress, currentBlockNumber);
+        const currentBlockNumber = await contract.provider?.getBlockNumber();
+        await _queryTokenIds(contract, walletAddress, currentBlockNumber);
+        _setupContractListeners(contract, walletAddress, currentBlockNumber);
+        setContract(contract);
       } catch (err) {
         console.error(err);
       }
       setIsUserTokenIDsLoading(false);
     }
-    console.log('before newContract');
     const newContract = new ethers.Contract(CONTRACT_ADDRESS, DesImages.abi, signer);
-    console.log('after newContract');
     newContract && setupContract(newContract);
     return () => {
       newContract.removeAllListeners();
