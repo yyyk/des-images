@@ -35,9 +35,7 @@ export const useWallet = () => {
       return;
     }
     if (isCoinbaseWalletAndDisconnected(providers[index])) {
-      logoutWallet(providers[index])
-        .then(() => {})
-        .catch(() => {});
+      localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
       return;
     }
     connectWallet(providers[index]);
@@ -103,6 +101,7 @@ export const useWallet = () => {
   };
 
   const logoutWallet = async (walletProvider: WalletProvider | null): Promise<void> => {
+    _resetState();
     if (walletProvider?.logout) {
       try {
         if (walletProvider?.logout.constructor.name === 'AsyncFunction') {
@@ -115,7 +114,6 @@ export const useWallet = () => {
         console.log('logout failed:', e);
       }
     }
-    _resetState();
   };
 
   const connectWallet = async (walletProvider: WalletProvider): Promise<ConnectWalletResponse> => {
@@ -133,7 +131,7 @@ export const useWallet = () => {
       try {
         await (walletProvider?.provider as any)?.enable();
       } catch (err: any) {
-        await logoutWallet(walletProvider);
+        !isCoinbaseWallet(walletProvider) && (await logoutWallet(walletProvider));
         return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
       }
     }
@@ -152,12 +150,7 @@ export const useWallet = () => {
     }
     let error: ConnectWalletResponse | undefined = undefined;
     try {
-      // if (
-      //   !isWalletConnect(walletProvider) &&
-      //   !isWalletPortis(walletProvider) &&
-      //   !isWalletAuthereum(walletProvider) &&
-      //   !isWalletFortmatic(walletProvider)
-      // ) {
+      // if (!isWalletEnabled) {
       //   try {
       //     await (walletProvider.provider as any).request({
       //       method: 'eth_requestAccounts',
@@ -180,12 +173,16 @@ export const useWallet = () => {
       // const _address = await web3Provider.send(needRequest ? 'eth_requestAccounts' : 'eth_accounts', []);
       const chainId: number | string = await web3Provider.send('eth_chainId', []);
       // const chainId: number = await signer.getChainId();
-      console.log(`connected to ${network?.name}`);
+      console.log(`connected to ${chainId}: ${network?.name}`);
+      // if (isInvalidChain(chainId)) {
+      //   await logoutWallet(walletProvider);
+      //   setIsInvalidChainId(true);
+      //   setWalletProvider(walletProvider);
+      //   return createErrorResponse(ERROR_TYPE.INVALID_CHAIN_ID, 'Invalid Chain ID');
+      // }
+
       if (isInvalidChain(chainId)) {
-        await logoutWallet(walletProvider);
         setIsInvalidChainId(true);
-        setWalletProvider(walletProvider);
-        return createErrorResponse(ERROR_TYPE.INVALID_CHAIN_ID, 'Invalid Chain ID');
       }
       // console.log('address', userAddress);
       if (userAddress && userAddress?.length) {
@@ -193,7 +190,7 @@ export const useWallet = () => {
         setWalletAddress(userAddress);
         setWalletProvider(walletProvider);
         setCanLogout(!!walletProvider.logout);
-        setSigner(signer);
+        !isInvalidChain(chainId) && setSigner(signer);
         return { success: true };
       }
       error = createErrorResponse(ERROR_TYPE.NO_ADDRESS_FOUND, 'No address found');

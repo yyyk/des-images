@@ -105,7 +105,7 @@ export function createCoinbaseWalletSDKProvider(): WalletProvider {
 }
 
 export function createCoinbaseWalletInjectedProvider(
-  provider: Provider & { disconnect?: () => void; close?: () => void },
+  provider: Provider & { disconnect?: () => void; close?: () => Promise<void> },
 ): WalletProvider {
   return {
     type: WALLET_TYPE.COINBASE,
@@ -235,12 +235,12 @@ export function getProviders(): WalletProvider[] {
   }
 
   // Coinbase Wallet
-  // const coinbaseProvider = getInjectedProvider('isWalletLink');
-  // if (coinbaseProvider?.length) {
-  //   providers.push(createCoinbaseWalletInjectedProvider(coinbaseProvider[0]));
-  // }
-  const coinbaseSDKProvider = createCoinbaseWalletSDKProvider();
-  coinbaseSDKProvider && providers.push(coinbaseSDKProvider);
+  const coinbaseProvider = getInjectedProvider('isWalletLink');
+  if (coinbaseProvider?.length) {
+    providers.push(createCoinbaseWalletInjectedProvider(coinbaseProvider[0]));
+  }
+  // const coinbaseSDKProvider = createCoinbaseWalletSDKProvider();
+  // coinbaseSDKProvider && providers.push(coinbaseSDKProvider);
 
   // Authereum
   // const authereumProvider = createAuthereumProvider();

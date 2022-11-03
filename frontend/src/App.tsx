@@ -11,11 +11,11 @@ import Catalog from 'src/catalog';
 
 const App = () => {
   return (
-    <NotificationContextProvider>
-      <WalletContextProvider>
-        <ContractContextProvider>
-          <CatalogContextProvider>
-            <ThemeContextProvider>
+    <WalletContextProvider>
+      <ContractContextProvider>
+        <CatalogContextProvider>
+          <ThemeContextProvider>
+            <NotificationContextProvider>
               <Layout>
                 <Routes>
                   <Route path="/" element={<Main />} />
@@ -24,11 +24,11 @@ const App = () => {
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </Layout>
-            </ThemeContextProvider>
-          </CatalogContextProvider>
-        </ContractContextProvider>
-      </WalletContextProvider>
-    </NotificationContextProvider>
+            </NotificationContextProvider>
+          </ThemeContextProvider>
+        </CatalogContextProvider>
+      </ContractContextProvider>
+    </WalletContextProvider>
   );
 };
 
