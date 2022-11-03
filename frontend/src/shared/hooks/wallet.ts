@@ -105,7 +105,8 @@ export const useWallet = () => {
   const logoutWallet = async (walletProvider: WalletProvider | null): Promise<void> => {
     if (walletProvider?.logout) {
       try {
-        if (isWalletFortmatic(walletProvider)) {
+        if (walletProvider?.logout.constructor.name === 'AsyncFunction') {
+          // if (isWalletFortmatic(walletProvider) || isCoinbaseWallet(walletProvider)) {
           await walletProvider.logout();
         } else {
           walletProvider.logout();
