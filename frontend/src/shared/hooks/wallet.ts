@@ -172,6 +172,11 @@ export const useWallet = () => {
         setWalletProvider(walletProvider);
         return createErrorResponse(ERROR_TYPE.INVALID_CHAIN_ID, 'Invalid Chain ID');
       }
+      if (isCoinbaseWalletAndDisconnected(walletProvider)) {
+        console.log(walletProvider.provider);
+        console.log(userAddress);
+        console.log((walletProvider.provider as any)?.selectedAddress);
+      }
       // console.log('address', userAddress);
       if (userAddress && userAddress?.length) {
         localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, walletProvider.type);
