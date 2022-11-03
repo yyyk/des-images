@@ -34,7 +34,9 @@ export const useWallet = () => {
       return;
     }
     if (isCoinbaseWalletAndDisconnected(providers[index])) {
-      _resetState();
+      logoutWallet(walletProvider)
+        .then(() => {})
+        .catch(() => {});
       return;
     }
     connectWallet(providers[index]);

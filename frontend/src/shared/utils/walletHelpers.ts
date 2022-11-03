@@ -83,11 +83,14 @@ export function createOperaWalletProvider(provider: Provider): WalletProvider {
   };
 }
 
-export function createCoinbaseWalletProvider(provider: Provider): WalletProvider {
+export function createCoinbaseWalletProvider(provider: Provider & { disconnect?: () => void }): WalletProvider {
   return {
     type: WALLET_TYPE.COINBASE,
     name: WALLET_NAME.COINBASE,
     provider,
+    logout: () => {
+      provider.disconnect && provider.disconnect();
+    },
   };
 }
 
