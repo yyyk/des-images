@@ -235,12 +235,13 @@ export function getProviders(): WalletProvider[] {
   }
 
   // Coinbase Wallet
-  // const coinbaseProvider = getInjectedProvider('isWalletLink');
-  // if (coinbaseProvider?.length) {
-  //   providers.push(createCoinbaseWalletInjectedProvider(coinbaseProvider[0]));
-  // }
-  const coinbaseProvider = createCoinbaseWalletSDKProvider();
-  coinbaseProvider && providers.push(coinbaseProvider);
+  const coinbaseProvider = getInjectedProvider('isWalletLink');
+  if (coinbaseProvider?.length) {
+    providers.push(createCoinbaseWalletInjectedProvider(coinbaseProvider[0]));
+  } else {
+    // const coinbaseSDKProvider = createCoinbaseWalletSDKProvider();
+    // coinbaseSDKProvider && providers.push(coinbaseSDKProvider);
+  }
 
   // Authereum
   // const authereumProvider = createAuthereumProvider();
