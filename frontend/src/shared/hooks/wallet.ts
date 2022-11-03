@@ -24,6 +24,7 @@ export const useWallet = () => {
 
   useEffectOnce(() => {
     const providers = getProviders();
+    setProviders(providers);
     const wallet = localStorage.getItem(LOCAL_STORAGE_WALLET_KEY);
     if (!wallet) {
       return;
@@ -38,10 +39,9 @@ export const useWallet = () => {
       //   .catch(() => {});
       providers[index].logout && (providers[index] as any).logout();
       _resetState();
-    } else {
-      connectWallet(providers[index]);
+      return;
     }
-    setProviders(providers);
+    connectWallet(providers[index]);
   });
 
   useEffect(() => {
