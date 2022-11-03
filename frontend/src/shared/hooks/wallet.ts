@@ -35,7 +35,7 @@ export const useWallet = () => {
       return;
     }
     if (isCoinbaseWalletAndDisconnected(providers[index])) {
-      localStorage.removeItem(LOCAL_STORAGE_WALLET_KEY);
+      logoutWallet(providers[index]);
       return;
     }
     connectWallet(providers[index]);
@@ -101,7 +101,6 @@ export const useWallet = () => {
   };
 
   const logoutWallet = async (walletProvider: WalletProvider | null): Promise<void> => {
-    _resetState();
     if (walletProvider?.logout) {
       try {
         if (walletProvider?.logout.constructor.name === 'AsyncFunction') {
@@ -114,6 +113,7 @@ export const useWallet = () => {
         console.log('logout failed:', e);
       }
     }
+    _resetState();
   };
 
   const connectWallet = async (walletProvider: WalletProvider): Promise<ConnectWalletResponse> => {
@@ -129,10 +129,11 @@ export const useWallet = () => {
     ) {
       isWalletEnabled = true;
       try {
-        await (walletProvider?.provider as any)?.enable();
+        const accounts = await (walletProvider?.provider as any)?.enable();
+        console.log(`User's address is ${accounts[0]}`);
       } catch (err: any) {
         console.error(err);
-        !isCoinbaseWallet(walletProvider) && (await logoutWallet(walletProvider));
+        await logoutWallet(walletProvider);
         return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
       }
     }
@@ -182,11 +183,9 @@ export const useWallet = () => {
       //   setWalletProvider(walletProvider);
       //   return createErrorResponse(ERROR_TYPE.INVALID_CHAIN_ID, 'Invalid Chain ID');
       // }
-
       if (isInvalidChain(chainId)) {
         setIsInvalidChainId(true);
       }
-      // console.log('address', userAddress);
       if (userAddress && userAddress?.length) {
         localStorage.setItem(LOCAL_STORAGE_WALLET_KEY, walletProvider.type);
         setWalletAddress(userAddress);
@@ -203,7 +202,7 @@ export const useWallet = () => {
         err?.message ?? err,
       );
     }
-    // console.log('error', error);
+    console.log('wallet connection error', error);
     await logoutWallet(walletProvider);
     return error;
   };

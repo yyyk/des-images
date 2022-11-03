@@ -93,6 +93,7 @@ export function createCoinbaseWalletSDKProvider(): WalletProvider {
   const infuraId = process.env.REACT_APP_INFRA_ID ?? '';
   const chainId = !ETH_NETWORK ? parseInt(CHAIN_ID.LOCALHOST) : parseInt((CHAIN_ID as any)[ETH_NETWORK]);
   const provider = coinbaseWallet.makeWeb3Provider(`https://mainnet.infura.io/v3/${infuraId}`, chainId);
+  provider.disableReloadOnDisconnect && provider.disableReloadOnDisconnect();
   return {
     type: WALLET_TYPE.COINBASE,
     name: WALLET_NAME.COINBASE,
@@ -107,8 +108,9 @@ export function createCoinbaseWalletSDKProvider(): WalletProvider {
 }
 
 export function createCoinbaseWalletInjectedProvider(
-  provider: Provider & { disconnect?: () => void; close?: () => Promise<void> },
+  provider: Provider & { disconnect?: () => void; close?: () => Promise<void>; disableReloadOnDisconnect?: () => void },
 ): WalletProvider {
+  provider.disableReloadOnDisconnect && provider.disableReloadOnDisconnect();
   return {
     type: WALLET_TYPE.COINBASE,
     name: WALLET_NAME.COINBASE,
