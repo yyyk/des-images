@@ -6,7 +6,7 @@ import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import {
   createErrorResponse,
   getProviders,
-  // isCoinbaseWalletAndDisconnected,
+  isCoinbaseWalletAndDisconnected,
   isInvalidChain,
   isWalletAuthereum,
   isWalletConnect,
@@ -24,7 +24,6 @@ export const useWallet = () => {
 
   useEffectOnce(() => {
     const providers = getProviders();
-    setProviders(providers);
     const wallet = localStorage.getItem(LOCAL_STORAGE_WALLET_KEY);
     if (!wallet) {
       return;
@@ -33,13 +32,16 @@ export const useWallet = () => {
     if (index < 0) {
       return;
     }
-    // if (isCoinbaseWalletAndDisconnected(providers[index])) {
-    //   logoutWallet(walletProvider)
-    //     .then(() => {})
-    //     .catch(() => {});
-    //   return;
-    // }
-    connectWallet(providers[index]);
+    if (isCoinbaseWalletAndDisconnected(providers[index])) {
+      // logoutWallet(providers[index])
+      //   .then(() => {})
+      //   .catch(() => {});
+      providers[index].logout && (providers[index] as any).logout();
+      _resetState();
+    } else {
+      connectWallet(providers[index]);
+    }
+    setProviders(providers);
   });
 
   useEffect(() => {
