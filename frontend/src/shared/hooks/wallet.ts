@@ -6,6 +6,7 @@ import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import {
   createErrorResponse,
   getProviders,
+  isCoinbaseWallet,
   isCoinbaseWalletAndDisconnected,
   isInvalidChain,
   isWalletAuthereum,
@@ -172,7 +173,7 @@ export const useWallet = () => {
         setWalletProvider(walletProvider);
         return createErrorResponse(ERROR_TYPE.INVALID_CHAIN_ID, 'Invalid Chain ID');
       }
-      if (isCoinbaseWalletAndDisconnected(walletProvider)) {
+      if (isCoinbaseWallet(walletProvider)) {
         console.log(walletProvider.provider);
         console.log(userAddress);
         console.log((walletProvider.provider as any)?.selectedAddress);
