@@ -145,6 +145,21 @@ export const useWallet = () => {
     }
     let error: ConnectWalletResponse | undefined = undefined;
     try {
+      // if (
+      //   !isWalletConnect(walletProvider) &&
+      //   !isWalletPortis(walletProvider) &&
+      //   !isWalletAuthereum(walletProvider) &&
+      //   !isWalletFortmatic(walletProvider)
+      // ) {
+      //   try {
+      //     await (walletProvider.provider as any).request({
+      //       method: 'eth_requestAccounts',
+      //     });
+      //   } catch (error) {
+      //     throw new Error('User Rejected');
+      //   }
+      // }
+      const web3Provider = new ethers.providers.Web3Provider(walletProvider.provider as any);
       if (
         !isWalletConnect(walletProvider) &&
         !isWalletPortis(walletProvider) &&
@@ -152,14 +167,11 @@ export const useWallet = () => {
         !isWalletFortmatic(walletProvider)
       ) {
         try {
-          await (walletProvider.provider as any).request({
-            method: 'eth_requestAccounts',
-          });
+          await web3Provider.send('eth_requestAccounts', []);
         } catch (error) {
           throw new Error('User Rejected');
         }
       }
-      const web3Provider = new ethers.providers.Web3Provider(walletProvider.provider as any);
       const signer = web3Provider.getSigner();
       const network = await web3Provider.ready;
       const userAddress = await signer.getAddress();
@@ -172,11 +184,6 @@ export const useWallet = () => {
         setIsInvalidChainId(true);
         setWalletProvider(walletProvider);
         return createErrorResponse(ERROR_TYPE.INVALID_CHAIN_ID, 'Invalid Chain ID');
-      }
-      if (isCoinbaseWallet(walletProvider)) {
-        console.log(walletProvider.provider);
-        console.log(userAddress);
-        console.log((walletProvider.provider as any)?.selectedAddress);
       }
       // console.log('address', userAddress);
       if (userAddress && userAddress?.length) {
