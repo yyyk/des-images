@@ -6,7 +6,6 @@ import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import {
   createErrorResponse,
   getProviders,
-  isCoinbaseWallet,
   isCoinbaseWalletAndDisconnected,
   isInvalidChain,
   isWalletAuthereum,
@@ -35,11 +34,9 @@ export const useWallet = () => {
       return;
     }
     if (isCoinbaseWalletAndDisconnected(providers[index])) {
-      // logoutWallet(providers[index])
-      //   .then(() => {})
-      //   .catch(() => {});
-      providers[index].logout && (providers[index] as any).logout();
-      _resetState();
+      logoutWallet(providers[index])
+        .then(() => {})
+        .catch(() => {});
       return;
     }
     connectWallet(providers[index]);
