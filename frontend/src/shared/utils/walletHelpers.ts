@@ -1,8 +1,9 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
+import CoinbaseWalletSDK from '@coinbase/wallet-sdk';
 import Portis from '@portis/web3';
 // import Authereum from 'authereum';
 import Fortmatic from 'fortmatic';
-import { ETH_NETWORK } from 'src/shared/constants';
+import { APP_LOGO_URL, ETH_NETWORK } from 'src/shared/constants';
 import {
   CHAIN_ID,
   CHAIN_NAME,
@@ -83,7 +84,27 @@ export function createOperaWalletProvider(provider: Provider): WalletProvider {
   };
 }
 
-export function createCoinbaseWalletProvider(
+const coinbaseWallet = new CoinbaseWalletSDK({
+  appName: 'DesImages',
+  appLogoUrl: APP_LOGO_URL,
+  darkMode: false,
+});
+export function createCoinbaseWalletSDKProvider(): WalletProvider {
+  const infuraId = process.env.REACT_APP_INFRA_ID ?? '';
+  const chainId = !ETH_NETWORK ? parseInt(CHAIN_ID.LOCALHOST) : parseInt((CHAIN_ID as any)[ETH_NETWORK]);
+  const provider = coinbaseWallet.makeWeb3Provider(`https://mainnet.infura.io/v3/${infuraId}`, chainId);
+  return {
+    type: WALLET_TYPE.COINBASE,
+    name: WALLET_NAME.COINBASE,
+    provider,
+    logout: () => {
+      provider.disconnect && provider.disconnect();
+      provider.close && provider.close();
+    },
+  };
+}
+
+export function createCoinbaseWalletInjectedProvider(
   provider: Provider & { disconnect?: () => void; close?: () => void },
 ): WalletProvider {
   return {
@@ -214,10 +235,12 @@ export function getProviders(): WalletProvider[] {
   }
 
   // Coinbase Wallet
-  const coinbaseProvider = getInjectedProvider('isWalletLink');
-  if (coinbaseProvider?.length) {
-    providers.push(createCoinbaseWalletProvider(coinbaseProvider[0]));
-  }
+  // const coinbaseProvider = getInjectedProvider('isWalletLink');
+  // if (coinbaseProvider?.length) {
+  //   providers.push(createCoinbaseWalletInjectedProvider(coinbaseProvider[0]));
+  // }
+  const coinbaseProvider = createCoinbaseWalletSDKProvider();
+  coinbaseProvider && providers.push(coinbaseProvider);
 
   // Authereum
   // const authereumProvider = createAuthereumProvider();
