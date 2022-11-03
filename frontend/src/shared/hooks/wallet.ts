@@ -6,6 +6,7 @@ import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import {
   createErrorResponse,
   getProviders,
+  isCoinbaseWallet,
   isCoinbaseWalletAndDisconnected,
   isInvalidChain,
   isWalletAuthereum,
@@ -120,7 +121,14 @@ export const useWallet = () => {
     if (!walletProvider?.provider) {
       return createErrorResponse(ERROR_TYPE.INVALID_PROVIDER, 'Invalid Provider');
     }
-    if (isWalletConnect(walletProvider) || isWalletAuthereum(walletProvider) || isWalletPortis(walletProvider)) {
+    let isWalletEnabled = false;
+    if (
+      isCoinbaseWallet(walletProvider) ||
+      isWalletConnect(walletProvider) ||
+      isWalletAuthereum(walletProvider) ||
+      isWalletPortis(walletProvider)
+    ) {
+      isWalletEnabled = true;
       try {
         await (walletProvider?.provider as any)?.enable();
       } catch (err: any) {
@@ -129,6 +137,7 @@ export const useWallet = () => {
       }
     }
     if (isWalletFortmatic(walletProvider)) {
+      isWalletEnabled = true;
       try {
         await (walletProvider.provider as any)?.fm?.user?.login();
         const isLoggedIn = await (walletProvider.provider as any)?.fm?.user?.isLoggedIn();
@@ -157,12 +166,7 @@ export const useWallet = () => {
       //   }
       // }
       const web3Provider = new ethers.providers.Web3Provider(walletProvider.provider as any);
-      if (
-        !isWalletConnect(walletProvider) &&
-        !isWalletPortis(walletProvider) &&
-        !isWalletAuthereum(walletProvider) &&
-        !isWalletFortmatic(walletProvider)
-      ) {
+      if (!isWalletEnabled) {
         try {
           await web3Provider.send('eth_requestAccounts', []);
         } catch (error) {
