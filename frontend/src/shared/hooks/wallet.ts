@@ -33,12 +33,12 @@ export const useWallet = () => {
     if (index < 0) {
       return;
     }
-    if (isCoinbaseWalletAndDisconnected(providers[index])) {
-      logoutWallet(walletProvider)
-        .then(() => {})
-        .catch(() => {});
-      return;
-    }
+    // if (isCoinbaseWalletAndDisconnected(providers[index])) {
+    //   logoutWallet(walletProvider)
+    //     .then(() => {})
+    //     .catch(() => {});
+    //   return;
+    // }
     connectWallet(providers[index]);
   });
 
