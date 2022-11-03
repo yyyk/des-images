@@ -98,8 +98,10 @@ export function createCoinbaseWalletSDKProvider(): WalletProvider {
     name: WALLET_NAME.COINBASE,
     provider,
     logout: async () => {
-      coinbaseWallet.disconnect && coinbaseWallet.disconnect();
-      provider.close && (await provider.close());
+      try {
+        coinbaseWallet.disconnect && coinbaseWallet.disconnect();
+        provider.close && (await provider.close());
+      } catch (err) {}
     },
   };
 }
@@ -112,8 +114,10 @@ export function createCoinbaseWalletInjectedProvider(
     name: WALLET_NAME.COINBASE,
     provider,
     logout: async () => {
-      provider.disconnect && provider.disconnect();
-      provider.close && (await provider.close());
+      try {
+        provider.close && (await provider.close());
+        provider.disconnect && provider.disconnect();
+      } catch (err) {}
     },
   };
 }

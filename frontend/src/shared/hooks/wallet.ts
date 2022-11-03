@@ -131,6 +131,7 @@ export const useWallet = () => {
       try {
         await (walletProvider?.provider as any)?.enable();
       } catch (err: any) {
+        console.error(err);
         !isCoinbaseWallet(walletProvider) && (await logoutWallet(walletProvider));
         return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
       }
@@ -144,6 +145,7 @@ export const useWallet = () => {
           throw new Error('Failed to login to Fortmatic');
         }
       } catch (err: any) {
+        console.error(err);
         await logoutWallet(walletProvider);
         return createErrorResponse(ERROR_TYPE.WALLET_CONNECT_FAILED, err?.message ?? err);
       }
@@ -191,6 +193,7 @@ export const useWallet = () => {
         setWalletProvider(walletProvider);
         setCanLogout(!!walletProvider.logout);
         !isInvalidChain(chainId) && setSigner(signer);
+        console.log('wallet connected');
         return { success: true };
       }
       error = createErrorResponse(ERROR_TYPE.NO_ADDRESS_FOUND, 'No address found');
