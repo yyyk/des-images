@@ -49,11 +49,6 @@ export enum CHAIN_ID {
   RINKEBY = '0x4',
   LOCALHOST = '0x539',
   HARD_HAT = '0x7a69',
-  mainnet = '0x1',
-  ropsten = '0x3',
-  rinkeby = '0x4',
-  localhost = '0x539',
-  hardhat = '0x7a69',
 }
 
 export interface Chain {

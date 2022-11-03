@@ -84,6 +84,13 @@ export function createOperaWalletProvider(provider: Provider): WalletProvider {
   };
 }
 
+const chainName: { [key: string]: string } = {
+  mainnet: 'MAIN_NET',
+  ropsten: 'ROPSTEN',
+  rinkeby: 'RINKEBY',
+  localhost: 'LOCALHOST',
+  hardhat: 'HARD_HAT',
+};
 export function createCoinbaseWalletSDKProvider(): WalletProvider {
   const coinbaseWallet = new CoinbaseWalletSDK({
     appName: 'DesImages',
@@ -91,7 +98,8 @@ export function createCoinbaseWalletSDKProvider(): WalletProvider {
     darkMode: false,
   });
   const infuraId = process.env.REACT_APP_INFRA_ID ?? '';
-  const chainId = !ETH_NETWORK ? parseInt(CHAIN_ID.LOCALHOST) : parseInt((CHAIN_ID as any)[ETH_NETWORK]);
+  // TODO: logic needs improvement
+  const chainId = !ETH_NETWORK ? parseInt(CHAIN_ID.LOCALHOST) : parseInt((CHAIN_ID as any)[chainName[ETH_NETWORK]]);
   const provider = coinbaseWallet.makeWeb3Provider(`https://mainnet.infura.io/v3/${infuraId}`, chainId);
   provider.disableReloadOnDisconnect && provider.disableReloadOnDisconnect();
   return {

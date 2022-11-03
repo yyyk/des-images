@@ -130,7 +130,7 @@ export const useWallet = () => {
       isWalletEnabled = true;
       try {
         const accounts = await (walletProvider?.provider as any)?.enable();
-        console.log(`User's address is ${accounts[0]}`);
+        console.log(`User's address: ${accounts[0]}`);
       } catch (err: any) {
         console.error(err);
         await logoutWallet(walletProvider);

@@ -9,15 +9,15 @@ export async function queryTokenIds(
   walletAddress: string,
   currentBlock?: number,
 ): Promise<string[]> {
-  try {
-    const startBlock = parseInt(
-      ETH_NETWORK === CHAIN_NAME.RINKEBY ? '10793462' : ETH_NETWORK === CHAIN_NAME.MAIN_NET ? '15074398' : '0', // localhost
-    );
-    const endBlock = (isNil(currentBlock) ? await contract.provider.getBlockNumber() : currentBlock) as number;
-    const owned: Set<string> = new Set();
-    for (let i = startBlock; i <= endBlock; i += 2000) {
-      const _startBlock = i;
-      const _endBlock = Math.min(endBlock, i + 1999);
+  const startBlock = parseInt(
+    ETH_NETWORK === CHAIN_NAME.RINKEBY ? '10793462' : ETH_NETWORK === CHAIN_NAME.MAIN_NET ? '15074398' : '0', // localhost
+  );
+  const endBlock = (isNil(currentBlock) ? await contract.provider.getBlockNumber() : currentBlock) as number;
+  const owned: Set<string> = new Set();
+  for (let i = startBlock; i <= endBlock; i += 2000) {
+    const _startBlock = i;
+    const _endBlock = Math.min(endBlock, i + 1999);
+    try {
       const sentLogs = await contract.queryFilter(
         contract.filters.Transfer(walletAddress, null),
         _startBlock,
@@ -44,13 +44,13 @@ export async function queryTokenIds(
           }
         }
       }
+    } catch (err) {
+      console.error(err);
+      break;
     }
-    const result = Array.from(owned);
-    return result.reverse();
-  } catch (err) {
-    console.error(err);
   }
-  return [];
+  const result = Array.from(owned);
+  return result.reverse();
 }
 
 const BASE_PRICE = ethers.utils.parseEther(BASE_MINT_PRICE);
