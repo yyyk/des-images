@@ -6,7 +6,7 @@ import { useEffectOnce } from 'src/shared/utils/hookHelpers';
 import {
   createErrorResponse,
   getProviders,
-  isCoinbaseWalletAndDisconnected,
+  // isCoinbaseWalletAndDisconnected,
   isInvalidChain,
   isWalletAuthereum,
   isWalletConnect,
