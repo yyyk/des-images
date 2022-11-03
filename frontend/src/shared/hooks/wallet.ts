@@ -76,7 +76,6 @@ export const useWallet = () => {
       }
     };
 
-  // TODO:
   const _handleChainChanged =
     (walletProvider: WalletProvider) =>
     async (_chainId: string): Promise<void> => {
@@ -114,6 +113,7 @@ export const useWallet = () => {
       }
     }
     _resetState();
+    console.log('logout completed');
   };
 
   const connectWallet = async (walletProvider: WalletProvider): Promise<ConnectWalletResponse> => {
@@ -177,6 +177,7 @@ export const useWallet = () => {
       const chainId: number | string = await web3Provider.send('eth_chainId', []);
       // const chainId: number = await signer.getChainId();
       console.log(`connected to ${chainId}: ${network?.name}`);
+      console.log(`userAddress: ${userAddress}`);
       // if (isInvalidChain(chainId)) {
       //   await logoutWallet(walletProvider);
       //   setIsInvalidChainId(true);
