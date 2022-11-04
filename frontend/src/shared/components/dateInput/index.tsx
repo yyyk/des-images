@@ -5,12 +5,13 @@ interface DateInputProps {
   showLabel?: boolean;
   defaultValue?: string;
   classNames?: string;
+  disabled?: boolean;
   onChange?: (value: string) => void;
 }
 
 const DEFAULT_MIN_DATE = '2020-01-01';
 
-const DateInput = ({ showLabel = true, defaultValue, classNames = '', onChange }: DateInputProps) => {
+const DateInput = ({ showLabel = true, defaultValue, classNames = '', disabled = false, onChange }: DateInputProps) => {
   const [date, setDate] = useState(
     defaultValue ?? `${defaultTokenData.year}-${defaultTokenData.month}-${defaultTokenData.day}`,
   );
@@ -44,6 +45,7 @@ const DateInput = ({ showLabel = true, defaultValue, classNames = '', onChange }
           value={date}
           onClick={() => dateInputRef?.current?.focus()}
           data-testid="date-input__text-input"
+          disabled={disabled}
         />
         <input
           ref={dateInputRef}
@@ -56,6 +58,7 @@ const DateInput = ({ showLabel = true, defaultValue, classNames = '', onChange }
           max={maxDate}
           onChange={handleOnChange}
           data-testid="date-input__date-input"
+          disabled={disabled}
         />
       </div>
     </>

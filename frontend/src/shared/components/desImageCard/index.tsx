@@ -1,11 +1,11 @@
 import { MouseEvent, useState } from 'react';
 import { useContractContext } from 'src/shared/contexts/contract';
-import { useWalletContext } from 'src/shared/contexts/wallet';
 import { useThemeContext } from 'src/shared/contexts/theme';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { isNil } from 'src/shared/utils/isNil';
 import DesImageSvg from 'src/shared/components/desImageSvg';
 import Modal from 'src/shared/components/modal';
+import { decrypt } from 'src/shared/utils/des';
 
 const MintConfirmModal = ({
   open,
@@ -113,39 +113,39 @@ const DesImageCard = ({
   onBurn,
 }: DesImageCardProps) => {
   const { theme } = useThemeContext();
-  const { walletAddress } = useWalletContext();
   const {
+    contract,
     contractState: { isPaused },
   } = useContractContext();
   const [openMintModal, setOpenMintModal] = useState(false);
   const [openBurnModal, setOpenBurnModal] = useState(false);
   const date = `#${tokenData.year}${String(tokenData.month).padStart(2, '0')}${String(tokenData.day).padStart(2, '0')}`;
   const { status, isOwner } = tokenData;
-  const showMintButton = onMint && status === TOKEN_STATUS.FOR_SALE;
-  const showBurnButton = onBurn && isOwner && status === TOKEN_STATUS.MINTED;
+  const showMintButton = onMint && contract && status === TOKEN_STATUS.FOR_SALE;
+  const showBurnButton = onBurn && contract && isOwner && status === TOKEN_STATUS.MINTED;
 
   const handleOnMintSubmit = async () => {
-    if (walletAddress && tokenData && onMint) {
+    if (contract && tokenData && onMint) {
       onMint(tokenData);
     }
   };
 
   const handleOnBurnSubmit = async () => {
-    if (walletAddress && tokenData && onBurn) {
+    if (contract && tokenData && onBurn) {
       onBurn(tokenData);
     }
   };
 
   const handleOnMint = async (e: MouseEvent) => {
     e.preventDefault();
-    if (walletAddress && tokenData && onMint) {
+    if (contract && tokenData && onMint) {
       setOpenMintModal(true);
     }
   };
 
   const handleOnBurn = async (e: MouseEvent) => {
     e.preventDefault();
-    if (walletAddress && tokenData && onBurn) {
+    if (contract && tokenData && onBurn) {
       setOpenBurnModal(true);
     }
   };
@@ -201,26 +201,29 @@ const DesImageCard = ({
               {tokenData.ciphertext}
             </code>
           )}
-          {showPlaintext && tokenData?.plaintext && (
+          {showPlaintext && !isNil(tokenData?.plaintext) && (
             <p
               className={`w-full overflow-hidden text-ellipsis whitespace-pre m-0 ${
                 showMintButton || showBurnButton ? 'mb-3' : 'mb-2'
               }`}
               data-testid="desImagesCard__plaintext"
             >
-              {tokenData.plaintext}
+              {tokenData.plaintext === '' && isOwner
+                ? // TODO: clean up code
+                  decrypt(`${tokenData.year}${tokenData.month}${tokenData.day}`, tokenData.ciphertext as string)
+                : tokenData.plaintext}
             </p>
           )}
           {showMintButton && (
-            <div className="card-actions justify-end">
+            <div className="card-actions grow justify-end items-end">
               <div
-                className={!walletAddress || isPaused ? 'tooltip tooltip-left' : ''}
-                data-tip={!walletAddress ? 'Please connect wallet' : isPaused ? 'Currently minting paused' : ''}
+                className={!contract || isPaused ? 'tooltip tooltip-left' : ''}
+                data-tip={!contract ? 'Please connect wallet' : isPaused ? 'Currently minting paused' : ''}
               >
                 <button
                   className={`btn px-8 ${isLoading ? 'loading' : ''}`}
                   onClick={handleOnMint}
-                  disabled={!walletAddress || isLoading || isPaused}
+                  disabled={!contract || isLoading || isPaused}
                   data-testid="desImagesCard__cta-mint"
                 >
                   Mint
@@ -229,15 +232,15 @@ const DesImageCard = ({
             </div>
           )}
           {showBurnButton && (
-            <div className="card-actions justify-end">
+            <div className="card-actions grow justify-end items-end">
               <div
-                className={!walletAddress ? 'tooltip tooltip-left' : ''}
-                data-tip={!walletAddress ? 'Please connect wallet' : ''}
+                className={!contract ? 'tooltip tooltip-left' : ''}
+                data-tip={!contract ? 'Please connect wallet' : ''}
               >
                 <button
                   className={`btn px-8 ${isLoading ? 'loading' : ''}`}
                   onClick={handleOnBurn}
-                  disabled={!walletAddress || isLoading}
+                  disabled={!contract || isLoading}
                   data-testid="desImagesCard__cta-burn"
                 >
                   Burn

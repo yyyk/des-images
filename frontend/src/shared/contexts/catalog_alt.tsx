@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
-import { useContractContext } from 'src/shared/contexts/contract';
+import { useContractContext } from 'src/shared/contexts/contract_alt';
 import { TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import {
   getOwnerOf,
@@ -114,6 +114,7 @@ const CatalogContextProvider = ({ children }: { children: ReactNode }) => {
       );
       setIsUserTokensLoading(false);
     }
+    // console.log('ownedTokenIds', ownedTokenIds);
     fetchOwnedTokenData(contract, ownedTokenIds);
   }, [contract, ownedTokenIds]);
 

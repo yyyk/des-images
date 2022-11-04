@@ -3,6 +3,26 @@ import { BASE_MINT_PRICE, ETH_NETWORK, MINT_PRICE_COEF, RESERVE_CUT_OVER_10000 }
 import { CHAIN_NAME } from 'src/shared/interfaces';
 import { isNil } from 'src/shared/utils/isNil';
 
+const BASE_PRICE = ethers.utils.parseEther(BASE_MINT_PRICE);
+const COEF = ethers.utils.parseEther(MINT_PRICE_COEF);
+
+export function calcMintPrice(totalSupply: BigNumber): string {
+  return ethers.utils.formatEther(BASE_PRICE.add(COEF.mul(totalSupply)));
+}
+
+export function calcBurnReward(totalSupply: BigNumber): string {
+  return ethers.utils.formatEther(
+    BASE_PRICE.add(COEF.mul(totalSupply.sub(1)))
+      .mul(RESERVE_CUT_OVER_10000)
+      .div(10000),
+  );
+}
+
+export function isSameAddress(a: string, b: string): boolean {
+  return a.toLowerCase() === b.toLowerCase();
+}
+
+// THIS FUNCTION IS NO LONGER USED. THIS IS LEFT ONLY FOR ARCHIVE
 // TODO: replace with subgraph in the future?
 export async function queryTokenIds(
   contract: Contract,
@@ -51,23 +71,4 @@ export async function queryTokenIds(
   }
   const result = Array.from(owned);
   return result.reverse();
-}
-
-const BASE_PRICE = ethers.utils.parseEther(BASE_MINT_PRICE);
-const COEF = ethers.utils.parseEther(MINT_PRICE_COEF);
-
-export function calcMintPrice(totalSupply: BigNumber): string {
-  return ethers.utils.formatEther(BASE_PRICE.add(COEF.mul(totalSupply)));
-}
-
-export function calcBurnReward(totalSupply: BigNumber): string {
-  return ethers.utils.formatEther(
-    BASE_PRICE.add(COEF.mul(totalSupply.sub(1)))
-      .mul(RESERVE_CUT_OVER_10000)
-      .div(10000),
-  );
-}
-
-export function isSameAddress(a: string, b: string): boolean {
-  return a.toLowerCase() === b.toLowerCase();
 }

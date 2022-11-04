@@ -23,7 +23,9 @@ export function getTokenData({
   ciphertext?: string;
 }): TokenData {
   const _ciphertext = ciphertext || encrypt(`${year}${month}${day}`, plaintext || undefined);
-  const _plaintext = plaintext || (ciphertext ? decrypt(`${year}${month}${day}`, ciphertext as string) : undefined);
+  const _plaintext =
+    plaintext ||
+    (plaintext === '' ? '' : ciphertext ? decrypt(`${year}${month}${day}`, ciphertext as string) : undefined);
   return {
     year: year.padStart(4, '0'),
     month: month.padStart(2, '0'),
