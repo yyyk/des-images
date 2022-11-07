@@ -23,7 +23,7 @@ export function isSameAddress(a: string, b: string): boolean {
 }
 
 // THIS FUNCTION IS NO LONGER USED. THIS IS LEFT ONLY FOR ARCHIVE
-// TODO: replace with subgraph in the future?
+// OLD COMMENT: replace with subgraph in the future?
 export async function queryTokenIds(
   contract: Contract,
   walletAddress: string,

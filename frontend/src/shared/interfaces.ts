@@ -39,6 +39,7 @@ export enum CHAIN_NAME {
   MAIN_NET = 'mainnet',
   ROPSTEN = 'ropsten',
   RINKEBY = 'rinkeby',
+  GOERLI = 'goerli',
   LOCALHOST = 'localhost',
   HARD_HAT = 'hardhat',
 }
@@ -47,6 +48,7 @@ export enum CHAIN_ID {
   MAIN_NET = '0x1',
   ROPSTEN = '0x3',
   RINKEBY = '0x4',
+  GOERLI = '0x5',
   LOCALHOST = '0x539',
   HARD_HAT = '0x7a69',
 }

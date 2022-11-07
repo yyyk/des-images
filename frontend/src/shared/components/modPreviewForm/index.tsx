@@ -112,9 +112,6 @@ const ModPreviewForm = ({
     setIsLoading(true);
     if (textType === TextType.TOKEN_ID) {
       if (contract && text.tokenId.length) {
-        //TODO: check if the token is owned by the user
-        // 60114598768532421696374607022791738811469092434450248593684004579539945911496
-        // 0x84e7a83afbc4a78787ce69041aeee475484a249d787ae8b7dd150c397385f4c8
         const tokenId = BigNumber.from(text.tokenId).toHexString();
         try {
           const owner = await getOwnerOfByTokenId(contract, tokenId);

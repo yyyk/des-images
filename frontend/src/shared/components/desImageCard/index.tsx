@@ -208,9 +208,11 @@ const DesImageCard = ({
               }`}
               data-testid="desImagesCard__plaintext"
             >
-              {tokenData.plaintext === '' && isOwner
-                ? // TODO: clean up code
-                  decrypt(`${tokenData.year}${tokenData.month}${tokenData.day}`, tokenData.ciphertext as string)
+              {tokenData.plaintext === '' && isOwner && tokenData.ciphertext
+                ? decrypt(
+                    `${tokenData.year}${tokenData.month.padStart(2, '0')}${tokenData.day.padStart(2, '0')}`,
+                    tokenData.ciphertext as string,
+                  )
                 : tokenData.plaintext}
             </p>
           )}

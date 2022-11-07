@@ -41,6 +41,8 @@ describe('contract service', function () {
 
   // getOwnerOf
 
+  // getOwnerOfByTokenId
+
   // mint
 
   // burn

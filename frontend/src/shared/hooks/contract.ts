@@ -22,20 +22,6 @@ import {
 } from 'src/shared/utils/tokenDataHelpers';
 import { calcBurnReward, calcMintPrice, isSameAddress } from 'src/shared/utils/contractHelpers';
 
-/**
- * contractState
- *
- * ContractListeners (Transfer, Minted, Burned, Paused, UnPaused)
- *
- * tokenDataArray
- * local storage
- * add, remove (user)
- * minted, burned (user)
- * Transfer, Minted, Burned events (other users)
- * signer/contract connected -> update array data
- *
- * TODO: test event listeners and storage event
- */
 const useContract = (signer: ethers.providers.JsonRpcSigner | null) => {
   const [contract, setContract] = useState<Contract | null>(null);
   const [walletAddress, setWalletAddress] = useState('');
@@ -65,7 +51,6 @@ const useContract = (signer: ethers.providers.JsonRpcSigner | null) => {
           if (index < 0) {
             return;
           }
-          // console.log('index:', index);
           _updateTokenData([
             ...tokenDataRef.current.slice(0, index),
             {
@@ -227,7 +212,6 @@ const useContract = (signer: ethers.providers.JsonRpcSigner | null) => {
     window.addEventListener('storage', storageListener);
 
     function storageListener() {
-      // TODO: add loading states of each data?
       const data = getTokenDataFromLocalStorage();
       contract && walletAddress
         ? _updateTokenDataStatus(contract, [...data], walletAddress, false)
