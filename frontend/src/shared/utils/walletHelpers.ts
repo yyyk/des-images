@@ -281,6 +281,7 @@ export function isInvalidChain(chainId: number | string): boolean {
       chainId !== CHAIN_ID.LOCALHOST &&
       chainId !== parseInt(CHAIN_ID.LOCALHOST)) ||
     (ETH_NETWORK === CHAIN_NAME.RINKEBY && chainId !== CHAIN_ID.RINKEBY && chainId !== parseInt(CHAIN_ID.RINKEBY)) ||
+    (ETH_NETWORK === CHAIN_NAME.GOERLI && chainId !== CHAIN_ID.GOERLI && chainId !== parseInt(CHAIN_ID.GOERLI)) ||
     (ETH_NETWORK === CHAIN_NAME.MAIN_NET && chainId !== CHAIN_ID.MAIN_NET && chainId !== parseInt(CHAIN_ID.MAIN_NET))
   );
 }

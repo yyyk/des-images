@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import {
   CIPHERTEXT_LENGTH,
   DEFAULT_CIPHERTEXT,
@@ -7,11 +7,18 @@ import {
   PLAINTEXT_LENGTH,
 } from 'src/shared/constants';
 import { TextType } from 'src/mod/interfaces';
-import { PreviewFormData } from 'src/shared/interfaces';
+import { NOTIFICATION_TYPE, PreviewFormData } from 'src/shared/interfaces';
 import { destructDateInputValue } from 'src/shared/utils/formHelpers';
 import TextInput from 'src/shared/components/textInput';
 import DateInput from 'src/shared/components/dateInput';
 import TextTypeSelect from 'src/shared/components/textTypeSelect';
+import { getTokenDataFromTokenIds } from 'src/shared/utils/tokenDataHelpers';
+import { useContractContext } from 'src/shared/contexts/contract';
+import { BigNumber } from 'ethers';
+import { getOwnerOfByTokenId } from 'src/shared/services/contract';
+import { useWalletContext } from 'src/shared/contexts/wallet';
+import { isSameAddress } from 'src/shared/utils/contractHelpers';
+import { useNotificationContext } from 'src/shared/contexts/notification';
 
 const KeyLabel = () => (
   <label className="label" htmlFor="">
@@ -19,9 +26,17 @@ const KeyLabel = () => (
   </label>
 );
 
-const TypeSelect = ({ showHint, onChange }: { showHint: boolean; onChange: (value: TextType) => void }) => (
+const TypeSelect = ({
+  showHint,
+  showTokenIdOption,
+  onChange,
+}: {
+  showHint: boolean;
+  showTokenIdOption: boolean;
+  onChange: (value: TextType) => void;
+}) => (
   <>
-    <TextTypeSelect defaultValue={TextType.PLAINTEXT} onChange={onChange} />
+    <TextTypeSelect defaultValue={TextType.PLAINTEXT} showTokenIdOption={showTokenIdOption} onChange={onChange} />
     {showHint && (
       <div className="tooltip tooltip-top ml-0.5" data-tip="have you clicked 'official'?">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -41,6 +56,7 @@ interface ModPreviewFormProps {
   defaultCiphertext?: string;
   defaultDate?: string;
   showHint?: boolean;
+  showTokenIdInput?: boolean;
   onSubmit: ({ year, month, day, plaintext, ciphertext }: PreviewFormData) => void;
 }
 
@@ -49,36 +65,78 @@ const ModPreviewForm = ({
   defaultCiphertext = DEFAULT_CIPHERTEXT,
   defaultDate = DEFAULT_DATE,
   showHint = false,
+  showTokenIdInput = false,
   onSubmit,
 }: ModPreviewFormProps) => {
+  const { walletAddress } = useWalletContext();
+  const { contract } = useContractContext();
+  const { add: addNotification } = useNotificationContext();
   const [isLoading, setIsLoading] = useState(false);
-  const [text, setText] = useState({
+  const [text, setText] = useState<{ plaintext: string; ciphertext: string; tokenId: string; isValid: boolean }>({
     plaintext: defaultPlaintext,
     ciphertext: defaultCiphertext,
+    tokenId: '',
     isValid: true,
   });
   const [date, setDate] = useState<string>(defaultDate);
   const [textType, setTextType] = useState<TextType>(TextType.PLAINTEXT);
+  const prevShowTokenIdInput = useRef(showTokenIdInput);
+  const shouldShowHint = textType !== TextType.PLAINTEXT ? false : showHint;
 
-  const handleTextInputOnChange = (value: { plaintext: string; ciphertext: string; isValid: boolean }) => {
+  useEffect(() => {
+    if (!showTokenIdInput && prevShowTokenIdInput.current) {
+      setTextType(TextType.PLAINTEXT);
+    }
+    prevShowTokenIdInput.current = showTokenIdInput;
+  }, [showTokenIdInput]);
+
+  const handleTextInputOnChange = (value: {
+    plaintext: string;
+    ciphertext: string;
+    tokenId: string;
+    isValid: boolean;
+  }) => {
     setText(value);
   };
 
-  const handleOnPreview = (e: FormEvent) => {
+  const handleOnPreview = async (e: FormEvent) => {
     e.preventDefault();
     if (
       !date ||
       (textType === TextType.PLAINTEXT && text.plaintext.length > PLAINTEXT_LENGTH) ||
-      (textType === TextType.CIPHERTEXT && text.ciphertext.length !== CIPHERTEXT_LENGTH)
+      (textType === TextType.CIPHERTEXT && text.ciphertext.length !== CIPHERTEXT_LENGTH) ||
+      (textType === TextType.TOKEN_ID && text.tokenId.length === 0)
     ) {
       return;
     }
     setIsLoading(true);
-    onSubmit({
-      ...destructDateInputValue(date),
-      plaintext: textType === TextType.CIPHERTEXT ? undefined : text.plaintext.padEnd(PLAINTEXT_LENGTH, ' '),
-      ciphertext: textType === TextType.CIPHERTEXT ? text.ciphertext : undefined,
-    });
+    if (textType === TextType.TOKEN_ID) {
+      if (contract && text.tokenId.length) {
+        const tokenId = BigNumber.from(text.tokenId).toHexString();
+        try {
+          const owner = await getOwnerOfByTokenId(contract, tokenId);
+          const data = await getTokenDataFromTokenIds(contract, [tokenId]);
+          if (data.length) {
+            const { year, month, day, plaintext, ciphertext } = data[0];
+            onSubmit({
+              year,
+              month,
+              day,
+              plaintext: isSameAddress(owner, walletAddress) || plaintext === DEFAULT_PLAINTEXT ? plaintext : '',
+              ciphertext,
+            });
+          }
+        } catch (err) {
+          addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Invalid Token ID.' });
+        }
+      }
+    } else {
+      onSubmit({
+        ...destructDateInputValue(date),
+        plaintext: textType === TextType.CIPHERTEXT ? undefined : text.plaintext.padEnd(PLAINTEXT_LENGTH, ' '),
+        ciphertext: textType === TextType.CIPHERTEXT ? text.ciphertext : undefined,
+      });
+    }
     setIsLoading(false);
   };
 
@@ -89,7 +147,11 @@ const ModPreviewForm = ({
           <KeyLabel />
         </div>
         <div className="grow flex flex-row justify-start items-start">
-          <TypeSelect showHint={showHint} onChange={(value) => setTextType(value)} />
+          <TypeSelect
+            showHint={shouldShowHint}
+            showTokenIdOption={showTokenIdInput}
+            onChange={(value) => setTextType(value)}
+          />
         </div>
         <div className="w-2/12"></div>
       </div>
@@ -102,16 +164,21 @@ const ModPreviewForm = ({
             classNames="relative sm:rounded-r-none sm:border-r-0 sm:focus:z-10"
             defaultValue={defaultDate}
             showLabel={false}
+            disabled={textType === TextType.TOKEN_ID}
             onChange={(value) => setDate(value)}
           />
         </div>
         <div className="w-full sm:w-auto grow mx-0 mt-4 sm:mt-0">
           <div className="flex sm:hidden flex-row justify-start items-start mb-1">
-            <TypeSelect showHint={showHint} onChange={(value) => setTextType(value)} />
+            <TypeSelect
+              showHint={shouldShowHint}
+              showTokenIdOption={showTokenIdInput}
+              onChange={(value) => setTextType(value)}
+            />
           </div>
           <TextInput
             classNames="relative sm:rounded-l-none sm:rounded-r-none sm:border-r-0 sm:focus:border-r sm:focus:z-10"
-            defaultValue={{ plaintext: defaultPlaintext, ciphertext: defaultCiphertext }}
+            defaultValue={{ plaintext: defaultPlaintext, ciphertext: defaultCiphertext, tokenId: '' }}
             textType={textType}
             onChange={handleTextInputOnChange}
           />
@@ -123,10 +190,11 @@ const ModPreviewForm = ({
             isLoading ||
             !text.isValid ||
             (textType === TextType.PLAINTEXT && text.plaintext.length > PLAINTEXT_LENGTH) ||
-            (textType === TextType.CIPHERTEXT && text.ciphertext.length !== CIPHERTEXT_LENGTH)
+            (textType === TextType.CIPHERTEXT && text.ciphertext.length !== CIPHERTEXT_LENGTH) ||
+            (textType === TextType.TOKEN_ID && (!text.tokenId || text.tokenId.length === 0))
           }
         >
-          Preview
+          {!isLoading && 'Preview'}
         </button>
       </div>
     </form>

@@ -3,19 +3,21 @@ import { isValidCiphertext, isValidPlaintext } from 'src/shared/utils/des';
 import { latin1Table } from 'src/shared/utils/latin1Table';
 import { CIPHERTEXT_LENGTH, DEFAULT_CIPHERTEXT, DEFAULT_PLAINTEXT, PLAINTEXT_LENGTH } from 'src/shared/constants';
 import { TextType } from 'src/mod/interfaces';
+import { isValidTokenId } from 'src/shared/utils/formHelpers';
 
 interface TextInputProps {
   defaultValue?: {
     plaintext: string;
     ciphertext: string;
+    tokenId?: string;
   };
   textType: TextType;
   classNames?: string;
-  onChange?: (value: { plaintext: string; ciphertext: string; isValid: boolean }) => void;
+  onChange?: (value: { plaintext: string; ciphertext: string; tokenId: string; isValid: boolean }) => void;
 }
 
 const TextInput = ({
-  defaultValue = { plaintext: DEFAULT_PLAINTEXT, ciphertext: DEFAULT_CIPHERTEXT },
+  defaultValue = { plaintext: DEFAULT_PLAINTEXT, ciphertext: DEFAULT_CIPHERTEXT, tokenId: '' },
   textType,
   classNames = '',
   onChange,
@@ -24,16 +26,20 @@ const TextInput = ({
     plaintextRaw: defaultValue.plaintext,
     plaintext: defaultValue.plaintext,
     ciphertext: defaultValue.ciphertext,
+    tokenId: defaultValue.tokenId ?? '',
     isValidPlaintext: isValidPlaintext(defaultValue.plaintext),
     isValidCiphertext: isValidCiphertext(defaultValue.ciphertext),
+    isValidTokenId: isValidTokenId(defaultValue.tokenId ?? ''),
   });
 
   const inputStateClasses =
     (textType === TextType.PLAINTEXT && text.plaintext.length <= PLAINTEXT_LENGTH && text.isValidPlaintext) ||
-    (textType === TextType.CIPHERTEXT && text.ciphertext.length === CIPHERTEXT_LENGTH && text.isValidCiphertext)
+    (textType === TextType.CIPHERTEXT && text.ciphertext.length === CIPHERTEXT_LENGTH && text.isValidCiphertext) ||
+    (textType === TextType.TOKEN_ID && text.tokenId.length > 0 && text.isValidTokenId)
       ? 'focus:input-success'
       : (textType === TextType.PLAINTEXT && text.plaintext.length === 0) ||
-        (textType === TextType.CIPHERTEXT && text.ciphertext.length === 0)
+        (textType === TextType.CIPHERTEXT && text.ciphertext.length === 0) ||
+        (textType === TextType.TOKEN_ID && text.tokenId.length === 0)
       ? ''
       : 'focus:input-warning';
 
@@ -66,13 +72,23 @@ const TextInput = ({
         break;
       case TextType.CIPHERTEXT:
         if (value.length <= 2) {
-          setText({ ...text, ciphertext: '0x' });
-          return;
+          // TODO: test new implementation
+          // setText({ ...result, ciphertext: '0x', isValidCiphertext: false });
+          // return;
+          result = { ...result, ciphertext: '0x', isValidCiphertext: true };
+        } else {
+          result = {
+            ...result,
+            ciphertext: new RegExp(/^0x/).test(value) ? value : `0x${value}`,
+            isValidCiphertext: isValidCiphertext(value),
+          };
         }
+        break;
+      case TextType.TOKEN_ID:
         result = {
           ...result,
-          ciphertext: new RegExp(/^0x/).test(value) ? value : `0x${value}`,
-          isValidCiphertext: isValidCiphertext(value),
+          tokenId: value,
+          isValidTokenId: isValidTokenId(value),
         };
         break;
     }
@@ -81,7 +97,13 @@ const TextInput = ({
       onChange({
         plaintext: result.plaintext,
         ciphertext: result.ciphertext,
-        isValid: textType === TextType.PLAINTEXT ? result.isValidPlaintext : result.isValidCiphertext,
+        tokenId: result.tokenId,
+        isValid:
+          textType === TextType.PLAINTEXT
+            ? result.isValidPlaintext
+            : textType === TextType.CIPHERTEXT
+            ? result.isValidCiphertext
+            : result.isValidTokenId,
       });
   };
 
@@ -93,11 +115,27 @@ const TextInput = ({
         name=""
         id=""
         placeholder="Type here"
-        value={textType === TextType.PLAINTEXT ? text.plaintextRaw : text.ciphertext}
+        value={
+          textType === TextType.PLAINTEXT
+            ? text.plaintextRaw
+            : textType === TextType.CIPHERTEXT
+            ? text.ciphertext
+            : text.tokenId
+        }
         onChange={handleTextInputOnChange}
       />
       <div className="label">
-        <span className="label-text-alt">{hintText}</span>
+        <span className="label-text-alt">
+          {textType === TextType.TOKEN_ID ? (
+            textType === TextType.TOKEN_ID && !text.isValidTokenId ? (
+              'Token ID should be number or hex string'
+            ) : (
+              <span>&nbsp;</span>
+            )
+          ) : (
+            hintText
+          )}
+        </span>
       </div>
     </>
   );

@@ -15,6 +15,8 @@ const {
   MAINNET_PRIVATE_KEY,
   RINKEBY_API_URL,
   RINKEBY_PRIVATE_KEY,
+  GOERLI_API_URL,
+  GOERLI_PRIVATE_KEY,
 } = process.env;
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -54,6 +56,10 @@ const config: HardhatUserConfig = {
     rinkeby: {
       url: RINKEBY_API_URL,
       accounts: [`0x${RINKEBY_PRIVATE_KEY}`],
+    },
+    goerli: {
+      url: GOERLI_API_URL,
+      accounts: [`0x${GOERLI_PRIVATE_KEY}`],
     },
     mainnet: {
       url: MAINNET_API_URL,

@@ -1,16 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import * as ThemeContext from 'src/shared/contexts/theme';
-import * as CatalogContext from 'src/shared/contexts/catalog';
 import * as ContractContext from 'src/shared/contexts/contract';
-import * as WalletContext from 'src/shared/contexts/wallet';
 import DesImageCard from '.';
 import { TokenData } from 'src/shared/interfaces';
+import { Contract } from 'ethers';
 
 describe('<DesImageCard>', function () {
   let themeMock: jest.SpyInstance;
-  let walletMock: jest.SpyInstance;
   let contractMock: jest.SpyInstance;
-  let catalogMock: jest.SpyInstance;
 
   const baseTokenData: TokenData = {
     plaintext: 'i am still alive',
@@ -26,19 +23,8 @@ describe('<DesImageCard>', function () {
       .spyOn(ThemeContext, 'useThemeContext')
       .mockImplementation(() => ({ theme: 'lofi', setTheme: jest.fn() }));
 
-    walletMock = jest.spyOn(WalletContext, 'useWalletContext').mockImplementation(() => ({
-      signer: null,
-      providers: [],
-      isInvalidChainId: false,
-      walletAddress: '0x000000000',
-      walletProvider: null,
-      canLogout: true,
-      connectWallet: jest.fn(),
-      logout: jest.fn(),
-    }));
-
     contractMock = jest.spyOn(ContractContext, 'useContractContext').mockImplementation(() => ({
-      contract: null,
+      contract: {} as Contract,
       contractState: {
         isPaused: false,
         totalSupply: '',
@@ -46,32 +32,18 @@ describe('<DesImageCard>', function () {
         mintPrice: '',
         burnPrice: '',
       },
-      ownedTokenIds: [],
-      isUserTokenIDsLoading: false,
-      mintedToken: null,
-      burnedToken: null,
       mint: (dateHex: string, ciphertext: string) => new Promise((resolve, reject) => resolve(true)),
       burn: (tokenId: string) => new Promise((resolve, reject) => resolve(true)),
-    }));
-
-    catalogMock = jest.spyOn(CatalogContext, 'useCatalogContext').mockImplementation(() => ({
       tokenData: [],
-      ownedTokenData: [],
-      isUserTokensLoading: false,
-      add: jest.fn(),
-      remove: jest.fn(),
-      minted: jest.fn(),
-      burned: jest.fn(),
-      processStarted: jest.fn(),
-      processEnded: jest.fn(),
+      addTokenData: jest.fn(),
+      removeTokenData: jest.fn(),
+      updateTokenData: jest.fn(),
     }));
   });
 
   afterEach(() => {
     themeMock.mockRestore();
-    walletMock.mockRestore();
     contractMock.mockRestore();
-    catalogMock.mockRestore();
   });
 
   it('renders image with title', function () {

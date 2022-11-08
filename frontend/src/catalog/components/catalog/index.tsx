@@ -1,21 +1,22 @@
 import { useRef } from 'react';
-import { useCatalogContext } from 'src/shared/contexts/catalog';
 import { useContractContext } from 'src/shared/contexts/contract';
 import { useNotificationContext } from 'src/shared/contexts/notification';
-import { NOTIFICATION_TYPE, PreviewFormData, TokenData } from 'src/shared/interfaces';
+import { NOTIFICATION_TYPE, PreviewFormData, TokenData, TOKEN_STATUS } from 'src/shared/interfaces';
 import { getTokenData, getTokenId } from 'src/shared/utils/tokenDataHelpers';
 import DesImageCard from 'src/shared/components/desImageCard';
 import ModPreviewForm from 'src/shared/components/modPreviewForm';
+import { useWalletContext } from 'src/shared/contexts/wallet';
+import { DEFAULT_PLAINTEXT } from 'src/shared/constants';
 
 const Catalog = () => {
-  const { mint, burn } = useContractContext();
-  const { tokenData, add, remove, minted, burned, processStarted, processEnded } = useCatalogContext();
+  const { isInvalidChainId } = useWalletContext();
+  const { contract, mint, burn, tokenData, addTokenData, removeTokenData, updateTokenData } = useContractContext();
   const { add: addNotification } = useNotificationContext();
   const scrollRef = useRef<HTMLLIElement>(null);
 
   const handleOnPreview = async ({ year, month, day, plaintext, ciphertext }: PreviewFormData) => {
     const _tokenData = getTokenData({ year, month, day, plaintext, ciphertext });
-    const result = await add(_tokenData);
+    const result = await addTokenData(_tokenData);
     if (!result) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Preview already exists.' });
       return;
@@ -26,33 +27,50 @@ const Catalog = () => {
   };
 
   const handleMint = async (data: TokenData) => {
-    processStarted(data);
+    updateTokenData({ ...data, isInProcess: true });
     const res = await mint(data.dateHex, data.ciphertext);
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Mint failed.' });
-      processEnded(data);
+      updateTokenData({ ...data, isInProcess: false });
       return;
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Minted.' });
-    minted(data);
+    updateTokenData({
+      ...data,
+      isOwner: true,
+      status: TOKEN_STATUS.MINTED,
+      tokenId: data.tokenId || getTokenId(data.dateHex, data.ciphertext),
+      isInProcess: false,
+    });
   };
 
   const handleBurn = async (data: TokenData) => {
-    processStarted(data);
+    updateTokenData({ ...data, isInProcess: true });
     const res = await burn(data?.tokenId || getTokenId(data.dateHex, data.ciphertext));
     if (!res) {
       addNotification({ type: NOTIFICATION_TYPE.WARNING, text: 'Burn failed.' });
-      processEnded(data);
+      updateTokenData({ ...data, isInProcess: false });
       return;
     }
     addNotification({ type: NOTIFICATION_TYPE.SUCCESS, text: 'Burned.' });
-    burned(data);
+    updateTokenData({
+      ...data,
+      isOwner: false,
+      status: TOKEN_STATUS.BURNED,
+      tokenId: data.tokenId || getTokenId(data.dateHex, data.ciphertext),
+      isInProcess: false,
+    });
   };
 
   return (
     <>
       <div className="pt-0 sm:pt-3 pb-10 px-3 sm:px-0">
-        <ModPreviewForm onSubmit={handleOnPreview} defaultPlaintext="i am still alive" showHint={true} />
+        <ModPreviewForm
+          onSubmit={handleOnPreview}
+          defaultPlaintext={DEFAULT_PLAINTEXT}
+          showHint={true}
+          showTokenIdInput={!isInvalidChainId && contract ? true : false}
+        />
       </div>
       <ul
         className={`w-2/3 sm:w-full list-none grid gap-12 sm:gap-8 grid-cols-1 sm:grid-cols-2 grid-rows-${
@@ -73,7 +91,7 @@ const Catalog = () => {
               isLoading={data.isInProcess ?? false}
               onMint={handleMint}
               onBurn={handleBurn}
-              onRemove={() => remove(data)}
+              onRemove={() => removeTokenData(data)}
             />
           </li>
         ))}

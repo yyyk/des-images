@@ -70,6 +70,15 @@ export async function getOwnerOf(contract: Contract, dateHex: string, ciphertext
   }
 }
 
+export async function getOwnerOfByTokenId(contract: Contract, tokenId: string): Promise<string> {
+  try {
+    return await contract.ownerOf(BigNumber.from(tokenId));
+  } catch (err: any) {
+    console.error(err);
+    throw new Error(err?.message ?? '');
+  }
+}
+
 export async function mint(contract: Contract, dateHex: string, ciphertext: string, cost: string): Promise<boolean> {
   try {
     const tx = await contract.mint(parseInt(dateHex), BigNumber.from(ciphertext), {

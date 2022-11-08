@@ -6,6 +6,7 @@ import Header from 'src/shared/components/header';
 import Footer from 'src/shared/components/footer';
 import StatsBanner from 'src/shared/components/statsBanner';
 import NotificationsContainer from 'src/shared/components/notificationContainer';
+import FAQ from 'src/shared/components/faq';
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const { theme } = useThemeContext();
@@ -38,6 +39,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
         <main className="w-full my-0 mx-auto pt-0 pb-16 flex flex-col flex-nowrap grow">{children}</main>
         <Footer />
       </div>
+      <FAQ />
       <NotificationsContainer />
     </div>
   );
